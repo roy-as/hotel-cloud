@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.modules.sys.oauth2;
 
 import com.hotel.cloud.common.exception.RRException;
@@ -16,7 +8,6 @@ import java.util.UUID;
 /**
  * 生成token
  *
- * @author Mark sunlightcs@gmail.com
  */
 public class TokenGenerator {
 

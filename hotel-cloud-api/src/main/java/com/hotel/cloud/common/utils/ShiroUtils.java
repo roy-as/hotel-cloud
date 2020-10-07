@@ -1,13 +1,6 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.common.utils;
 
+import com.hotel.cloud.common.enums.ExceptionEnum;
 import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import org.apache.shiro.SecurityUtils;
@@ -16,8 +9,6 @@ import org.apache.shiro.subject.Subject;
 
 /**
  * Shiro工具类
- *
- * @author Mark sunlightcs@gmail.com
  */
 public class ShiroUtils {
 
@@ -29,12 +20,9 @@ public class ShiroUtils {
 		return SecurityUtils.getSubject();
 	}
 
-	public static SysUserEntity getUserEntity() {
-		return (SysUserEntity)SecurityUtils.getSubject().getPrincipal();
-	}
 
 	public static Long getUserId() {
-		return getUserEntity().getUserId();
+		return getLoginUser().getUserId();
 	}
 	
 	public static void setSessionAttribute(Object key, Object value) {
@@ -56,6 +44,14 @@ public class ShiroUtils {
 		}
 		getSession().removeAttribute(key);
 		return kaptcha.toString();
+	}
+
+	public static SysUserEntity getLoginUser() {
+		Object user = SecurityUtils.getSubject().getPrincipal();
+		if(null == user) {
+			throw new RRException(ExceptionEnum.LOGIN_USER_EXPITED);
+		}
+		return (SysUserEntity) user;
 	}
 
 }

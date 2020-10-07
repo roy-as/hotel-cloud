@@ -1,16 +1,8 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.modules.sys.service.impl;
 
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hotel.cloud.common.utils.Constant;
+import com.hotel.cloud.common.utils.Constants;
 import com.hotel.cloud.common.utils.MapUtils;
 import com.hotel.cloud.modules.sys.service.SysMenuService;
 import com.hotel.cloud.modules.sys.service.SysRoleMenuService;
@@ -60,7 +52,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenuEntity> i
 	@Override
 	public List<SysMenuEntity> getUserMenuList(Long userId) {
 		//系统管理员，拥有最高权限
-		if(userId == Constant.SUPER_ADMIN){
+		if(userId == Constants.SUPER_ADMIN){
 			return getAllMenuList(null);
 		}
 		
@@ -97,7 +89,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuDao, SysMenuEntity> i
 		
 		for(SysMenuEntity entity : menuList){
 			//目录
-			if(entity.getType() == Constant.MenuType.CATALOG.getValue()){
+			if(entity.getType() == Constants.MenuType.CATALOG.getValue()){
 				entity.setList(getMenuTreeList(queryListParentId(entity.getMenuId(), menuIdList), menuIdList));
 			}
 			subMenuList.add(entity);

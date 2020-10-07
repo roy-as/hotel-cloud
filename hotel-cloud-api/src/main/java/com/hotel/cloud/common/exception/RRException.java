@@ -1,17 +1,9 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.common.exception;
+
+import com.hotel.cloud.common.enums.ExceptionEnum;
 
 /**
  * 自定义异常
- *
- * @author Mark sunlightcs@gmail.com
  */
 public class RRException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
@@ -39,6 +31,12 @@ public class RRException extends RuntimeException {
 		super(msg, e);
 		this.msg = msg;
 		this.code = code;
+	}
+
+	public RRException(ExceptionEnum e) {
+		super(e.getMsg());
+		this.msg = e.getMsg();
+		this.code = e.getCode();
 	}
 
 	public String getMsg() {

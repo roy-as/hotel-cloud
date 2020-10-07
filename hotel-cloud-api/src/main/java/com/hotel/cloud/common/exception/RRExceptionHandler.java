@@ -1,26 +1,19 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.common.exception;
 
 import com.hotel.cloud.common.utils.R;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.AuthorizationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 /**
  * 异常处理器
- *
- * @author Mark sunlightcs@gmail.com
  */
 @RestControllerAdvice
 public class RRExceptionHandler {
@@ -61,4 +54,18 @@ public class RRExceptionHandler {
 		logger.error(e.getMessage(), e);
 		return R.error();
 	}
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public R handleConstraintViolationException(MethodArgumentNotValidException e) {
+		logger.error(e.getMessage(), e);
+		StringBuilder errorMsg = new StringBuilder();
+		for (FieldError error : e.getBindingResult().getFieldErrors()) {
+			String message = error.getDefaultMessage();
+			if (StringUtils.isNotEmpty(message)) {
+				errorMsg.append(message).append(";");
+			}
+		}
+		return R.error(errorMsg.toString());
+	}
+
 }

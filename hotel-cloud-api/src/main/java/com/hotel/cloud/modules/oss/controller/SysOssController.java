@@ -1,17 +1,9 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.modules.oss.controller;
 
 import com.google.gson.Gson;
 import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.common.utils.ConfigConstant;
-import com.hotel.cloud.common.utils.Constant;
+import com.hotel.cloud.common.utils.Constants;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
 import com.hotel.cloud.common.validator.ValidatorUtils;
@@ -35,7 +27,6 @@ import java.util.Map;
 /**
  * 文件上传
  *
- * @author Mark sunlightcs@gmail.com
  */
 @RestController
 @RequestMapping("sys/oss")
@@ -80,13 +71,13 @@ public class SysOssController {
 		//校验类型
 		ValidatorUtils.validateEntity(config);
 
-		if(config.getType() == Constant.CloudService.QINIU.getValue()){
+		if(config.getType() == Constants.CloudService.QINIU.getValue()){
 			//校验七牛数据
 			ValidatorUtils.validateEntity(config, QiniuGroup.class);
-		}else if(config.getType() == Constant.CloudService.ALIYUN.getValue()){
+		}else if(config.getType() == Constants.CloudService.ALIYUN.getValue()){
 			//校验阿里云数据
 			ValidatorUtils.validateEntity(config, AliyunGroup.class);
-		}else if(config.getType() == Constant.CloudService.QCLOUD.getValue()){
+		}else if(config.getType() == Constants.CloudService.QCLOUD.getValue()){
 			//校验腾讯云数据
 			ValidatorUtils.validateEntity(config, QcloudGroup.class);
 		}

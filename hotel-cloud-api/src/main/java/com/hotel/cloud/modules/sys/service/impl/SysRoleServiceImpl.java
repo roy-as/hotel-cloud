@@ -1,18 +1,10 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hotel.cloud.common.exception.RRException;
-import com.hotel.cloud.common.utils.Constant;
+import com.hotel.cloud.common.utils.Constants;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.Query;
 import com.hotel.cloud.modules.sys.dao.SysRoleDao;
@@ -34,7 +26,6 @@ import java.util.Map;
 /**
  * 角色
  *
- * @author Mark sunlightcs@gmail.com
  */
 @Service("sysRoleService")
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleDao, SysRoleEntity> implements SysRoleService {
@@ -109,7 +100,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleDao, SysRoleEntity> i
 	 */
 	private void checkPrems(SysRoleEntity role){
 		//如果不是超级管理员，则需要判断角色的权限是否超过自己的权限
-		if(role.getCreateUserId() == Constant.SUPER_ADMIN){
+		if(role.getCreateUserId() == Constants.SUPER_ADMIN){
 			return ;
 		}
 		

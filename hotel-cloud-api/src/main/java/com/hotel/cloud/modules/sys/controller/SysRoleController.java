@@ -1,15 +1,7 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.modules.sys.controller;
 
 import com.hotel.cloud.common.annotation.SysLog;
-import com.hotel.cloud.common.utils.Constant;
+import com.hotel.cloud.common.utils.Constants;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
 import com.hotel.cloud.common.validator.ValidatorUtils;
@@ -27,7 +19,6 @@ import java.util.Map;
 /**
  * 角色管理
  *
- * @author Mark sunlightcs@gmail.com
  */
 @RestController
 @RequestMapping("/sys/role")
@@ -44,7 +35,7 @@ public class SysRoleController extends AbstractController {
 	@RequiresPermissions("sys:role:list")
 	public R list(@RequestParam Map<String, Object> params){
 		//如果不是超级管理员，则只查询自己创建的角色列表
-		if(getUserId() != Constant.SUPER_ADMIN){
+		if(getUserId() != Constants.SUPER_ADMIN){
 			params.put("createUserId", getUserId());
 		}
 
@@ -62,7 +53,7 @@ public class SysRoleController extends AbstractController {
 		Map<String, Object> map = new HashMap<>();
 		
 		//如果不是超级管理员，则只查询自己所拥有的角色列表
-		if(getUserId() != Constant.SUPER_ADMIN){
+		if(getUserId() != Constants.SUPER_ADMIN){
 			map.put("create_user_id", getUserId());
 		}
 		List<SysRoleEntity> list = (List<SysRoleEntity>) sysRoleService.listByMap(map);

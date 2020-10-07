@@ -1,15 +1,9 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.modules.sys.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hotel.cloud.common.annotation.SysLog;
-import com.hotel.cloud.common.utils.Constant;
+import com.hotel.cloud.common.enums.FlagEnum;
+import com.hotel.cloud.common.utils.Constants;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
 import com.hotel.cloud.common.validator.Assert;
@@ -32,7 +26,6 @@ import java.util.Map;
 /**
  * 系统用户
  *
- * @author Mark sunlightcs@gmail.com
  */
 @RestController
 @RequestMapping("/sys/user")
@@ -50,7 +43,7 @@ public class SysUserController extends AbstractController {
 	@RequiresPermissions("sys:user:list")
 	public R list(@RequestParam Map<String, Object> params){
 		//只有超级管理员，才能查看所有管理员列表
-		if(getUserId() != Constant.SUPER_ADMIN){
+		if(getUserId() != Constants.SUPER_ADMIN){
 			params.put("createUserId", getUserId());
 		}
 		PageUtils page = sysUserService.queryPage(params);
@@ -94,7 +87,10 @@ public class SysUserController extends AbstractController {
 	@GetMapping("/info/{userId}")
 	@RequiresPermissions("sys:user:info")
 	public R info(@PathVariable("userId") Long userId){
-		SysUserEntity user = sysUserService.getById(userId);
+		SysUserEntity user = sysUserService.getOne(
+				new QueryWrapper<SysUserEntity>().eq("user_id", userId)
+				.eq("flag", FlagEnum.OK.getCode())
+		);
 		
 		//获取用户所属的角色列表
 		List<Long> roleIdList = sysUserRoleService.queryRoleIdList(userId);

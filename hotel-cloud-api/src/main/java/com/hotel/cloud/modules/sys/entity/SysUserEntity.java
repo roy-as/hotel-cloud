@@ -1,16 +1,9 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.modules.sys.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.hotel.cloud.common.enums.AgentLevelEnum;
 import com.hotel.cloud.common.validator.group.AddGroup;
 import com.hotel.cloud.common.validator.group.UpdateGroup;
 import lombok.Data;
@@ -18,13 +11,11 @@ import lombok.Data;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 系统用户
  *
- * @author Mark sunlightcs@gmail.com
  */
 @Data
 @TableName("sys_user")
@@ -72,6 +63,12 @@ public class SysUserEntity implements Serializable {
 	private Integer status;
 
 	/**
+	 * 状态  0：删除   1：正常
+	 */
+	private Integer flag;
+
+
+	/**
 	 * 角色ID列表
 	 */
 	@TableField(exist=false)
@@ -87,4 +84,29 @@ public class SysUserEntity implements Serializable {
 	 */
 	private Date createTime;
 
+	/**
+	 * 代理等级
+	 */
+	private Integer agentLevel;
+
+	@TableField(exist = false)
+	private String agentLevelName;
+
+	/**
+	 * 上级代理
+	 */
+	private Long parentId;
+
+	@TableField(exist = false)
+	private String parentName;
+
+	/**
+	 * 联系人
+	 */
+	private String contactPerson;
+
+	public void setAgentLevel(Integer agentLevel) {
+		this.agentLevel = agentLevel;
+		this.setAgentLevelName(AgentLevelEnum.getAgentLevelName(agentLevel));
+	}
 }

@@ -1,19 +1,9 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.common.utils;
 
 /**
  * 常量
- *
- * @author Mark sunlightcs@gmail.com
  */
-public class Constant {
+public class Constants {
 	/** 超级管理员ID */
 	public static final int SUPER_ADMIN = 1;
     /**
@@ -33,9 +23,25 @@ public class Constant {
      */
     public static final String ORDER = "order";
     /**
+     * 0常量
+     */
+    public static final int ZERO = 0;
+    /**
+     * 无字符串
+     */
+    public static final String NONE = "无";
+    /**
+     * 空字符串
+     */
+    public static final String EMPTY = "";
+    /**
      *  升序
      */
     public static final String ASC = "asc";
+    // 手机号正则
+    public static final String MOBILE_PATTERN = "(13|14|15|16|17|18|19)[0-9]{9}";
+    // 邮箱正则
+    public static final String EMAIL_PATTERN = "^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((.[a-zA-Z0-9_-]{2,3}){1,2})$";
 	/**
 	 * 菜单类型
 	 * 

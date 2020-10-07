@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.modules.job.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -13,7 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hotel.cloud.modules.job.entity.ScheduleJobEntity;
 import com.hotel.cloud.modules.job.service.ScheduleJobService;
-import com.hotel.cloud.common.utils.Constant;
+import com.hotel.cloud.common.utils.Constants;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.Query;
 import com.hotel.cloud.modules.job.dao.ScheduleJobDao;
@@ -67,7 +59,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
 	@Transactional(rollbackFor = Exception.class)
 	public void saveJob(ScheduleJobEntity scheduleJob) {
 		scheduleJob.setCreateTime(new Date());
-		scheduleJob.setStatus(Constant.ScheduleStatus.NORMAL.getValue());
+		scheduleJob.setStatus(Constants.ScheduleStatus.NORMAL.getValue());
         this.save(scheduleJob);
         
         ScheduleUtils.createScheduleJob(scheduler, scheduleJob);
@@ -115,7 +107,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
     		ScheduleUtils.pauseJob(scheduler, jobId);
     	}
         
-    	updateBatch(jobIds, Constant.ScheduleStatus.PAUSE.getValue());
+    	updateBatch(jobIds, Constants.ScheduleStatus.PAUSE.getValue());
     }
 
 	@Override
@@ -125,7 +117,7 @@ public class ScheduleJobServiceImpl extends ServiceImpl<ScheduleJobDao, Schedule
     		ScheduleUtils.resumeJob(scheduler, jobId);
     	}
 
-    	updateBatch(jobIds, Constant.ScheduleStatus.NORMAL.getValue());
+    	updateBatch(jobIds, Constants.ScheduleStatus.NORMAL.getValue());
     }
     
 }

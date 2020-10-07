@@ -1,16 +1,8 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.modules.sys.controller;
 
 import com.hotel.cloud.common.annotation.SysLog;
 import com.hotel.cloud.common.exception.RRException;
-import com.hotel.cloud.common.utils.Constant;
+import com.hotel.cloud.common.utils.Constants;
 import com.hotel.cloud.common.utils.R;
 import com.hotel.cloud.modules.sys.entity.SysMenuEntity;
 import com.hotel.cloud.modules.sys.service.ShiroService;
@@ -26,7 +18,6 @@ import java.util.Set;
 /**
  * 系统菜单
  *
- * @author Mark sunlightcs@gmail.com
  */
 @RestController
 @RequestMapping("/sys/menu")
@@ -158,31 +149,31 @@ public class SysMenuController extends AbstractController {
 		}
 		
 		//菜单
-		if(menu.getType() == Constant.MenuType.MENU.getValue()){
+		if(menu.getType() == Constants.MenuType.MENU.getValue()){
 			if(StringUtils.isBlank(menu.getUrl())){
 				throw new RRException("菜单URL不能为空");
 			}
 		}
 		
 		//上级菜单类型
-		int parentType = Constant.MenuType.CATALOG.getValue();
+		int parentType = Constants.MenuType.CATALOG.getValue();
 		if(menu.getParentId() != 0){
 			SysMenuEntity parentMenu = sysMenuService.getById(menu.getParentId());
 			parentType = parentMenu.getType();
 		}
 		
 		//目录、菜单
-		if(menu.getType() == Constant.MenuType.CATALOG.getValue() ||
-				menu.getType() == Constant.MenuType.MENU.getValue()){
-			if(parentType != Constant.MenuType.CATALOG.getValue()){
+		if(menu.getType() == Constants.MenuType.CATALOG.getValue() ||
+				menu.getType() == Constants.MenuType.MENU.getValue()){
+			if(parentType != Constants.MenuType.CATALOG.getValue()){
 				throw new RRException("上级菜单只能为目录类型");
 			}
 			return ;
 		}
 		
 		//按钮
-		if(menu.getType() == Constant.MenuType.BUTTON.getValue()){
-			if(parentType != Constant.MenuType.MENU.getValue()){
+		if(menu.getType() == Constants.MenuType.BUTTON.getValue()){
+			if(parentType != Constants.MenuType.MENU.getValue()){
 				throw new RRException("上级菜单只能为菜单类型");
 			}
 			return ;

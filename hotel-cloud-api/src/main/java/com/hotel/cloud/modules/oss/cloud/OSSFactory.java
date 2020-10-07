@@ -1,23 +1,14 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package com.hotel.cloud.modules.oss.cloud;
 
 
 import com.hotel.cloud.common.utils.ConfigConstant;
-import com.hotel.cloud.common.utils.Constant;
+import com.hotel.cloud.common.utils.Constants;
 import com.hotel.cloud.common.utils.SpringContextUtils;
 import com.hotel.cloud.modules.sys.service.SysConfigService;
 
 /**
  * 文件上传Factory
  *
- * @author Mark sunlightcs@gmail.com
  */
 public final class OSSFactory {
     private static SysConfigService sysConfigService;
@@ -30,11 +21,11 @@ public final class OSSFactory {
         //获取云存储配置信息
         CloudStorageConfig config = sysConfigService.getConfigObject(ConfigConstant.CLOUD_STORAGE_CONFIG_KEY, CloudStorageConfig.class);
 
-        if(config.getType() == Constant.CloudService.QINIU.getValue()){
+        if(config.getType() == Constants.CloudService.QINIU.getValue()){
             return new QiniuCloudStorageService(config);
-        }else if(config.getType() == Constant.CloudService.ALIYUN.getValue()){
+        }else if(config.getType() == Constants.CloudService.ALIYUN.getValue()){
             return new AliyunCloudStorageService(config);
-        }else if(config.getType() == Constant.CloudService.QCLOUD.getValue()){
+        }else if(config.getType() == Constants.CloudService.QCLOUD.getValue()){
             return new QcloudCloudStorageService(config);
         }
 

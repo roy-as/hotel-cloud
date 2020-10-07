@@ -11,8 +11,10 @@ package com.hotel.cloud.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hotel.cloud.common.enums.AgentLevelEnum;
+import com.hotel.cloud.common.enums.FlagEnum;
 import com.hotel.cloud.common.exception.RRException;
-import com.hotel.cloud.common.utils.Constant;
+import com.hotel.cloud.common.utils.Constants;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.Query;
 import com.hotel.cloud.modules.sys.dao.SysUserDao;
@@ -31,6 +33,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -55,6 +58,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 			new QueryWrapper<SysUserEntity>()
 				.like(StringUtils.isNotBlank(username),"username", username)
 				.eq(createUserId != null,"create_user_id", createUserId)
+				.eq("flag", FlagEnum.OK.getCode())
+				.eq("agent_level", AgentLevelEnum.SYSTEM_USER.getLevel())
 		);
 
 		return new PageUtils(page);
@@ -77,7 +82,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 
 	@Override
 	@Transactional
-	public void saveUser(SysUserEntity user) {
+	public SysUserEntity saveUser(SysUserEntity user) {
 		user.setCreateTime(new Date());
 		//sha256加密
 		String salt = RandomStringUtils.randomAlphanumeric(20);
@@ -90,6 +95,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 		
 		//保存用户与角色关系
 		sysUserRoleService.saveOrUpdate(user.getUserId(), user.getRoleIdList());
+		return user;
 	}
 
 	@Override
@@ -110,8 +116,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 	}
 
 	@Override
-	public void deleteBatch(Long[] userId) {
-		this.removeByIds(Arrays.asList(userId));
+	@Transactional
+	public void deleteBatch(Long[] userIds) {
+		List<SysUserEntity> users = Arrays.stream(userIds).map(userId -> {
+			SysUserEntity user = new SysUserEntity();
+			user.setUserId(userId);
+			user.setFlag(FlagEnum.DELETE.getCode());
+			return user;
+		}).collect(Collectors.toList());
+		this.updateBatchById(users);
 	}
 
 	@Override
@@ -129,8 +142,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 		if(user.getRoleIdList() == null || user.getRoleIdList().size() == 0){
 			return;
 		}
+		if(!AgentLevelEnum.ALL_AGENT_LEVEL.containsAll(user.getRoleIdList())) {
+			return;
+		}
 		//如果不是超级管理员，则需要判断用户的角色是否自己创建
-		if(user.getCreateUserId() == Constant.SUPER_ADMIN){
+		if(user.getCreateUserId() == Constants.SUPER_ADMIN){
 			return ;
 		}
 		
