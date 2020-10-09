@@ -2,20 +2,18 @@ package com.hotel.cloud.modules.hotel.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
 import com.hotel.cloud.common.vo.DisableVo;
 import com.hotel.cloud.common.vo.HotelInfoVo;
+import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.hotel.cloud.modules.hotel.entity.HotelInfoEntity;
 import com.hotel.cloud.modules.hotel.service.HotelInfoService;
 
@@ -97,5 +95,11 @@ public class HotelInfoController {
         hotelInfoService.disable(disableVo);
 
         return R.ok();
+    }
+
+    @GetMapping("/getPicture")
+    public R getPicture(Long id, Integer pictureType) {
+        List<SysOssEntity> oss = hotelInfoService.getPicture(id, pictureType);
+        return R.ok().put("data", oss);
     }
 }

@@ -2,7 +2,7 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-input v-model="dataForm.name" placeholder="酒店名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -135,6 +135,8 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="showPictureHandle(scope.row.id, 1)">全景图</el-button>
+          <el-button type="text" size="small" @click="showPictureHandle(scope.row.id, 2)">酒店照片</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id, scope.row.name)">删除</el-button>
           <el-button v-if="scope.row.status === 0" type="text" size="small" @click="disable(scope.row.id, scope.row.name, 1)">启用</el-button>
           <el-button v-else type="text" size="small" @click="disable(scope.row.id, scope.row.name, 0)"><span style="color: lightpink">禁用</span></el-button>
@@ -152,11 +154,13 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <show-picture v-if="showPictureVisible" ref="showPicture" @refreshDataList="getDataList"></show-picture>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './hotelInfo-add-or-update'
+  import ShowPicture from './hotelInfo-show-picture'
   export default {
     data () {
       return {
@@ -169,11 +173,13 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        showPictureVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      ShowPicture
     },
     activated () {
       this.getDataList()
@@ -188,7 +194,7 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'name': this.dataForm.name
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -221,6 +227,12 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
+        })
+      },
+      showPictureHandle (id, pictureType) {
+        this.showPictureVisible = true
+        this.$nextTick(() => {
+          this.$refs.showPicture.init(id, pictureType)
         })
       },
       // 删除

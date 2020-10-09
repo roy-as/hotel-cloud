@@ -5,6 +5,7 @@ import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.vo.DisableVo;
 import com.hotel.cloud.common.vo.HotelInfoVo;
 import com.hotel.cloud.modules.hotel.entity.HotelInfoEntity;
+import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,5 +28,7 @@ public interface HotelInfoService extends IService<HotelInfoEntity> {
     void disable(DisableVo disableVo);
 
     void deleteBatch(List<Long> ids);
+
+    List<SysOssEntity> getPicture(Long id, Integer pictureType);
 }
 

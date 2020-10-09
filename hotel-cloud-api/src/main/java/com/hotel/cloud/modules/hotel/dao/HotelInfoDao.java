@@ -3,6 +3,7 @@ package com.hotel.cloud.modules.hotel.dao;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.hotel.cloud.modules.hotel.entity.HotelInfoEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface HotelInfoDao extends BaseMapper<HotelInfoEntity> {
 
 
     List<HotelInfoEntity> getHotelInfoList(IPage<HotelInfoEntity> page, Map<String, Object> params);
+
+    List<SysOssEntity> getPicture(Long id, Integer pictureType);
 }

@@ -189,4 +189,9 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
         this.updateBatchById(hotels);
     }
 
+    @Override
+    public List<SysOssEntity> getPicture(Long id, Integer pictureType) {
+        return this.baseMapper.getPicture(id, pictureType);
+    }
+
 }
