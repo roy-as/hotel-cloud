@@ -89,7 +89,7 @@ public class HotelInfoController {
      * 启用禁用
      */
     @RequestMapping("/disable")
-    @RequiresPermissions("agentUser:update")
+    @RequiresPermissions("hotel:hotelInfo:update")
     public R disable(@RequestBody DisableVo disableVo){
 
         hotelInfoService.disable(disableVo);
