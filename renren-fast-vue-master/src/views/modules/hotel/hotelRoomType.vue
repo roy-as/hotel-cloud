@@ -56,7 +56,7 @@
         prop="hotelId"
         header-align="center"
         align="center"
-        label="酒店ID">
+        label="酒店">
       </el-table-column>
       <el-table-column
         prop="createTime"

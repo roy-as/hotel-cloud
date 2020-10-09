@@ -16,5 +16,7 @@ import java.util.Map;
 public interface HotelOssMappingService extends IService<HotelOssMappingEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void insert(HotelOssMappingEntity mappingEntity);
 }
 

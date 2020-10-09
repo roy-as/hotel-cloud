@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hotel.cloud.modules.hotel.dao.HotelOssMappingDao;
 import com.hotel.cloud.modules.hotel.entity.HotelOssMappingEntity;
 import com.hotel.cloud.modules.hotel.service.HotelOssMappingService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("hotelOssMappingService")
@@ -24,6 +25,12 @@ public class HotelOssMappingServiceImpl extends ServiceImpl<HotelOssMappingDao, 
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    @Transactional
+    public void insert(HotelOssMappingEntity mappingEntity) {
+        this.baseMapper.save(mappingEntity);
     }
 
 }

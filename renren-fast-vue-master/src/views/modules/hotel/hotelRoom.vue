@@ -47,7 +47,7 @@
         label="房间名称">
       </el-table-column>
       <el-table-column
-        prop="hotelId"
+        prop="hotel"
         header-align="center"
         align="center"
         label="酒店ID">
@@ -56,7 +56,7 @@
         prop="roomTypeId"
         header-align="center"
         align="center"
-        label="酒店ID">
+        label="房型">
       </el-table-column>
       <el-table-column
         prop="status"

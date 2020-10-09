@@ -135,7 +135,10 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
             UpdateWrapper<HotelOssMappingEntity> wrapper = new UpdateWrapper<HotelOssMappingEntity>()
                     .eq(true, "hotel_id", mappingEntity.getHotelId())
                     .eq(true, "picture_type", mappingEntity.getPictureType());
-            this.hotelOssMappingService.update(mappingEntity, wrapper);
+            boolean success = this.hotelOssMappingService.update(mappingEntity, wrapper);
+            if(!success) {
+                this.hotelOssMappingService.insert(mappingEntity);
+            }
         }
 
     }

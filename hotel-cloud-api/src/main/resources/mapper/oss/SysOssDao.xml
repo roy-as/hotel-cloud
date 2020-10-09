@@ -3,5 +3,4 @@
 
 <mapper namespace="com.hotel.cloud.modules.oss.dao.SysOssDao">
 
-
 </mapper>

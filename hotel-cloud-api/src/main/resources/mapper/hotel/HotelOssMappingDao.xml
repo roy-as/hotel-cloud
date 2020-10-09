@@ -10,5 +10,9 @@
         <result property="pictureType" column="picture_type"/>
     </resultMap>
 
+    <insert id="save" parameterType="com.hotel.cloud.modules.hotel.entity.HotelOssMappingEntity">
+        insert into t_hotel_oss_mapping(hotel_id,oss_id,picture_type) values(#{hotelId},#{ossId},#{pictureType})
+    </insert>
+
 
 </mapper>
