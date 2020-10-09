@@ -97,18 +97,7 @@ public class SysOssController {
 		if (file.isEmpty()) {
 			throw new RRException("上传文件不能为空");
 		}
-
-		//上传文件
-		String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
-		String url = OSSFactory.build().uploadSuffix(file.getBytes(), suffix);
-
-		//保存文件信息
-		SysOssEntity ossEntity = new SysOssEntity();
-		ossEntity.setUrl(url);
-		ossEntity.setCreateDate(new Date());
-		sysOssService.save(ossEntity);
-
-		return R.ok().put("url", url);
+		return R.ok().put("url", sysOssService.saveFile(file).getUrl());
 	}
 
 

@@ -3,7 +3,9 @@ package com.hotel.cloud.common.enums;
 public enum  ExceptionEnum {
 
     NOT_ALLOW_CREATE_CHILD_AGENT(1001, "不能闯将子代理"),
-    LOGIN_USER_EXPITED(1002, "登陆用户失效")
+    LOGIN_USER_EXPITED(1002, "登陆用户失效"),
+    OSS_CONFIG_NOT_EXIST(1003, "云配置不存在"),
+    NOT_AUTHENTICATION(1004, "授权不足")
 
     ;
 

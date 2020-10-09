@@ -46,7 +46,7 @@ public class AgentUserVo {
     private String province;
 
     @Length(size = 3, message = "地区格式错误")
-    private List<String> areas;
+    private String[] areas;
 
     @NotBlank(message = "地址不能为空")
     private String address;

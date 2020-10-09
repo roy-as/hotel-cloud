@@ -272,6 +272,7 @@
                   type: 'success',
                   duration: 1500,
                   onClose: () => {
+                    this.dataForm.parentId = null
                     this.visible = false
                     this.$emit('refreshDataList')
                   }

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hotel.cloud.modules.hotel.dao.HotelInfoDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hotel.cloud.modules.hotel.entity.HotelInfoEntity" id="hotelInfoMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="address" column="address"/>
+        <result property="desc" column="desc"/>
+        <result property="area" column="area"/>
+        <result property="mobile" column="mobile"/>
+        <result property="notice" column="notice"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="service" column="service"/>
+        <result property="status" column="status"/>
+        <association property="logo" javaType="com.hotel.cloud.modules.oss.entity.SysOssEntity">
+            <result property="id" column="oss_id"/>
+            <result property="url" column="oss_url"/>
+            <result property="pictureType" column="picture_type"/>
+
+        </association>
+    </resultMap>
+
+    <select id="getHotelInfoList" resultMap="hotelInfoMap">
+        select i.*,o.id oss_id,o.url oss_url,m.picture_type from t_hotel_info i
+        left join (select * from t_hotel_oss_mapping where picture_type = 0) m on
+        m.hotel_id = i.id
+        left join sys_oss o on
+        o.id = m.oss_id
+        where flag = 1
+        <if test="params.id != null">
+            and i.id = #{params.id}
+        </if>
+        order by i.create_time desc
+    </select>
+
+
+</mapper>

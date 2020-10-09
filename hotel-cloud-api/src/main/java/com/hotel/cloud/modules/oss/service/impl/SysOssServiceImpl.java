@@ -4,11 +4,16 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.Query;
+import com.hotel.cloud.modules.oss.cloud.OSSFactory;
 import com.hotel.cloud.modules.oss.dao.SysOssDao;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import com.hotel.cloud.modules.oss.service.SysOssService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -23,5 +28,20 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssDao, SysOssEntity> impl
 
 		return new PageUtils(page);
 	}
-	
+
+	@Transactional
+	@Override
+	public SysOssEntity saveFile(MultipartFile file) throws IOException {
+		//上传文件
+		String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+		String url = OSSFactory.build().uploadSuffix(file.getBytes(), suffix);
+
+		//保存文件信息
+		SysOssEntity ossEntity = new SysOssEntity();
+		ossEntity.setUrl(url);
+		ossEntity.setCreateDate(new Date());
+		this.save(ossEntity);
+		return ossEntity;
+	}
+
 }

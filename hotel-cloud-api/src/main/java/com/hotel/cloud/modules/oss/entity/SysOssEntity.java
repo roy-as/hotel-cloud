@@ -1,5 +1,6 @@
 package com.hotel.cloud.modules.oss.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -23,5 +24,8 @@ public class SysOssEntity implements Serializable {
 	private String url;
 	//创建时间
 	private Date createDate;
+	//文件类型
+	@TableField(exist = false)
+	private Integer pictureType;
 
 }

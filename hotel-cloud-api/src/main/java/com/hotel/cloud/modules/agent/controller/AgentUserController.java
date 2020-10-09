@@ -1,10 +1,6 @@
 package com.hotel.cloud.modules.agent.controller;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.HashMap;
 import java.util.Map;
-
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
 import com.hotel.cloud.common.vo.AgentUserVo;
@@ -114,11 +110,4 @@ public class AgentUserController {
 
         return R.ok();
     }
-
-
-    public static void main(String[] args) throws FileNotFoundException {
-
-    }
-
-
 }

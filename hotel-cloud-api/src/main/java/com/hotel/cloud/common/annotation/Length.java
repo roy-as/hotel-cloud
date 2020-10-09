@@ -17,14 +17,14 @@ public @interface Length {
 
     int size();
 
-    String message() default "array length is ";
+    String message() default "array length is error";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 
     @Component
-    class ArrayLengthValidator implements ConstraintValidator<Length, List<?>> {
+    class ArrayLengthValidator implements ConstraintValidator<Length, Object[]> {
 
         private int minLength;
 
@@ -34,8 +34,8 @@ public @interface Length {
         }
 
         @Override
-        public boolean isValid(List<?> value, ConstraintValidatorContext context) {
-            return value.size() == this.minLength;
+        public boolean isValid(Object[] value, ConstraintValidatorContext context) {
+            return value.length == this.minLength;
         }
     }
 

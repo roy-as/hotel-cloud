@@ -6,11 +6,14 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import java.util.List;
 
 /**
  * 异常处理器
@@ -58,14 +61,23 @@ public class RRExceptionHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public R handleConstraintViolationException(MethodArgumentNotValidException e) {
 		logger.error(e.getMessage(), e);
+		return R.error(this.getErrorMsg(e.getBindingResult().getFieldErrors()));
+	}
+
+	@ExceptionHandler(BindException.class)
+	public R handleCBindException(BindException e) {
+		logger.error(e.getMessage(), e);
+		return R.error(this.getErrorMsg(e.getBindingResult().getFieldErrors()));
+	}
+
+	private String getErrorMsg(List<FieldError> fieldErrors) {
 		StringBuilder errorMsg = new StringBuilder();
-		for (FieldError error : e.getBindingResult().getFieldErrors()) {
+		for (FieldError error : fieldErrors) {
 			String message = error.getDefaultMessage();
 			if (StringUtils.isNotEmpty(message)) {
 				errorMsg.append(message).append(";");
 			}
 		}
-		return R.error(errorMsg.toString());
+		return errorMsg.toString();
 	}
-
 }

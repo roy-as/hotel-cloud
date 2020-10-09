@@ -1,6 +1,8 @@
 package com.hotel.cloud.modules.oss.cloud;
 
 
+import com.hotel.cloud.common.enums.ExceptionEnum;
+import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.common.utils.ConfigConstant;
 import com.hotel.cloud.common.utils.Constants;
 import com.hotel.cloud.common.utils.SpringContextUtils;
@@ -28,8 +30,7 @@ public final class OSSFactory {
         }else if(config.getType() == Constants.CloudService.QCLOUD.getValue()){
             return new QcloudCloudStorageService(config);
         }
-
-        return null;
+        throw new RRException(ExceptionEnum.OSS_CONFIG_NOT_EXIST);
     }
 
 }
