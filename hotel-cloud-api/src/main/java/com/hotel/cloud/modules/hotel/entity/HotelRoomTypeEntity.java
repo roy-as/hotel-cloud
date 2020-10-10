@@ -46,6 +46,10 @@ public class HotelRoomTypeEntity implements Serializable {
 	 */
 	private Long hotelId;
 	/**
+	 * 酒店名称
+	 */
+	private String hotelName;
+	/**
 	 * 创建时间
 	 */
 	private Date createTime;

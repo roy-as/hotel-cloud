@@ -36,9 +36,8 @@ public class AgentUserServiceImpl extends ServiceImpl<AgentUserDao, AgentUserEnt
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<AgentUserEntity> page = new Query<AgentUserEntity>().getPage(params);
-        SysUserEntity loginUser = ShiroUtils.getLoginUser();
-        Integer agentLevel = loginUser.getAgentLevel();
-        if (!AgentLevelEnum.SYSTEM_USER.getLevel().equals(agentLevel)) {
+        if (ShiroUtils.isAgent()) {
+            SysUserEntity loginUser = ShiroUtils.getLoginUser();
             AgentUserEntity agentUser = this.getById(loginUser.getUserId());
             params.put("parentName", agentUser.getAgentName());
         }
@@ -73,24 +72,45 @@ public class AgentUserServiceImpl extends ServiceImpl<AgentUserDao, AgentUserEnt
     public void updateAgentUser(AgentUserVo vo) {
         SysUserEntity sysUserEntity = vo.getSysUserEntity();
         AgentUserEntity agentUserEntity = vo.getAgentUserEntity();
+        SysUserEntity user = sysUserService.getById(vo.getUserId());
+        this.checkAuth(user);
         if (StringUtils.isNotBlank(vo.getPassword())) {
-            SysUserEntity user = sysUserService.getById(vo.getUserId());
-            sysUserEntity.setPassword(new Sha256Hash(user.getPassword(), user.getSalt()).toHex());
+            sysUserEntity.setPassword(new Sha256Hash(vo.getPassword(), user.getSalt()).toHex());
 
         }
         this.sysUserService.updateById(sysUserEntity);
         this.updateById(agentUserEntity);
     }
 
+    private void checkAuth(Long[] ids) {
+        List<SysUserEntity> users = sysUserService.getBaseMapper().selectBatchIds(Arrays.asList(ids));
+        for(SysUserEntity user : users) {
+            checkAuth(user);
+        }
+    }
+
+    private void checkAuth(SysUserEntity entity) {
+        if (ShiroUtils.isAgent()) {
+            SysUserEntity loginUser = ShiroUtils.getLoginUser();
+            Long loginUserId = loginUser.getUserId();
+            if (!entity.getCreateUserId().equals(loginUserId)
+                    && !entity.getParentId().equals(loginUserId)) {
+                throw new RRException(ExceptionEnum.NOT_AUTHENTICATION);
+            }
+        }
+    }
+
     @Override
     @Transactional
     public void delete(Long[] userIds) {
+        checkAuth(userIds);
         sysUserService.deleteBatch(userIds);
     }
 
     @Override
     @Transactional
     public void disable(DisableVo vo) {
+        checkAuth(vo.getId());
         Integer status = vo.getStatus();
         List<SysUserEntity> users = Arrays.stream(vo.getId()).map(userId -> {
             SysUserEntity user = new SysUserEntity();

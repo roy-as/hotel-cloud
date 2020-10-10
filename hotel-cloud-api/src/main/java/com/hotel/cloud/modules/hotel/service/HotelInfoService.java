@@ -27,8 +27,10 @@ public interface HotelInfoService extends IService<HotelInfoEntity> {
 
     void disable(DisableVo disableVo);
 
-    void deleteBatch(List<Long> ids);
+    void deleteBatch(Long[] ids);
 
     List<SysOssEntity> getPicture(Long id, Integer pictureType);
+
+    List<HotelInfoEntity> select();
 }
 

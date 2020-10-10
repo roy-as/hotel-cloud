@@ -47,16 +47,16 @@
         label="价格">
       </el-table-column>
       <el-table-column
-        prop="remark"
-        header-align="center"
-        align="center"
-        label="房型描述">
-      </el-table-column>
-      <el-table-column
         prop="hotelId"
         header-align="center"
         align="center"
         label="酒店">
+      </el-table-column>
+      <el-table-column
+        prop="remark"
+        header-align="center"
+        align="center"
+        label="房型描述">
       </el-table-column>
       <el-table-column
         prop="createTime"

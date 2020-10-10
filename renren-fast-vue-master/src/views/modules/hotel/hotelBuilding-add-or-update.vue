@@ -4,33 +4,24 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="楼栋名称" prop="name">
-      <el-input v-model="dataForm.name" placeholder="楼栋名称"></el-input>
-    </el-form-item>
-    <el-form-item label="楼栋号" prop="number">
-      <el-input v-model="dataForm.number" placeholder="楼栋号"></el-input>
-    </el-form-item>
-    <el-form-item label="备注" prop="remark">
-      <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
-    </el-form-item>
-    <el-form-item label="酒店ID" prop="hotelId">
-      <el-input v-model="dataForm.hotelId" placeholder="酒店ID"></el-input>
-    </el-form-item>
-    <el-form-item label="创建时间" prop="createTime">
-      <el-input v-model="dataForm.createTime" placeholder="创建时间"></el-input>
-    </el-form-item>
-    <el-form-item label="更新时间" prop="updateTime">
-      <el-input v-model="dataForm.updateTime" placeholder="更新时间"></el-input>
-    </el-form-item>
-    <el-form-item label="创建人" prop="createBy">
-      <el-input v-model="dataForm.createBy" placeholder="创建人"></el-input>
-    </el-form-item>
-    <el-form-item label="更新人" prop="updateBy">
-      <el-input v-model="dataForm.updateBy" placeholder="更新人"></el-input>
-    </el-form-item>
+      <el-form-item label="楼栋名称" prop="name">
+        <el-input v-model="dataForm.name" placeholder="楼栋名称"></el-input>
+      </el-form-item>
+      <el-form-item label="楼栋号" prop="buildingNumber">
+        <el-input v-model="dataForm.buildingNumber" placeholder="楼栋号"></el-input>
+      </el-form-item>
+      <el-form-item label="酒店"  prop="parentList" :class="{ 'is-required': !dataForm.id }">
+        <el-select v-model="dataForm.hotelId" @change="$forceUpdate()" filterable clearable placeholder="请选择" style="width: 100%; position: relative" :disabled="!!dataForm.id">
+          <el-option v-for="hotel in hotels" :key="hotel.id" :label="hotel.name" :value="hotel.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="备注" prop="remark">
+        <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="cancel">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
@@ -41,41 +32,23 @@
     data () {
       return {
         visible: false,
+        hotels: [],
         dataForm: {
           id: 0,
           name: '',
-          number: '',
-          remark: '',
+          buildingNumber: '',
           hotelId: '',
-          createTime: '',
-          updateTime: '',
-          createBy: '',
-          updateBy: ''
+          remark: ''
         },
         dataRule: {
           name: [
             { required: true, message: '楼栋名称不能为空', trigger: 'blur' }
           ],
-          number: [
+          buildingNumber: [
             { required: true, message: '楼栋号不能为空', trigger: 'blur' }
           ],
-          remark: [
-            { required: true, message: '备注不能为空', trigger: 'blur' }
-          ],
           hotelId: [
-            { required: true, message: '酒店ID不能为空', trigger: 'blur' }
-          ],
-          createTime: [
-            { required: true, message: '创建时间不能为空', trigger: 'blur' }
-          ],
-          updateTime: [
-            { required: true, message: '更新时间不能为空', trigger: 'blur' }
-          ],
-          createBy: [
-            { required: true, message: '创建人不能为空', trigger: 'blur' }
-          ],
-          updateBy: [
-            { required: true, message: '更新人不能为空', trigger: 'blur' }
+            { required: true, message: '酒店不能为空', trigger: 'blur' }
           ]
         }
       }
@@ -84,45 +57,49 @@
       init (id) {
         this.dataForm.id = id || 0
         this.visible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-          if (this.dataForm.id) {
-            this.$http({
-              url: this.$http.adornUrl(`/hotel/hotelBuilding/info/${this.dataForm.id}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.dataForm.name = data.hotelBuilding.name
-                this.dataForm.number = data.hotelBuilding.number
-                this.dataForm.remark = data.hotelBuilding.remark
-                this.dataForm.hotelId = data.hotelBuilding.hotelId
-                this.dataForm.createTime = data.hotelBuilding.createTime
-                this.dataForm.updateTime = data.hotelBuilding.updateTime
-                this.dataForm.createBy = data.hotelBuilding.createBy
-                this.dataForm.updateBy = data.hotelBuilding.updateBy
-              }
-            })
-          }
+        this.$http({
+          url: this.$http.adornUrl('/hotel/hotelInfo/select'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          this.hotels = data && data.code === 0 ? data.data : []
+        }).then(() => {
+          this.$nextTick(() => {
+            this.$refs['dataForm'].resetFields()
+            if (this.dataForm.id) {
+              this.$http({
+                url: this.$http.adornUrl(`/hotel/hotelBuilding/info/${this.dataForm.id}`),
+                method: 'get',
+                params: this.$http.adornParams()
+              }).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.dataForm.name = data.hotelBuilding.name
+                  this.dataForm.buildingNumber = data.hotelBuilding.buildingNumber
+                  this.dataForm.remark = data.hotelBuilding.remark
+                  this.dataForm.hotelId = data.hotelBuilding.hotelId
+                }
+              })
+            }
+          })
         })
       },
       // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            const chosenHotel = this.hotels.find((item) => {
+              return item.id === this.dataForm.hotelId
+            })
             this.$http({
               url: this.$http.adornUrl(`/hotel/hotelBuilding/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
                 'name': this.dataForm.name,
-                'number': this.dataForm.number,
+                'buildingNumber': this.dataForm.buildingNumber,
                 'remark': this.dataForm.remark,
                 'hotelId': this.dataForm.hotelId,
-                'createTime': this.dataForm.createTime,
-                'updateTime': this.dataForm.updateTime,
-                'createBy': this.dataForm.createBy,
-                'updateBy': this.dataForm.updateBy
+                'hotelName': chosenHotel ? chosenHotel.name : null
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -131,6 +108,7 @@
                   type: 'success',
                   duration: 1500,
                   onClose: () => {
+                    this.dataForm.hotelId = null
                     this.visible = false
                     this.$emit('refreshDataList')
                   }
@@ -141,6 +119,10 @@
             })
           }
         })
+      },
+      cancel () {
+        this.visible = false
+        this.dataForm.hotelId = null
       }
     }
   }

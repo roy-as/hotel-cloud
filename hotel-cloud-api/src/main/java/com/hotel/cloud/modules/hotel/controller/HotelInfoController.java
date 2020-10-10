@@ -80,7 +80,7 @@ public class HotelInfoController {
     @RequestMapping("/delete")
     @RequiresPermissions("hotel:hotelInfo:delete")
     public R delete(@RequestBody Long[] ids){
-		hotelInfoService.deleteBatch(Arrays.asList(ids));
+		hotelInfoService.deleteBatch(ids);
 
         return R.ok();
     }
@@ -98,8 +98,20 @@ public class HotelInfoController {
     }
 
     @GetMapping("/getPicture")
+    @RequiresPermissions("hotel:hotelInfo:info")
     public R getPicture(Long id, Integer pictureType) {
         List<SysOssEntity> oss = hotelInfoService.getPicture(id, pictureType);
         return R.ok().put("data", oss);
+    }
+
+    /**
+     * 下拉
+     * @return
+     */
+    @GetMapping("select")
+    @RequiresPermissions("hotel:hotelInfo:select")
+    public R select() {
+        List<HotelInfoEntity> hotels = hotelInfoService.select();
+        return R.ok().put("data", hotels);
     }
 }

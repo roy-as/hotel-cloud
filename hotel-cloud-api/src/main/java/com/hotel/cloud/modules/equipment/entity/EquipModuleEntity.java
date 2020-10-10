@@ -1,6 +1,5 @@
-package com.hotel.cloud.modules.hotel.entity;
+package com.hotel.cloud.modules.equipment.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -9,18 +8,17 @@ import java.util.Date;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 /**
- * 酒店楼栋表
+ * 设备模块表
  * 
  * @author ${author}
  * @email ${email}
- * @date 2020-10-09 17:24:56
+ * @date 2020-10-10 11:22:30
  */
 @Data
-@TableName("t_hotel_building")
-public class HotelBuildingEntity implements Serializable {
+@TableName("t_equip_module")
+public class EquipModuleEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -29,24 +27,14 @@ public class HotelBuildingEntity implements Serializable {
 	@TableId
 	private Long id;
 	/**
-	 * 楼栋名称
+	 * 设备模块名称
 	 */
-	@NotBlank(message = "楼栋名称不能为空")
+	@NotBlank(message = "模块名称不能为空")
 	private String name;
 	/**
-	 * 楼栋号
-	 */
-	@NotBlank(message = "楼栋号不能为空")
-	private String buildingNumber;
-	/**
-	 * 备注
+	 * 房间名称
 	 */
 	private String remark;
-	/**
-	 * 酒店ID
-	 */
-	@NotNull(message = "酒店不能为空")
-	private Long hotelId;
 	/**
 	 * 创建时间
 	 */
@@ -63,9 +51,5 @@ public class HotelBuildingEntity implements Serializable {
 	 * 更新人
 	 */
 	private String updateBy;
-	/**
-	 * 酒店名称
-	 */
-	private String hotelName;
 
 }

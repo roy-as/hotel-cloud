@@ -2,7 +2,10 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-input v-model="dataForm.name" placeholder="楼栋名称" clearable></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="dataForm.hotelName" placeholder="酒店名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -36,13 +39,13 @@
         label="楼栋名称">
       </el-table-column>
       <el-table-column
-        prop="number"
+        prop="buildingNumber"
         header-align="center"
         align="center"
         label="楼栋号">
       </el-table-column>
       <el-table-column
-        prop="hotelId"
+        prop="hotelName"
         header-align="center"
         align="center"
         label="酒店">
@@ -51,12 +54,14 @@
         prop="createTime"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="创建时间">
       </el-table-column>
       <el-table-column
         prop="updateTime"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="更新时间">
       </el-table-column>
       <el-table-column
@@ -75,6 +80,7 @@
         prop="remark"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="备注">
       </el-table-column>
       <el-table-column
@@ -136,7 +142,8 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'name': this.dataForm.name,
+            'hotelName': this.dataForm.hotelName
           })
         }).then(({data}) => {
           if (data && data.code === 0) {

@@ -17,4 +17,6 @@ public interface SysOssService extends IService<SysOssEntity> {
 	PageUtils queryPage(Map<String, Object> params);
 
     SysOssEntity saveFile(MultipartFile file) throws IOException;
+
+    SysOssEntity saveFile(byte[] bytes, String suffix) throws IOException;
 }

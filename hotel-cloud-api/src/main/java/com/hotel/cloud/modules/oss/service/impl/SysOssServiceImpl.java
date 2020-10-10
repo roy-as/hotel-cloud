@@ -34,8 +34,12 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssDao, SysOssEntity> impl
 	public SysOssEntity saveFile(MultipartFile file) throws IOException {
 		//上传文件
 		String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
-		String url = OSSFactory.build().uploadSuffix(file.getBytes(), suffix);
+		return this.saveFile(file.getBytes(), suffix);
+	}
 
+	@Override
+	public SysOssEntity saveFile(byte[] bytes, String suffix) throws IOException {
+		String url = OSSFactory.build().uploadSuffix(bytes, suffix);
 		//保存文件信息
 		SysOssEntity ossEntity = new SysOssEntity();
 		ossEntity.setUrl(url);

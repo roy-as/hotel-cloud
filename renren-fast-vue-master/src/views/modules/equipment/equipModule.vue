@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('hotel:hotelRoom:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('hotel:hotelRoom:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('equipment:equipModule:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('equipment:equipModule:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -33,31 +33,14 @@
         prop="name"
         header-align="center"
         align="center"
-        label="房间名称">
+        label="模块名称">
       </el-table-column>
       <el-table-column
-        prop="number"
+        prop="remark"
         header-align="center"
         align="center"
-        label="房号">
-      </el-table-column>
-      <el-table-column
-        prop="hotel"
-        header-align="center"
-        align="center"
-        label="酒店">
-      </el-table-column>
-      <el-table-column
-        prop="roomTypeId"
-        header-align="center"
-        align="center"
-        label="房型">
-      </el-table-column>
-      <el-table-column
-        prop="status"
-        header-align="center"
-        align="center"
-        label="状态">
+        show-overflow-tooltip
+        label="备注">
       </el-table-column>
       <el-table-column
         prop="createTime"
@@ -93,7 +76,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id, scope.row.name)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -112,7 +95,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './hotelRoom-add-or-update'
+  import AddOrUpdate from './equipModule-add-or-update'
   export default {
     data () {
       return {
@@ -139,7 +122,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/hotel/hotelRoom/list'),
+          url: this.$http.adornUrl('/equipment/equipModule/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -180,17 +163,20 @@
         })
       },
       // 删除
-      deleteHandle (id) {
+      deleteHandle (id, name) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        var names = name ? [name] : this.dataListSelections.map(item => {
+          return item.name
+        })
+        this.$confirm(`确定对[设备模块:${names.join(',')}]进行[${name ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/hotel/hotelRoom/delete'),
+            url: this.$http.adornUrl('/equipment/equipModule/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

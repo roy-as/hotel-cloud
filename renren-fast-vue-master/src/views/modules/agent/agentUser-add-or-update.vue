@@ -17,7 +17,7 @@
       <el-input v-model="dataForm.agentName" placeholder="代理商名称"></el-input>
     </el-form-item>
     <el-form-item label="上级代理"  prop="parentList" :class="{ 'is-required': !dataForm.id }">
-      <el-select v-model="dataForm.parentId" filterable clearable placeholder="请选择" style="width: 100%; position: relative" :disabled="!!dataForm.userId">
+      <el-select v-model="dataForm.parentId" @change="$forceUpdate()" filterable clearable placeholder="请选择" style="width: 100%; position: relative" :disabled="!!dataForm.userId">
         <el-option v-for="parent in parentList" :key="parent.userId" :label="parent.agentName" :value="parent.userId">
           <span style="float: left">{{ parent.agentName }}</span>
           <span style="float: right; color: #8492a6; font-size: 13px">{{ parent.sysUser.agentLevelName }}</span>
@@ -50,7 +50,7 @@
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="cancel">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
@@ -214,7 +214,6 @@
           params: this.$http.adornParams()
         }).then(({data}) => {
           this.parentList = data && data.code === 0 ? data.data : []
-          console.log(this.parentList)
         }).then(() => {
           this.visible = true
           this.$nextTick(() => {
@@ -283,6 +282,10 @@
             })
           }
         })
+      },
+      cancel () {
+        this.visible = false
+        this.dataForm.parentId = null
       }
     }
   }

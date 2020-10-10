@@ -1,6 +1,7 @@
 package com.hotel.cloud.modules.hotel.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.hotel.cloud.common.enums.AgentLevelEnum;
 import com.hotel.cloud.common.enums.ExceptionEnum;
@@ -88,6 +89,7 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
 
     /**
      * 保存文件
+     *
      * @param hotelId
      * @param file
      * @param pictureType
@@ -103,6 +105,7 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
 
     /**
      * 保存文件
+     *
      * @param hotelId
      * @param files
      * @param pictureType
@@ -111,7 +114,7 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
      */
     private List<HotelOssMappingEntity> saveFile(Long hotelId, MultipartFile[] files, Integer pictureType) throws IOException {
         List<HotelOssMappingEntity> ossList = new ArrayList<>(files.length);
-        for(MultipartFile file : files) {
+        for (MultipartFile file : files) {
             HotelOssMappingEntity mappingEntity = this.saveFile(hotelId, file, pictureType);
             ossList.add(mappingEntity);
         }
@@ -136,7 +139,7 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
                     .eq(true, "hotel_id", mappingEntity.getHotelId())
                     .eq(true, "picture_type", mappingEntity.getPictureType());
             boolean success = this.hotelOssMappingService.update(mappingEntity, wrapper);
-            if(!success) {
+            if (!success) {
                 this.hotelOssMappingService.insert(mappingEntity);
             }
         }
@@ -158,10 +161,20 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
      */
     private void checkAuth(Long id) {
         HotelInfoEntity hotel = this.getById(id);
+        checkAuth(hotel);
+    }
+
+    private void checkAuth(Long[] ids) {
+        List<HotelInfoEntity> list = this.baseMapper.selectBatchIds(Arrays.asList(ids));
+        for (HotelInfoEntity hotel : list) {
+            checkAuth(hotel);
+        }
+    }
+
+    private void checkAuth(HotelInfoEntity hotel) {
         String createBy = hotel.getCreateBy();
-        SysUserEntity loginUser = ShiroUtils.getLoginUser();
-        Integer agentLevel = loginUser.getAgentLevel();
-        if (!AgentLevelEnum.SYSTEM_USER.getLevel().equals(agentLevel)) {
+        if (ShiroUtils.isAgent()) {
+            SysUserEntity loginUser = ShiroUtils.getLoginUser();
             if (!createBy.equals(loginUser.getUsername())) {
                 throw new RRException(ExceptionEnum.NOT_AUTHENTICATION);
             }
@@ -171,6 +184,7 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
     @Override
     @Transactional
     public void disable(DisableVo vo) {
+        checkAuth(vo.getId());
         Integer status = vo.getStatus();
         List<HotelInfoEntity> users = Arrays.stream(vo.getId()).map(id -> {
             HotelInfoEntity hotel = new HotelInfoEntity();
@@ -182,8 +196,9 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
     }
 
     @Override
-    public void deleteBatch(List<Long> ids) {
-        List<HotelInfoEntity> hotels = ids.stream().map(id -> {
+    public void deleteBatch(Long[] ids) {
+        checkAuth(ids);
+        List<HotelInfoEntity> hotels = Arrays.stream(ids).map(id -> {
             HotelInfoEntity hotel = new HotelInfoEntity();
             hotel.setId(id);
             hotel.setFlag(FlagEnum.DELETE.getCode());
@@ -195,6 +210,18 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
     @Override
     public List<SysOssEntity> getPicture(Long id, Integer pictureType) {
         return this.baseMapper.getPicture(id, pictureType);
+    }
+
+    @Override
+    public List<HotelInfoEntity> select() {
+        boolean isAgent = ShiroUtils.isAgent();
+        return this.list(
+                new QueryWrapper<HotelInfoEntity>()
+                        .eq(isAgent, "create_by", ShiroUtils.getLoginUser().getUsername())
+                        .eq("status", FlagEnum.OK.getCode())
+                        .eq("flag", FlagEnum.OK.getCode())
+                        .orderByDesc("create_time")
+        );
     }
 
 }

@@ -49,7 +49,7 @@
           <div slot="tip" class="el-upload__tip">只能上传jpg/png/jpeg/tif/tga文件</div>
         </el-upload>
       </el-form-item>
-      <el-form-item label="全景图" prop="logoUrl">
+      <el-form-item label="全景图" prop="logoUrl" v-if="!dataForm.id">
         <el-upload
           class="avatar-uploader"
           :action="upload"
@@ -65,7 +65,7 @@
           <div slot="tip" class="el-upload__tip">只能上传jpg/png/jpeg/tif/tga文件</div>
         </el-upload>
       </el-form-item>
-      <el-form-item label="酒店图片" prop="logoUrl">
+      <el-form-item label="酒店图片" prop="logoUrl" v-if="!dataForm.id">
         <el-upload
           class="avatar-uploader"
           :action="upload"

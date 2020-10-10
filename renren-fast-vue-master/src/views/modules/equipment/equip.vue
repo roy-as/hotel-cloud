@@ -6,8 +6,9 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('hotel:hotelRoom:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('hotel:hotelRoom:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('equipment:equip:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('equipment:equip:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('equipment:equip:generateQrcode')" type="danger" @click="generateQrcode()" :disabled="dataListSelections.length <= 0">生成二维码</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -33,31 +34,81 @@
         prop="name"
         header-align="center"
         align="center"
-        label="房间名称">
+        label="设备名称">
       </el-table-column>
       <el-table-column
-        prop="number"
+        prop="moduleName"
         header-align="center"
         align="center"
-        label="房号">
+        label="设备模块">
       </el-table-column>
       <el-table-column
-        prop="hotel"
+        prop="qrcodeUrl"
+        header-align="center"
+        align="center"
+        label="Logo">
+        <template slot-scope="scope">
+          <span v-if="scope.row.qrcodeUrl">
+            <img :src="imgUrl(scope.row)" height="70" width="70"/>
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="qrcodeInfo"
+        header-align="center"
+        align="center"
+        show-overflow-tooltip
+        width="100"
+        label="二维码信息">
+      </el-table-column>
+      <el-table-column
+        prop="agentName"
+        header-align="center"
+        align="center"
+        label="代理">
+      </el-table-column>
+      <el-table-column
+        prop="hotelName"
         header-align="center"
         align="center"
         label="酒店">
       </el-table-column>
       <el-table-column
-        prop="roomTypeId"
+        prop="mac"
         header-align="center"
         align="center"
-        label="房型">
+        show-overflow-tooltip
+        label="mac地址">
+      </el-table-column>
+      <el-table-column
+        prop="sn"
+        header-align="center"
+        align="center"
+        show-overflow-tooltip
+        label="序列号">
+      </el-table-column>
+      <el-table-column
+        prop="versionNumber"
+        header-align="center"
+        align="center"
+        label="版本号">
+      </el-table-column>
+      <el-table-column
+        prop="remark"
+        header-align="center"
+        align="center"
+        label="备注">
       </el-table-column>
       <el-table-column
         prop="status"
         header-align="center"
         align="center"
         label="状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 0" size="small" type="danger">禁用</el-tag>
+          <el-tag v-if="scope.row.status === 1" size="small" type="warning">待下发</el-tag>
+          <el-tag v-if="scope.row.status === 2" size="small">已绑定</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         prop="createTime"
@@ -77,12 +128,14 @@
         prop="createBy"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="创建人">
       </el-table-column>
       <el-table-column
         prop="updateBy"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="更新人">
       </el-table-column>
       <el-table-column
@@ -93,7 +146,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id, scope.row.name)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -108,11 +161,13 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <generate-qrcode v-if="generateQrcodeVisible" ref="generateQrcode" @refreshDataList="getDataList"></generate-qrcode>
   </div>
 </template>
 
 <script>
-  import AddOrUpdate from './hotelRoom-add-or-update'
+  import AddOrUpdate from './equip-add-or-update'
+  import GenerateQrcode from './equip-generate-qrcode'
   export default {
     data () {
       return {
@@ -125,11 +180,13 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        generateQrcodeVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      GenerateQrcode
     },
     activated () {
       this.getDataList()
@@ -139,7 +196,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/hotel/hotelRoom/list'),
+          url: this.$http.adornUrl('/equipment/equip/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -180,17 +237,20 @@
         })
       },
       // 删除
-      deleteHandle (id) {
+      deleteHandle (id, name) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        var names = name ? [name] : this.dataListSelections.map(item => {
+          return item.name
+        })
+        this.$confirm(`确定对[设备:${names.join(',')}]进行[${name ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/hotel/hotelRoom/delete'),
+            url: this.$http.adornUrl('/equipment/equip/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
@@ -208,6 +268,45 @@
             }
           })
         })
+      },
+      generateQrcode: function (id, name) {
+        let valid = true
+        let devices = []
+        this.dataListSelections.forEach((item, index) => {
+          if (!item.qrcodeInfo) {
+            valid = false
+            devices.push(item.name)
+          }
+        })
+        const msg = `设备:  [${devices.join(',')}] 已生成二维码`
+        if (valid) {
+          this.$alert(msg, '提示', {
+            confirmButtonText: '确定',
+            callback: () => {
+              this.$message({
+                type: 'warning',
+                message: msg
+              })
+            }
+          })
+          return
+        }
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        var names = name ? [name] : this.dataListSelections.map(item => {
+          return item.name
+        })
+        this.generateQrcodeVisible = true
+        this.$nextTick(() => {
+          this.$refs.generateQrcode.init(ids, names)
+        })
+      },
+      imgUrl: function (row) {
+        if (!row.qrcodeUrl) {
+          return ''
+        }
+        return row.qrcodeUrl
       }
     }
   }

@@ -42,11 +42,21 @@ public class Constants {
     public static final String MOBILE_PATTERN = "(13|14|15|16|17|18|19)[0-9]{9}";
     // 邮箱正则
     public static final String EMAIL_PATTERN = "^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((.[a-zA-Z0-9_-]{2,3}){1,2})$";
+    // 默认字符编码
+    public static final String DEFAULT_CHARSET = "UTF-8";
+    // 二维码图片格式
+    public static final String QRCODE_FORMAT = "PNG";
+    public static final String PNG_SUFFIX = ".png";
+    // 默认二维码宽
+    public static final int DEFAULT_QRCODE_WIDTH = 240;
+    // 默认二维码高度
+    public static final int DEFAULT_QRCODE_HEIGHT = 240;
+    // 设备二维码信息格式
+    public static final String EQUIP_QRCODE_INFO = "{0}-{1}-{2}";
 	/**
 	 * 菜单类型
 	 * 
 	 * @author chenshun
-	 * @email sunlightcs@gmail.com
 	 * @date 2016年11月15日 下午1:24:29
 	 */
     public enum MenuType {
@@ -78,7 +88,6 @@ public class Constants {
      * 定时任务状态
      * 
      * @author chenshun
-     * @email sunlightcs@gmail.com
      * @date 2016年12月3日 上午12:07:22
      */
     public enum ScheduleStatus {

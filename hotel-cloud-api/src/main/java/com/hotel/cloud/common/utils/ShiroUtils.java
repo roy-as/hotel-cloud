@@ -1,5 +1,6 @@
 package com.hotel.cloud.common.utils;
 
+import com.hotel.cloud.common.enums.AgentLevelEnum;
 import com.hotel.cloud.common.enums.ExceptionEnum;
 import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
@@ -52,6 +53,12 @@ public class ShiroUtils {
 			throw new RRException(ExceptionEnum.LOGIN_USER_EXPITED);
 		}
 		return (SysUserEntity) user;
+	}
+
+	public static boolean isAgent() {
+		SysUserEntity loginUser = getLoginUser();
+		Integer agentLevel = loginUser.getAgentLevel();
+		return !AgentLevelEnum.SYSTEM_USER.getLevel().equals(agentLevel);
 	}
 
 }

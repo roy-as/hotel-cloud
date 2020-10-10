@@ -1,12 +1,15 @@
 package com.hotel.cloud.modules.hotel.controller;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
+import com.hotel.cloud.common.utils.ShiroUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,7 +62,11 @@ public class HotelBuildingController {
      */
     @RequestMapping("/save")
     @RequiresPermissions("hotel:hotelBuilding:save")
-    public R save(@RequestBody HotelBuildingEntity hotelBuilding){
+    public R save(@RequestBody @Validated  HotelBuildingEntity hotelBuilding){
+        hotelBuilding.setCreateTime(new Date());
+        String loginUserName = ShiroUtils.getLoginUser().getUsername();
+        hotelBuilding.setCreateBy(loginUserName);
+        hotelBuilding.setUpdateBy(loginUserName);
 		hotelBuildingService.save(hotelBuilding);
 
         return R.ok();
