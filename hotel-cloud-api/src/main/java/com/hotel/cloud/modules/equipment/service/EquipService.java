@@ -2,7 +2,8 @@ package com.hotel.cloud.modules.equipment.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hotel.cloud.common.utils.PageUtils;
-import com.hotel.cloud.common.vo.QrcodeVo;
+import com.hotel.cloud.common.vo.equip.QrcodeVo;
+import com.hotel.cloud.common.vo.equip.ReleaseEquipVo;
 import com.hotel.cloud.modules.equipment.entity.EquipEntity;
 
 import java.io.IOException;
@@ -20,5 +21,7 @@ public interface EquipService extends IService<EquipEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     void generateQrcode(QrcodeVo vo) throws IOException;
+
+    void releaseVo(ReleaseEquipVo vo);
 }
 

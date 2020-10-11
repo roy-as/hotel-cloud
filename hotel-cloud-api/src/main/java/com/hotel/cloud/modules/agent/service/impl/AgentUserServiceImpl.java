@@ -14,7 +14,7 @@ import com.hotel.cloud.common.vo.DisableVo;
 import com.hotel.cloud.modules.agent.dao.AgentUserDao;
 import com.hotel.cloud.modules.agent.entity.AgentUserEntity;
 import com.hotel.cloud.modules.agent.service.AgentUserService;
-import com.hotel.cloud.common.vo.AgentUserVo;
+import com.hotel.cloud.common.vo.agent.AgentUserVo;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import com.hotel.cloud.modules.sys.service.SysUserService;
 import org.apache.commons.lang.StringUtils;
@@ -53,7 +53,7 @@ public class AgentUserServiceImpl extends ServiceImpl<AgentUserDao, AgentUserEnt
         sysUserEntity.setCreateUserId(ShiroUtils.getUserId());
         Integer agentLevel = Optional.ofNullable(vo.getAgentLevel()).orElse(this.getAgentLevel(vo.getParentId()));
         sysUserEntity.setAgentLevel(agentLevel);
-        Long roleId = (long) (agentLevel + 1);
+        Long roleId = AgentLevelEnum.INDIVIDUAL_AGENT.getLevel().equals(agentLevel) ? agentLevel : (long) (agentLevel + 1);
         List<Long> roles = ImmutableList.of(roleId);
         sysUserEntity.setRoleIdList(roles);
         SysUserEntity user = this.sysUserService.saveUser(sysUserEntity);
@@ -84,7 +84,7 @@ public class AgentUserServiceImpl extends ServiceImpl<AgentUserDao, AgentUserEnt
 
     private void checkAuth(Long[] ids) {
         List<SysUserEntity> users = sysUserService.getBaseMapper().selectBatchIds(Arrays.asList(ids));
-        for(SysUserEntity user : users) {
+        for (SysUserEntity user : users) {
             checkAuth(user);
         }
     }
@@ -122,14 +122,13 @@ public class AgentUserServiceImpl extends ServiceImpl<AgentUserDao, AgentUserEnt
     }
 
     @Override
-    public List<AgentUserEntity> select() {
+    public List<AgentUserEntity> selectParentAgent() {
         HashMap<String, Object> params = new HashMap<>();
         params.put("limit", String.valueOf(Long.MAX_VALUE));
         params.put("agentSelect", true);
         SysUserEntity loginUser = ShiroUtils.getLoginUser();
-        Integer agentLevel = loginUser.getAgentLevel();
         List<AgentUserEntity> list;
-        if (AgentLevelEnum.SYSTEM_USER.getLevel().equals(agentLevel)) {
+        if (!ShiroUtils.isAgent()) {
             list = new ArrayList<>();
             list.add(AgentUserEntity.getSysUserInstance());
             list.addAll((List<AgentUserEntity>) this.queryPage(params).getList());
@@ -154,6 +153,19 @@ public class AgentUserServiceImpl extends ServiceImpl<AgentUserDao, AgentUserEnt
         }
         ++agentLevel;
         return agentLevel;
+    }
+
+    public List<AgentUserEntity> select(boolean isAgent) {
+        Map<String, Object> params = new HashMap<>();
+        if (isAgent) {
+            SysUserEntity loginUser = ShiroUtils.getLoginUser();
+            params.put("parentId", loginUser.getUserId());
+        } else {
+            List<Integer> agentLevels = ImmutableList.of(AgentLevelEnum.PROVINCE_AGENT.getLevel(),
+                    AgentLevelEnum.INDIVIDUAL_AGENT.getLevel());
+            params.put("agentLevels", agentLevels);
+        }
+        return this.baseMapper.getAgentUserList(null, params);
     }
 
 }

@@ -1,14 +1,17 @@
 package com.hotel.cloud.modules.equipment.controller;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
 import com.hotel.cloud.common.utils.ShiroUtils;
-import com.hotel.cloud.common.vo.QrcodeVo;
+import com.hotel.cloud.common.vo.equip.QrcodeVo;
+import com.hotel.cloud.common.vo.equip.ReleaseEquipVo;
+import com.hotel.cloud.modules.agent.entity.AgentUserEntity;
+import com.hotel.cloud.modules.agent.service.AgentUserService;
+import com.hotel.cloud.modules.hotel.entity.HotelInfoEntity;
+import com.hotel.cloud.modules.hotel.service.HotelInfoService;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +33,15 @@ import com.hotel.cloud.modules.equipment.service.EquipService;
 @RestController
 @RequestMapping("equipment/equip")
 public class EquipController {
+
     @Autowired
     private EquipService equipService;
+
+    @Autowired
+    private HotelInfoService hotelInfoService;
+
+    @Autowired
+    private AgentUserService agentUserService;
 
     /**
      * 列表
@@ -99,6 +109,28 @@ public class EquipController {
         this.equipService.generateQrcode(vo);
         return R.ok();
     }
+
+    @GetMapping("selectAgentAndHotel")
+    @RequiresPermissions({"agentUser:select", "hotel:hotelInfo:select"})
+    public R selectAgentAndHotel() {
+        boolean isAgent = ShiroUtils.isAgent();
+        List<HotelInfoEntity> hotels;
+        if(!isAgent) {
+            hotels = new ArrayList<>();
+        } else {
+            hotels = hotelInfoService.select();
+        }
+        List<AgentUserEntity> agents = agentUserService.select(isAgent);
+        return R.ok().put("hotels", hotels).put("agents", agents).put("agentLevel", ShiroUtils.getLoginUser().getAgentLevel());
+    }
+
+    @PostMapping("release")
+    @RequiresPermissions("equipment:equip:release")
+    public R release(@RequestBody @Validated ReleaseEquipVo vo) {
+        equipService.releaseVo(vo);
+        return R.ok();
+    }
+
 
 
 }

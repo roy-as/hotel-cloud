@@ -7,6 +7,7 @@ import com.hotel.cloud.modules.sys.entity.SysRoleMenuEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,15 +28,15 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuDao, SysRoleM
 		if(menuIdList.size() == 0){
 			return ;
 		}
-
+		List<SysRoleMenuEntity> list = new ArrayList<>();
 		//保存角色与菜单关系
 		for(Long menuId : menuIdList){
 			SysRoleMenuEntity sysRoleMenuEntity = new SysRoleMenuEntity();
 			sysRoleMenuEntity.setMenuId(menuId);
 			sysRoleMenuEntity.setRoleId(roleId);
-
-			this.save(sysRoleMenuEntity);
+			list.add(sysRoleMenuEntity);
 		}
+		this.saveBatch(list);
 	}
 
 	@Override

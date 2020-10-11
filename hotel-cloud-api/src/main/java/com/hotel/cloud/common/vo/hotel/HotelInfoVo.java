@@ -1,4 +1,4 @@
-package com.hotel.cloud.common.vo;
+package com.hotel.cloud.common.vo.hotel;
 
 import com.alibaba.fastjson.JSON;
 import com.hotel.cloud.common.annotation.Length;

@@ -41,7 +41,7 @@ public @interface Min {
 
         @Override
         public boolean isValid(List<?> value, ConstraintValidatorContext context) {
-            return value.size() >= this.min;
+            return null != value && value.size() >= this.min;
         }
     }
 

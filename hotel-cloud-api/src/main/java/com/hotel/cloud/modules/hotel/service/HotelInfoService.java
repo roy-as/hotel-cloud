@@ -3,7 +3,7 @@ package com.hotel.cloud.modules.hotel.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.vo.DisableVo;
-import com.hotel.cloud.common.vo.HotelInfoVo;
+import com.hotel.cloud.common.vo.hotel.HotelInfoVo;
 import com.hotel.cloud.modules.hotel.entity.HotelInfoEntity;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 

@@ -1,14 +1,26 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+      <el-form-item label="设备名称">
+        <el-input v-model="dataForm.name" placeholder="设备名称" clearable></el-input>
+      </el-form-item>
+      <el-form-item prop="module" label="设备模块">
+        <el-select v-model="dataForm.moduleId" filterable clearable @change="$forceUpdate()">
+          <el-option v-for="module in modules" :key="module.id" :label="module.name" :value="module.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="酒店"  prop="hotelId">
+        <el-select v-model="dataForm.hotelId" @change="$forceUpdate()" filterable clearable>
+          <el-option v-for="hotel in hotels" :key="hotel.id" :label="hotel.name" :value="hotel.id">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('equipment:equip:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('equipment:equip:generateQrcode')" type="primary" @click="generateQrcode()" :disabled="dataListSelections.length <= 0">生成二维码</el-button>
+        <el-button v-if="isAuth('equipment:equip:release')" type="primary" @click="releaseEquip()" :disabled="dataListSelections.length <= 0">设备下发</el-button>
         <el-button v-if="isAuth('equipment:equip:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button v-if="isAuth('equipment:equip:generateQrcode')" type="danger" @click="generateQrcode()" :disabled="dataListSelections.length <= 0">生成二维码</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -162,12 +174,14 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <generate-qrcode v-if="generateQrcodeVisible" ref="generateQrcode" @refreshDataList="getDataList"></generate-qrcode>
+    <release v-if="releaseVisible" ref="release"  @refreshDataList="getDataList"></release>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './equip-add-or-update'
   import GenerateQrcode from './equip-generate-qrcode'
+  import Release from './equip-release'
   export default {
     data () {
       return {
@@ -175,18 +189,22 @@
           key: ''
         },
         dataList: [],
+        modules: [],
+        hotels: [],
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        generateQrcodeVisible: false
+        generateQrcodeVisible: false,
+        releaseVisible: false
       }
     },
     components: {
       AddOrUpdate,
-      GenerateQrcode
+      GenerateQrcode,
+      Release
     },
     activated () {
       this.getDataList()
@@ -201,7 +219,9 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'name': this.dataForm.name,
+            'moduleId': this.dataForm.moduleId,
+            'hotelId': this.dataForm.hotelId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -212,6 +232,20 @@
             this.totalPage = 0
           }
           this.dataListLoading = false
+        })
+        this.$http({
+          url: this.$http.adornUrl('/equipment/equipModule/select'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          this.modules = data && data.code === 0 ? data.data : []
+        })
+        this.$http({
+          url: this.$http.adornUrl('/hotel/hotelInfo/select'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          this.hotels = data && data.code === 0 ? data.data : []
         })
       },
       // 每页数
@@ -273,13 +307,13 @@
         let valid = true
         let devices = []
         this.dataListSelections.forEach((item, index) => {
-          if (!item.qrcodeInfo) {
+          if (item.qrcodeInfo && item.ossId) {
             valid = false
             devices.push(item.name)
           }
         })
         const msg = `设备:  [${devices.join(',')}] 已生成二维码`
-        if (valid) {
+        if (!valid) {
           this.$alert(msg, '提示', {
             confirmButtonText: '确定',
             callback: () => {
@@ -300,6 +334,39 @@
         this.generateQrcodeVisible = true
         this.$nextTick(() => {
           this.$refs.generateQrcode.init(ids, names)
+        })
+      },
+      releaseEquip (id, name) {
+        let valid = true
+        let devices = []
+        this.dataListSelections.forEach((item, index) => {
+          if (item.agentId && item.hotelId) {
+            valid = false
+            devices.push(item.name)
+          }
+        })
+        const msg = `设备:  [${devices.join(',')}] 已下发`
+        if (!valid) {
+          this.$alert(msg, '提示', {
+            confirmButtonText: '确定',
+            callback: () => {
+              this.$message({
+                type: 'warning',
+                message: msg
+              })
+            }
+          })
+          return
+        }
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        var names = name ? [name] : this.dataListSelections.map(item => {
+          return item.name
+        })
+        this.releaseVisible = true
+        this.$nextTick(() => {
+          this.$refs.release.init(ids, names)
         })
       },
       imgUrl: function (row) {

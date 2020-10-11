@@ -164,6 +164,7 @@
   export default {
     data () {
       return {
+        modules: [],
         dataForm: {
           key: ''
         },

@@ -43,8 +43,14 @@
         <if test="params.parentName != null and params.parentName != ''">
             and au.agent_name like CONCAT(CONCAT('%', #{params.parentName}), '%')
         </if>
-        <if test="params.agentLevel != null">
-            and t.agent_level = #{params.agentLevel}
+        <if test="params.parentId != null">
+            and t.parent_id = #{params.parentId}
+        </if>
+        <if test="params.agentLevels != null and params.agentLevels.size() > 0">
+            and t.agent_level in
+            <foreach collection="params.agentLevels" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="params.status != null">
             and t.status = #{params.status}

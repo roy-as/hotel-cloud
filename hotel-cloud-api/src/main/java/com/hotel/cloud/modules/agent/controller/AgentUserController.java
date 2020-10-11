@@ -3,7 +3,7 @@ package com.hotel.cloud.modules.agent.controller;
 import java.util.Map;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
-import com.hotel.cloud.common.vo.AgentUserVo;
+import com.hotel.cloud.common.vo.agent.AgentUserVo;
 import com.hotel.cloud.common.vo.DisableVo;
 import com.hotel.cloud.modules.agent.entity.AgentUserEntity;
 import com.hotel.cloud.modules.agent.service.AgentUserService;
@@ -61,7 +61,7 @@ public class AgentUserController {
     @RequestMapping("/select")
     @RequiresPermissions("agentUser:select")
     public R select(){
-        return R.ok().put("data", agentUserService.select());
+        return R.ok().put("data", agentUserService.selectParentAgent());
     }
 
     /**

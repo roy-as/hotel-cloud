@@ -1,14 +1,13 @@
 package com.hotel.cloud.modules.hotel.controller;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
 import com.hotel.cloud.common.vo.DisableVo;
-import com.hotel.cloud.common.vo.HotelInfoVo;
+import com.hotel.cloud.common.vo.hotel.HotelInfoVo;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;

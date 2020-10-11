@@ -1,4 +1,4 @@
-package com.hotel.cloud.common.vo;
+package com.hotel.cloud.common.vo.equip;
 
 import com.hotel.cloud.common.annotation.Min;
 import lombok.Data;

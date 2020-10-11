@@ -3,14 +3,13 @@ package com.hotel.cloud.modules.hotel.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.hotel.cloud.common.enums.AgentLevelEnum;
 import com.hotel.cloud.common.enums.ExceptionEnum;
 import com.hotel.cloud.common.enums.FlagEnum;
 import com.hotel.cloud.common.enums.HotelPictureTypeEnum;
 import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.common.utils.*;
 import com.hotel.cloud.common.vo.DisableVo;
-import com.hotel.cloud.common.vo.HotelInfoVo;
+import com.hotel.cloud.common.vo.hotel.HotelInfoVo;
 import com.hotel.cloud.modules.hotel.entity.HotelOssMappingEntity;
 import com.hotel.cloud.modules.hotel.service.HotelOssMappingService;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
@@ -46,6 +45,10 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<HotelInfoEntity> page = new Query<HotelInfoEntity>().getPage(params);
+        if(ShiroUtils.isAgent()) {
+            SysUserEntity loginUser = ShiroUtils.getLoginUser();
+            params.put("createBy", loginUser.getUsername());
+        }
         List<HotelInfoEntity> list = this.baseMapper.getHotelInfoList(page, params);
         page.setRecords(list);
         return new PageUtils(page);
