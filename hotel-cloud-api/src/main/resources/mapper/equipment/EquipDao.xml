@@ -22,5 +22,14 @@
         <result property="updateBy" column="update_by"/>
     </resultMap>
 
+    <update id="updateBatchById" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            update t_equip
+            set hotel_id = #{item.hotelId}, hotel_name = #{item.hotelName}, agent_id = #{item.agentId},
+                agent_name = #{item.agentName}, update_by = #{item.updateBy}, status = #{item.status}
+            where id = #{item.id}
+        </foreach>
+    </update>
+
 
 </mapper>

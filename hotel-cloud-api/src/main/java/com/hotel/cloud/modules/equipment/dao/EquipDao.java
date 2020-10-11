@@ -4,6 +4,8 @@ import com.hotel.cloud.modules.equipment.entity.EquipEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * 设备表
  * 
@@ -13,5 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface EquipDao extends BaseMapper<EquipEntity> {
+
+    void updateBatchById(List<EquipEntity> equips);
 	
 }

@@ -23,5 +23,7 @@ public interface EquipService extends IService<EquipEntity> {
     void generateQrcode(QrcodeVo vo) throws IOException;
 
     void releaseVo(ReleaseEquipVo vo);
+
+    void recycle(Long[] ids);
 }
 

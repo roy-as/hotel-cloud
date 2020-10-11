@@ -21,7 +21,7 @@
         <el-button v-if="isAuth('equipment:equip:generateQrcode')" type="primary" @click="generateQrcode()" :disabled="dataListSelections.length <= 0">生成二维码</el-button>
         <el-button v-if="isAuth('equipment:equip:release')" type="primary" @click="releaseEquip()" :disabled="dataListSelections.length <= 0">设备下发</el-button>
         <el-button v-if="isAuth('equipment:equip:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button v-if="isAuth('equipment:equip:recycle')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量回收</el-button>
+        <el-button v-if="isAuth('equipment:equip:recycle')" type="danger" @click="recycleHandle()" :disabled="dataListSelections.length <= 0">批量回收</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -160,7 +160,7 @@
         <template slot-scope="scope">
           <el-button v-if="isAuth('equipment:equip:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button v-if="isAuth('equipment:equip:delete')" type="text" size="small" @click="deleteHandle(scope.row.id, scope.row.name)">删除</el-button>
-          <el-button v-if="isAuth('equipment:equip:recycle')" type="text" size="small" @click="deleteHandle(scope.row.id, scope.row.name)"><span style="color: lightpink">回收</span></el-button>
+          <el-button v-if="isAuth('equipment:equip:recycle')" type="text" size="small" @click="recycleHandle(scope.row.id, scope.row.name)"><span style="color: lightpink">回收</span></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -184,6 +184,7 @@
   import AddOrUpdate from './equip-add-or-update'
   import GenerateQrcode from './equip-generate-qrcode'
   import Release from './equip-release'
+  import { getUserId } from '@/utils/index'
   export default {
     data () {
       return {
@@ -305,6 +306,38 @@
           })
         })
       },
+      recycleHandle (id, name) {
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        var names = name ? [name] : this.dataListSelections.map(item => {
+          return item.name
+        })
+        this.$confirm(`确定对[设备:${names.join(',')}]进行[${name ? '回收' : '批量回收'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/equipment/equip/recycle'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        })
+      },
       generateQrcode: function (id, name) {
         let valid = true
         let devices = []
@@ -341,8 +374,9 @@
       releaseEquip (id, name) {
         let valid = true
         let devices = []
+        const userId = getUserId()
         this.dataListSelections.forEach((item, index) => {
-          if (item.agentId && item.hotelId) {
+          if (item.agentId && (item.hotelId || item.agentId !== Number(userId))) {
             valid = false
             devices.push(item.name)
           }

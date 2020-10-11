@@ -131,6 +131,13 @@ public class EquipController {
         return R.ok();
     }
 
+    @PostMapping("/recycle")
+    @RequiresPermissions("equipment:equip:recycle")
+    public R recycle(@RequestBody Long[] ids) {
+        equipService.recycle(ids);
+        return R.ok();
+    }
+
 
 
 }

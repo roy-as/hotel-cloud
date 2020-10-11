@@ -82,6 +82,7 @@
               if (data && data.code === 0) {
                 this.$cookie.set('token', data.token)
                 this.$router.replace({ name: 'home' })
+                sessionStorage.setItem('id', data.id)
               } else {
                 this.getCaptcha()
                 this.$message.error(data.msg)

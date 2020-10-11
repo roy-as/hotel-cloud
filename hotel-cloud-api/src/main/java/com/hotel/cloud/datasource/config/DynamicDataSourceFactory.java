@@ -1,9 +1,14 @@
 package com.hotel.cloud.datasource.config;
 
+import com.alibaba.druid.filter.Filter;
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.wall.WallConfig;
+import com.alibaba.druid.wall.WallFilter;
+import com.google.common.collect.ImmutableList;
 import com.hotel.cloud.datasource.properties.DataSourceProperties;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * DruidDataSource
@@ -32,6 +37,13 @@ public class DynamicDataSourceFactory {
         druidDataSource.setPoolPreparedStatements(properties.isPoolPreparedStatements());
         druidDataSource.setMaxOpenPreparedStatements(properties.getMaxOpenPreparedStatements());
         druidDataSource.setSharePreparedStatements(properties.isSharePreparedStatements());
+
+        WallConfig wallConfig = new WallConfig();
+        wallConfig.setMultiStatementAllow(true);
+        WallFilter wallFilter = new WallFilter();
+        wallFilter.setConfig(wallConfig);
+        List<Filter> filters = ImmutableList.of(wallFilter);
+        druidDataSource.setProxyFilters(filters);
 
         try {
             druidDataSource.setFilters(properties.getFilters());

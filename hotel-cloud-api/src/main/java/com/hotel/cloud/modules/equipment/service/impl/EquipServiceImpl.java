@@ -12,8 +12,8 @@ import com.hotel.cloud.modules.agent.service.AgentUserService;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import com.hotel.cloud.modules.oss.service.SysOssService;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
+import com.hotel.cloud.modules.sys.service.SysUserService;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.validator.constraints.pl.REGON;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -41,6 +41,9 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
     @Resource
     private AgentUserService agentUserService;
 
+    @Resource
+    private SysUserService sysUserService;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         String name = (String) params.get("name");
@@ -48,13 +51,23 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
         String hotelId = (String) params.get("hotelId");
         boolean isAgent = ShiroUtils.isAgent();
         SysUserEntity loginUser = ShiroUtils.getLoginUser();
+        List<Long> agents = new ArrayList<>();
+        if(isAgent) {
+            agents.add(loginUser.getUserId());
+            List<SysUserEntity> users = sysUserService.list(
+                    new QueryWrapper<SysUserEntity>().eq("parent_id", loginUser.getUserId())
+            );
+            for(SysUserEntity user : users) {
+                agents.add(user.getUserId());
+            }
+        }
         IPage<EquipEntity> page = this.page(
                 new Query<EquipEntity>().getPage(params),
                 new QueryWrapper<EquipEntity>()
                         .like(StringUtils.isNotBlank(name), "name", MessageFormat.format("%{0}%", name))
                         .eq(StringUtils.isNotBlank(moduleId), "module_id", moduleId)
                         .eq(StringUtils.isNotBlank(hotelId), "hotel_id", hotelId)
-                        .eq(isAgent, "agent_id", loginUser.getUserId())
+                        .in(isAgent, "agent_id", agents)
                         .orderByDesc("create_time")
         );
 
@@ -117,6 +130,38 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
             equip.setUpdateTime(new Date());
         }
         this.updateBatchById(equips);
+    }
+
+    @Override
+    @Transactional
+    public void recycle(Long[] ids) {
+        List<EquipEntity> equips = this.baseMapper.selectBatchIds(Arrays.asList(ids));
+        boolean isAgent = ShiroUtils.isAgent();
+        SysUserEntity loginUser = ShiroUtils.getLoginUser();
+        for(EquipEntity equip : equips) {
+            if(isAgent) {
+                Long agentId = equip.getAgentId();
+                Long userId = loginUser.getUserId();
+                SysUserEntity user = this.sysUserService.getById(agentId);
+                Long parentId = user.getParentId();
+                if(!userId.equals(agentId) && !userId.equals(parentId)) {
+                    throw new RRException(ExceptionEnum.NOT_AUTHENTICATION);
+                }
+                if(userId.equals(parentId)){
+                    equip.setAgentId(userId);
+                    AgentUserEntity agentUser = agentUserService.getAgentUser(userId);
+                    equip.setAgentName(agentUser.getAgentName());
+                }
+            } else {
+                equip.setAgentName(null);
+                equip.setAgentName(null);
+            }
+            equip.setStatus(EquipStatusEnum.PENDING_RELEASE.getCode());
+            equip.setUpdateBy(loginUser.getUsername());
+            equip.setHotelId(null);
+            equip.setHotelName(null);
+        }
+        this.baseMapper.updateBatchById(equips);
     }
 
     /**
