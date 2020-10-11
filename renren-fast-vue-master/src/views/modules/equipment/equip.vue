@@ -21,6 +21,7 @@
         <el-button v-if="isAuth('equipment:equip:generateQrcode')" type="primary" @click="generateQrcode()" :disabled="dataListSelections.length <= 0">生成二维码</el-button>
         <el-button v-if="isAuth('equipment:equip:release')" type="primary" @click="releaseEquip()" :disabled="dataListSelections.length <= 0">设备下发</el-button>
         <el-button v-if="isAuth('equipment:equip:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('equipment:equip:recycle')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量回收</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -157,8 +158,9 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id, scope.row.name)">删除</el-button>
+          <el-button v-if="isAuth('equipment:equip:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button v-if="isAuth('equipment:equip:delete')" type="text" size="small" @click="deleteHandle(scope.row.id, scope.row.name)">删除</el-button>
+          <el-button v-if="isAuth('equipment:equip:recycle')" type="text" size="small" @click="deleteHandle(scope.row.id, scope.row.name)"><span style="color: lightpink">回收</span></el-button>
         </template>
       </el-table-column>
     </el-table>

@@ -134,12 +134,12 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="showPictureHandle(scope.row.id, 1)">全景图</el-button>
-          <el-button type="text" size="small" @click="showPictureHandle(scope.row.id, 2)">酒店照片</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id, scope.row.name)">删除</el-button>
-          <el-button v-if="scope.row.status === 0" type="text" size="small" @click="disable(scope.row.id, scope.row.name, 1)">启用</el-button>
-          <el-button v-else type="text" size="small" @click="disable(scope.row.id, scope.row.name, 0)"><span style="color: lightpink">禁用</span></el-button>
+          <el-button v-if="isAuth('hotel:hotelInfo:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button v-if="isAuth('hotel:hotelInfo:info')" type="text" size="small" @click="showPictureHandle(scope.row.id, 1)">全景图</el-button>
+          <el-button v-if="isAuth('hotel:hotelInfo:info')" type="text" size="small" @click="showPictureHandle(scope.row.id, 2)">酒店照片</el-button>
+          <el-button v-if="isAuth('hotel:hotelInfo:delete')" type="text" size="small" @click="deleteHandle(scope.row.id, scope.row.name)">删除</el-button>
+          <el-button v-if="scope.row.status === 0 && isAuth('hotel:hotelInfo:update')" type="text" size="small" @click="disable(scope.row.id, scope.row.name, 1)">启用</el-button>
+          <el-button v-if="scope.row.status === 1 && isAuth('hotel:hotelInfo:update')" type="text" size="small" @click="disable(scope.row.id, scope.row.name, 0)"><span style="color: lightpink">禁用</span></el-button>
         </template>
       </el-table-column>
     </el-table>

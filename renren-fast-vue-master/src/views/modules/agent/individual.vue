@@ -129,10 +129,10 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.userId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.userId, scope.row.sysUser.username)">删除</el-button>
-          <el-button v-if="scope.row.sysUser.status === 0" type="text" size="small" @click="disable(scope.row.userId, scope.row.sysUser.username, 1)">启用</el-button>
-          <el-button v-else type="text" size="small" @click="disable(scope.row.userId, scope.row.sysUser.username, 0)"><span style="color: lightpink">禁用</span></el-button>
+          <el-button v-if="isAuth('agentUser:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.userId)">修改</el-button>
+          <el-button v-if="isAuth('agentUser:delete')" type="text" size="small" @click="deleteHandle(scope.row.userId, scope.row.sysUser.username)">删除</el-button>
+          <el-button v-if="scope.row.sysUser.status === 0 && isAuth('agentUser:delete')" type="text" size="small" @click="disable(scope.row.userId, scope.row.sysUser.username, 1)">启用</el-button>
+          <el-button v-if="scope.row.sysUser.status === 1 && isAuth('agentUser:delete')" type="text" size="small" @click="disable(scope.row.userId, scope.row.sysUser.username, 0)"><span style="color: lightpink">禁用</span></el-button>
         </template>
       </el-table-column>
     </el-table>
