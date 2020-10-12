@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.util.Arrays;
+import java.util.List;
 
 @Data
 public class HotelInfoVo {
@@ -67,11 +69,19 @@ public class HotelInfoVo {
      * 酒店图片
      */
     private MultipartFile[] hotelPictures;
+    /**
+     *  图片id
+     */
+    private Long[] pictureIds;
 
     public HotelInfoEntity getHotelInfoEntity() {
         HotelInfoEntity hotelInfo = new HotelInfoEntity();
         BeanUtils.copyProperties(this, hotelInfo);
         hotelInfo.setArea(JSON.toJSONString(this.area));
         return hotelInfo;
+    }
+
+    public List<Long> getPictureIds () {
+        return Arrays.asList(this.pictureIds);
     }
 }

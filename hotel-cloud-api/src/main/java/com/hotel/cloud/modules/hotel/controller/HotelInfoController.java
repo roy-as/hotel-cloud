@@ -113,4 +113,11 @@ public class HotelInfoController {
         List<HotelInfoEntity> hotels = hotelInfoService.select();
         return R.ok().put("data", hotels);
     }
+
+    @PostMapping("/deletePicture")
+    @RequiresPermissions("hotel:hotelInfo:update")
+    public R deletePicture(@RequestBody HotelInfoVo vo){
+        hotelInfoService.deletePicture(vo);
+        return R.ok();
+    }
 }

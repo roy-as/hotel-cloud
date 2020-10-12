@@ -133,6 +133,7 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
         SysUserEntity loginUser = ShiroUtils.getLoginUser();
         entity.setUpdateBy(loginUser.getUsername());
         this.updateById(entity);
+        List<HotelOssMappingEntity> ossList = new ArrayList<>();
         // 存储文件
         if (null != vo.getLogo()) {
             HotelOssMappingEntity mappingEntity = this.saveFile(
@@ -144,7 +145,25 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
             boolean success = this.hotelOssMappingService.update(mappingEntity, wrapper);
             if (!success) {
                 this.hotelOssMappingService.insert(mappingEntity);
+                ossList.add(mappingEntity);
             }
+        }
+        // 存错全景图
+        MultipartFile[] fullViews = vo.getFullViews();
+        if (CommonUtils.isNotEmpty(fullViews)) {
+            ossList.addAll(
+                    this.saveFile(entity.getId(), fullViews, HotelPictureTypeEnum.HOTEL_FULL_VIEW_PICTURE.getType())
+            );
+        }
+        // 存储酒店图片
+        MultipartFile[] hotelPictures = vo.getHotelPictures();
+        if (CommonUtils.isNotEmpty(hotelPictures)) {
+            ossList.addAll(
+                    this.saveFile(entity.getId(), hotelPictures, HotelPictureTypeEnum.HOTEL_PICTURE.getType())
+            );
+        }
+        if (CollectionUtil.isNotEmpty(ossList)) {
+            this.hotelOssMappingService.saveBatch(ossList);
         }
 
     }
@@ -225,6 +244,22 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
                         .eq("flag", FlagEnum.OK.getCode())
                         .orderByDesc("create_time")
         );
+    }
+
+    @Override
+    @Transactional
+    public void deletePicture(HotelInfoVo vo) {
+        HotelInfoEntity hotel = this.getById(vo.getId());
+        if(null != hotel) {
+            checkAuth(hotel);
+            hotelOssMappingService.getBaseMapper().delete(new QueryWrapper<HotelOssMappingEntity>()
+                    .eq("hotel_id", vo.getId())
+                    .in("oss_id", vo.getPictureIds())
+            );
+            sysOssService.removeByIds(vo.getPictureIds());
+            hotel.setUpdateBy(ShiroUtils.getLoginUser().getUsername());
+            this.updateById(hotel);
+        }
     }
 
 }

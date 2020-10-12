@@ -32,5 +32,7 @@ public interface HotelInfoService extends IService<HotelInfoEntity> {
     List<SysOssEntity> getPicture(Long id, Integer pictureType);
 
     List<HotelInfoEntity> select();
+
+    void deletePicture(HotelInfoVo vo);
 }
 
