@@ -4,6 +4,9 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+      <el-form-item label="参数类型" prop="paramType">
+        <el-input v-model="dataForm.paramType" placeholder="参数类型"></el-input>
+      </el-form-item>
       <el-form-item label="参数名" prop="paramKey">
         <el-input v-model="dataForm.paramKey" placeholder="参数名"></el-input>
       </el-form-item>
@@ -28,6 +31,7 @@
         visible: false,
         dataForm: {
           id: 0,
+          paramType: '',
           paramKey: '',
           paramValue: '',
           remark: ''
@@ -55,6 +59,7 @@
               params: this.$http.adornParams()
             }).then(({data}) => {
               if (data && data.code === 0) {
+                this.dataForm.paramType = data.config.paramType
                 this.dataForm.paramKey = data.config.paramKey
                 this.dataForm.paramValue = data.config.paramValue
                 this.dataForm.remark = data.config.remark
@@ -72,6 +77,7 @@
               method: 'post',
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
+                'paramType': this.dataForm.paramType,
                 'paramKey': this.dataForm.paramKey,
                 'paramValue': this.dataForm.paramValue,
                 'remark': this.dataForm.remark

@@ -128,6 +128,7 @@
         this.hotelVisible = false
       },
       select () {
+        this.$forceUpdate()
         const releaseType = this.dataForm.releaseType
         if (releaseType === 1) {
           this.agentVisible = true

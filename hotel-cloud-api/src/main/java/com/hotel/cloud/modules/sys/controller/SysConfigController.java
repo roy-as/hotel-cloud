@@ -1,7 +1,9 @@
 package com.hotel.cloud.modules.sys.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hotel.cloud.common.annotation.SysLog;
+import com.hotel.cloud.common.utils.CommonUtils;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
 import com.hotel.cloud.common.validator.ValidatorUtils;
@@ -11,7 +13,11 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotBlank;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 系统配置信息
@@ -84,6 +90,15 @@ public class SysConfigController extends AbstractController {
 		sysConfigService.deleteBatch(ids);
 		
 		return R.ok();
+	}
+
+	@GetMapping("/select")
+	public R select(String[] paramTypes) {
+		List<SysConfigEntity> configs = sysConfigService.list(new QueryWrapper<SysConfigEntity>()
+				.in(CommonUtils.isNotEmpty(paramTypes), "param_type", Arrays.asList(paramTypes))
+		);
+		Map<String, List<SysConfigEntity>> result = configs.stream().collect(Collectors.groupingBy(SysConfigEntity::getParamType));
+		return R.ok().put("data", result);
 	}
 
 }

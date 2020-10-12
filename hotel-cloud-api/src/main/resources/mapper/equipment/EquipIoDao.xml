@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hotel.cloud.modules.equipment.dao.EquipIoDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hotel.cloud.modules.equipment.entity.EquipIoEntity" id="equipIoMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="moduleId" column="module_id"/>
+        <result property="moduleName" column="module_name"/>
+        <result property="ioType" column="io_type"/>
+        <result property="swichType" column="swich_type"/>
+        <result property="keyType" column="key_type"/>
+        <result property="keyName" column="key_name"/>
+    </resultMap>
+
+
+</mapper>

@@ -154,7 +154,7 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
                 }
             } else {
                 equip.setAgentName(null);
-                equip.setAgentName(null);
+                equip.setAgentId(null);
             }
             equip.setStatus(EquipStatusEnum.PENDING_RELEASE.getCode());
             equip.setUpdateBy(loginUser.getUsername());

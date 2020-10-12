@@ -2,12 +2,12 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.paramKey" placeholder="参数名" clearable></el-input>
+        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('equipment:equipIo:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('equipment:equipIo:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -26,33 +26,66 @@
         prop="id"
         header-align="center"
         align="center"
-        width="80"
         v-if="false"
-        label="ID">
+        label="主键">
       </el-table-column>
       <el-table-column
-        prop="paramType"
+        prop="name"
         header-align="center"
         align="center"
-        label="参数类型">
+        label="IO名称">
       </el-table-column>
       <el-table-column
-        prop="paramKey"
+        prop="moduleName"
         header-align="center"
         align="center"
-        label="参数名">
+        label="设备模块">
       </el-table-column>
       <el-table-column
-        prop="paramValue"
+        prop="ioType"
         header-align="center"
         align="center"
-        label="参数值">
+        label="IO类型">
       </el-table-column>
       <el-table-column
-        prop="remark"
+        prop="switchType"
         header-align="center"
         align="center"
-        label="备注">
+        label="开关类型">
+      </el-table-column>
+      <el-table-column
+        prop="keyType"
+        header-align="center"
+        align="center"
+        label=" 按键类型">
+      </el-table-column>
+      <el-table-column
+        prop="createTime"
+        header-align="center"
+        align="center"
+        show-overflow-tooltip
+        label="创建时间">
+      </el-table-column>
+      <el-table-column
+        prop="updateTime"
+        header-align="center"
+        align="center"
+        show-overflow-tooltip
+        label="更新时间">
+      </el-table-column>
+      <el-table-column
+        prop="createBy"
+        header-align="center"
+        align="center"
+        show-overflow-tooltip
+        label="创建人">
+      </el-table-column>
+      <el-table-column
+        prop="updateBy"
+        header-align="center"
+        align="center"
+        show-overflow-tooltip
+        label="更新人">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -81,12 +114,12 @@
 </template>
 
 <script>
-  import AddOrUpdate from './config-add-or-update'
+  import AddOrUpdate from './equipIo-add-or-update'
   export default {
     data () {
       return {
         dataForm: {
-          paramKey: ''
+          key: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -108,12 +141,12 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/sys/config/list'),
+          url: this.$http.adornUrl('/equipment/equipIo/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'paramKey': this.dataForm.paramKey
+            'key': this.dataForm.key
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -159,7 +192,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/sys/config/delete'),
+            url: this.$http.adornUrl('/equipment/equipIo/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
@@ -176,7 +209,7 @@
               this.$message.error(data.msg)
             }
           })
-        }).catch(() => {})
+        })
       }
     }
   }
