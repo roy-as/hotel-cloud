@@ -44,7 +44,7 @@
         label="Logo">
         <template slot-scope="scope">
           <span v-if="scope.row.logo && scope.row.logo.url">
-            <img :src="imgUrl(scope.row)" height="95" width="70"/>
+            <img :src="imgUrl(scope.row)" :preview="scope.$index" height="95" width="70"/>
           </span>
         </template>
       </el-table-column>
