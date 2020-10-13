@@ -40,10 +40,15 @@ public class EquipIoEntity implements Serializable {
 	 * IO类型，1:强电，2:弱电
 	 */
 	private Integer ioType;
+
+	private String ioName;
+
 	/**
 	 * 开关类型，1:继电器，2:按键
 	 */
 	private Integer switchType;
+
+	private String switchName;
 	/**
 	 *  按键类型
 	 */
