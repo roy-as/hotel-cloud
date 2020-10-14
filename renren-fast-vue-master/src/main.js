@@ -16,7 +16,7 @@ import 'vue-photo-preview/dist/skin.css'
 Vue.use(preview, {
   maxSpreadZoom: 1,
   counterEl: false,
-  arrowEl: false
+  arrowEl: true
 })
 Vue.use(VueCookie)
 Vue.config.productionTip = false

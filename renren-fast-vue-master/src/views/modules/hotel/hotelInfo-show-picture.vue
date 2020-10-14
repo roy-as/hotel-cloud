@@ -2,13 +2,14 @@
   <el-dialog
     :title="dataForm.pictureType == 1 ? '全景图' : '酒店图片'"
     :close-on-click-modal="false"
-    :visible.sync="visible">
+    :visible.sync="visible"
+    @open='openImgDialog'>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
              label-width="80px">
       <el-form-item>
         <div v-for="pictures in pictureList">
-          <span v-for="picture in pictures">
-            <img :src="picture.url" width="140" height="160" style="margin: 10px">
+          <span v-for="(picture ,index) in pictures">
+            <img :src="picture.url" :preview="index" width="140" height="160" style="margin: 10px">
             <i class="el-icon-delete"></i>
           </span>
         </div>
@@ -123,7 +124,15 @@
             })
           }
         })
+      },
+      openImgDialog () {
+        this.$previewRefresh()
       }
     }
   }
 </script>
+<style lang="scss">
+  .pswp{
+    z-index: 9999 !important;
+  }
+</style>
