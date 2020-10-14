@@ -62,7 +62,7 @@
         label="Logo">
         <template slot-scope="scope">
           <span v-if="scope.row.qrcodeUrl">
-            <img :src="imgUrl(scope.row)" height="70" width="70"/>
+            <img :src="imgUrl(scope.row)" :preview="scope.$index" height="70" width="70"/>
           </span>
         </template>
       </el-table-column>
