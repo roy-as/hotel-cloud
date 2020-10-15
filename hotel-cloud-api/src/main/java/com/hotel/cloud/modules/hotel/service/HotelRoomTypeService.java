@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.modules.hotel.entity.HotelRoomTypeEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,5 +19,9 @@ public interface HotelRoomTypeService extends IService<HotelRoomTypeEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     void saveRoomType(HotelRoomTypeEntity hotelRoomType);
+
+    List<HotelRoomTypeEntity> select();
+
+    void delete(List<Long> ids);
 }
 
