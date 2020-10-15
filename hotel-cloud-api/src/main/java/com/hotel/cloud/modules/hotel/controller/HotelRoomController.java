@@ -1,10 +1,15 @@
 package com.hotel.cloud.modules.hotel.controller;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
+import com.hotel.cloud.common.utils.ShiroUtils;
+import com.hotel.cloud.common.vo.DisableVo;
+import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,8 +64,12 @@ public class HotelRoomController {
      */
     @RequestMapping("/save")
     @RequiresPermissions("hotel:hotelRoom:save")
-    public R save(@RequestBody HotelRoomEntity hotelRoom){
-		hotelRoomService.save(hotelRoom);
+    public R save(@RequestBody @Validated  HotelRoomEntity hotelRoom){
+        hotelRoom.setCreateTime(new Date());
+        SysUserEntity loginUser = ShiroUtils.getLoginUser();
+        hotelRoom.setCreateBy(loginUser.getUsername());
+        hotelRoom.setUpdateBy(loginUser.getUsername());
+        hotelRoomService.save(hotelRoom);
 
         return R.ok();
     }
@@ -71,7 +80,7 @@ public class HotelRoomController {
     @RequestMapping("/update")
     @RequiresPermissions("hotel:hotelRoom:update")
     public R update(@RequestBody HotelRoomEntity hotelRoom){
-		hotelRoomService.updateById(hotelRoom);
+		hotelRoomService.update(hotelRoom);
 
         return R.ok();
     }
@@ -82,7 +91,20 @@ public class HotelRoomController {
     @RequestMapping("/delete")
     @RequiresPermissions("hotel:hotelRoom:delete")
     public R delete(@RequestBody Long[] ids){
-		hotelRoomService.removeByIds(Arrays.asList(ids));
+
+		hotelRoomService.batchDelete(ids);
+
+        return R.ok();
+    }
+
+    /**
+     * 启用/禁用
+     */
+    @RequestMapping("/disable")
+    @RequiresPermissions("hotel:hotelRoom:update")
+    public R disable(@RequestBody DisableVo disableVo){
+
+        hotelRoomService.disable(disableVo);
 
         return R.ok();
     }

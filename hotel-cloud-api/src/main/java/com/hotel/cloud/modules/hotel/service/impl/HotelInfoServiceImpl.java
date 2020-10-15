@@ -208,13 +208,13 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
     public void disable(DisableVo vo) {
         checkAuth(vo.getId());
         Integer status = vo.getStatus();
-        List<HotelInfoEntity> users = Arrays.stream(vo.getId()).map(id -> {
+        List<HotelInfoEntity> hotels = Arrays.stream(vo.getId()).map(id -> {
             HotelInfoEntity hotel = new HotelInfoEntity();
             hotel.setId(id);
             hotel.setStatus(status);
             return hotel;
         }).collect(Collectors.toList());
-        this.updateBatchById(users);
+        this.updateBatchById(hotels);
     }
 
     @Override

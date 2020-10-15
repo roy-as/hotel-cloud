@@ -7,6 +7,9 @@ import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 /**
  * 酒店房间表
  * 
@@ -27,22 +30,26 @@ public class HotelRoomEntity implements Serializable {
 	/**
 	 * 房间名称
 	 */
+	@NotBlank(message = "房间名不能为空")
 	private String name;
 	/**
 	 * 房号
 	 */
+	@NotNull(message = "房号不能为空")
 	private String number;
 	/**
-	 * 房间名称
+	 * 备注
 	 */
 	private String remark;
 	/**
 	 * 酒店ID
 	 */
+	@NotNull(message = "酒店不能为空")
 	private Long hotelId;
 	/**
 	 * 酒店ID
 	 */
+	@NotNull(message = "房型不能为空")
 	private Long roomTypeId;
 	/**
 	 * 状态
@@ -69,12 +76,17 @@ public class HotelRoomEntity implements Serializable {
 	 */
 	private String updateBy;
 	/**
-	 * 楼栋ID
-	 */
-	private Long buildingId;
-	/**
 	 * 楼层
 	 */
+	@NotNull(message = "楼层不能为空")
 	private int floor;
+	/**
+	 * 酒店名称
+	 */
+	private String hotelName;
+	/**
+	 * 房型名称
+	 */
+	private String roomTypeName;
 
 }

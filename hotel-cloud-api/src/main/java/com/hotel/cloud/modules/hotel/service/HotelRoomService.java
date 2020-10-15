@@ -2,6 +2,7 @@ package com.hotel.cloud.modules.hotel.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hotel.cloud.common.utils.PageUtils;
+import com.hotel.cloud.common.vo.DisableVo;
 import com.hotel.cloud.modules.hotel.entity.HotelRoomEntity;
 
 import java.util.Map;
@@ -17,5 +18,11 @@ public interface
 HotelRoomService extends IService<HotelRoomEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void batchDelete(Long[] ids);
+
+    void update(HotelRoomEntity hotelRoom);
+
+    void disable(DisableVo disableVo);
 }
 

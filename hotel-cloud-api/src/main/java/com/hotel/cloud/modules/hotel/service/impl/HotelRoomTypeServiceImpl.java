@@ -1,6 +1,7 @@
 package com.hotel.cloud.modules.hotel.service.impl;
 
 import com.hotel.cloud.common.enums.ExceptionEnum;
+import com.hotel.cloud.common.enums.FlagEnum;
 import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.Query;
@@ -12,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -38,8 +40,8 @@ public class HotelRoomTypeServiceImpl extends ServiceImpl<HotelRoomTypeDao, Hote
         IPage<HotelRoomTypeEntity> page = this.page(
                 new Query<HotelRoomTypeEntity>().getPage(params),
                 new QueryWrapper<HotelRoomTypeEntity>()
-                .eq(StringUtils.isNotBlank(hotelId), "hotel_id", hotelId)
-                .eq(ShiroUtils.isAgent(), "create_by", ShiroUtils.getLoginUser().getUsername())
+                        .eq(StringUtils.isNotBlank(hotelId), "hotel_id", hotelId)
+                        .eq(ShiroUtils.isAgent(), "create_by", ShiroUtils.getLoginUser().getUsername())
         );
 
         return new PageUtils(page);
@@ -51,7 +53,7 @@ public class HotelRoomTypeServiceImpl extends ServiceImpl<HotelRoomTypeDao, Hote
         Long hotelId = hotelRoomType.getHotelId();
         HotelInfoEntity hotel = hotelInfoService.getById(hotelId);
         if (null != hotel) {
-            if(ShiroUtils.isAgent()) {
+            if (ShiroUtils.isAgent()) {
                 this.checkCreateAuth(hotel);
             }
             SysUserEntity loginUser = ShiroUtils.getLoginUser();
@@ -60,6 +62,14 @@ public class HotelRoomTypeServiceImpl extends ServiceImpl<HotelRoomTypeDao, Hote
             hotelRoomType.setUpdateBy(loginUser.getUsername());
             this.save(hotelRoomType);
         }
+    }
+
+    @Override
+    public List<HotelRoomTypeEntity> select() {
+        boolean isAgent = ShiroUtils.isAgent();
+        return this.list(new QueryWrapper<HotelRoomTypeEntity>()
+                .eq(isAgent, "create_by", ShiroUtils.getLoginUser().getUsername())
+                .orderByDesc("create_time"));
     }
 
     private void checkCreateAuth(HotelInfoEntity hotel) {
