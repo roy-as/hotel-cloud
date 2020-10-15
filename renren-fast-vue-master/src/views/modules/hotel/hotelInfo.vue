@@ -55,7 +55,7 @@
         show-overflow-tooltip
         label="地区">
         <template slot-scope="scope">
-          {{ JSON.parse(scope.row.area).join('|') || '无' }}
+          {{ scope.row.area === "null" ?  "无" : JSON.parse(scope.row.area).join('|') }}
         </template>
       </el-table-column>
       <el-table-column
