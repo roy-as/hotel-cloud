@@ -1,6 +1,7 @@
 package com.hotel.cloud.modules.hotel.controller;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -59,7 +60,7 @@ public class HotelRoomTypeController {
     @RequestMapping("/save")
     @RequiresPermissions("hotel:hotelRoomType:save")
     public R save(@RequestBody HotelRoomTypeEntity hotelRoomType){
-		hotelRoomTypeService.save(hotelRoomType);
+		hotelRoomTypeService.saveRoomType(hotelRoomType);
 
         return R.ok();
     }

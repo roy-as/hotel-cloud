@@ -42,19 +42,19 @@
         label="设备模块">
       </el-table-column>
       <el-table-column
-        prop="ioType"
+        prop="ioName"
         header-align="center"
         align="center"
         label="IO类型">
       </el-table-column>
       <el-table-column
-        prop="switchType"
+        prop="switchName"
         header-align="center"
         align="center"
         label="开关类型">
       </el-table-column>
       <el-table-column
-        prop="keyType"
+        prop="keyName"
         header-align="center"
         align="center"
         label=" 按键类型">

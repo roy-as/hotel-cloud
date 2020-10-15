@@ -8,10 +8,10 @@
         <el-input v-model="dataForm.name" placeholder="房型名称"></el-input>
       </el-form-item>
       <el-form-item label="面积" prop="square">
-        <el-input v-model="dataForm.square" placeholder="面积"></el-input>
+        <el-input v-model="dataForm.square" placeholder="面积,单位:平米"></el-input>
       </el-form-item>
       <el-form-item label="价格" prop="price">
-        <el-input v-model="dataForm.price" placeholder="价格"></el-input>
+        <el-input v-model="dataForm.price" placeholder="价格,单位:元"></el-input>
       </el-form-item>
       <el-form-item label="酒店" prop="hotelId" :class="{ 'is-required': !dataForm.id }">
         <el-select v-model="dataForm.hotelId" @change="$forceUpdate()" filterable clearable placeholder="请选择"
@@ -100,6 +100,9 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            const hotel = this.hotels.find((item) => {
+              return item.id === this.dataForm.hotelId
+            })
             this.$http({
               url: this.$http.adornUrl(`/hotel/hotelRoomType/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
@@ -109,7 +112,8 @@
                 'square': this.dataForm.square,
                 'price': this.dataForm.price,
                 'remark': this.dataForm.remark,
-                'hotelId': this.dataForm.hotelId
+                'hotelId': this.dataForm.hotelId,
+                'hotelName': hotel.name
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

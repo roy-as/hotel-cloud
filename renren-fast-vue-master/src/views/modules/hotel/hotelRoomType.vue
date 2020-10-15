@@ -1,8 +1,11 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+      <el-form-item label="酒店"  prop="hotelId">
+        <el-select v-model="dataForm.hotelId" @change="$forceUpdate()" filterable clearable>
+          <el-option v-for="hotel in hotels" :key="hotel.id" :label="hotel.name" :value="hotel.id">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -23,6 +26,7 @@
         width="50">
       </el-table-column>
       <el-table-column
+        v-if="false"
         prop="id"
         header-align="center"
         align="center"
@@ -47,7 +51,7 @@
         label="价格">
       </el-table-column>
       <el-table-column
-        prop="hotelId"
+        prop="hotelName"
         header-align="center"
         align="center"
         label="酒店">
@@ -62,12 +66,14 @@
         prop="createTime"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="创建时间">
       </el-table-column>
       <el-table-column
         prop="updateTime"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="更新时间">
       </el-table-column>
       <el-table-column
@@ -116,6 +122,7 @@
         dataForm: {
           key: ''
         },
+        hotels: [],
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -141,7 +148,7 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'hotelId': this.dataForm.hotelId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -152,6 +159,13 @@
             this.totalPage = 0
           }
           this.dataListLoading = false
+        })
+        this.$http({
+          url: this.$http.adornUrl('/hotel/hotelInfo/select'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          this.hotels = data && data.code === 0 ? data.data : []
         })
       },
       // 每页数

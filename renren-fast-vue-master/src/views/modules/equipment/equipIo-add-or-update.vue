@@ -22,14 +22,14 @@
         </el-select>
       </el-form-item>
       <el-form-item label="开关类型" prop="switchType">
-        <el-select v-model="dataForm.switchType" @change="$forceUpdate()" filterable clearable placeholder="请选择"
+        <el-select v-model="dataForm.switchType" @change="switchChange" filterable clearable placeholder="请选择"
                    style="width: 100%; position: relative" :disabled="!!dataForm.id">
           <el-option v-for="switchType in switchTypes" :key="switchType.value" :label="switchType.paramKey" :value="switchType.value">
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="按键类型" prop="keyType">
-        <el-select v-model="dataForm.keyType" @change="keyChange" filterable clearable placeholder="请选择"
+      <el-form-item v-if="keyTypeVisible" label="按键类型" prop="keyType">
+        <el-select v-model="dataForm.keyType" @change="$forceUpdate()" filterable clearable placeholder="请选择"
                    style="width: 100%; position: relative" :disabled="!!dataForm.id">
           <el-option v-for="keyType in keyTypes" :key="keyType.value" :label="keyType.paramKey" :value="keyType.value">
           </el-option>
@@ -52,6 +52,7 @@
         ioTypes: [],
         switchTypes: [],
         keyTypes: [],
+        keyTypeVisible: false,
         dataForm: {
           id: 0,
           name: '',
@@ -111,11 +112,9 @@
               if (data && data.code === 0) {
                 this.dataForm.name = data.equipIo.name
                 this.dataForm.moduleId = data.equipIo.moduleId
-                this.dataForm.moduleName = data.equipIo.moduleName
                 this.dataForm.ioType = data.equipIo.ioType
                 this.dataForm.switchType = data.equipIo.switchType
                 this.dataForm.keyType = data.equipIo.keyType
-                this.dataForm.keyName = data.equipIo.keyName
               }
             })
           }
@@ -125,6 +124,18 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            const module = this.modules.find((item) => {
+              return item.id === this.dataForm.moduleId
+            })
+            const io = this.ioTypes.find((item) => {
+              return item.value === this.dataForm.ioType
+            })
+            const switchType = this.switchTypes.find((item) => {
+              return item.value === this.dataForm.switchType
+            })
+            const key = this.keyTypes.find((item) => {
+              return item.value === this.dataForm.keyType
+            })
             this.$http({
               url: this.$http.adornUrl(`/equipment/equipIo/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
@@ -132,11 +143,13 @@
                 'id': this.dataForm.id || undefined,
                 'name': this.dataForm.name,
                 'moduleId': this.dataForm.moduleId,
-                'moduleName': this.dataForm.moduleName,
+                'moduleName': module.name,
                 'ioType': this.dataForm.ioType,
+                'ioName': io.paramKey,
                 'switchType': this.dataForm.switchType,
+                'switchName': switchType.switchName,
                 'keyType': this.dataForm.keyType,
-                'keyName': this.dataForm.keyName
+                'keyName': key ? key.paramKey : null
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -162,10 +175,13 @@
         this.dataForm.ioType = null
         this.dataForm.switchType = null
         this.dataForm.keyType = null
+        this.keyTypeVisible = false
       },
-      keyChange () {
+      switchChange () {
         this.$forceUpdate()
-        console.log(this.dataForm.ioType)
+        if (this.dataForm.switchType !== 1) {
+          this.keyTypeVisible = true
+        }
       }
     }
   }

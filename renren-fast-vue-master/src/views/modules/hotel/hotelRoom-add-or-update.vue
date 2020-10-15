@@ -13,29 +13,14 @@
     <el-form-item label="房间名称" prop="remark">
       <el-input v-model="dataForm.remark" placeholder="房间名称"></el-input>
     </el-form-item>
-    <el-form-item label="酒店ID" prop="hotelId">
-      <el-input v-model="dataForm.hotelId" placeholder="酒店ID"></el-input>
+    <el-form-item label="酒店" prop="hotelId">
+      <el-input v-model="dataForm.hotelId" placeholder="酒店"></el-input>
     </el-form-item>
-    <el-form-item label="酒店ID" prop="roomTypeId">
-      <el-input v-model="dataForm.roomTypeId" placeholder="酒店ID"></el-input>
+    <el-form-item label="房型" prop="roomTypeId">
+      <el-input v-model="dataForm.roomTypeId" placeholder="房型"></el-input>
     </el-form-item>
     <el-form-item label="状态" prop="status">
       <el-input v-model="dataForm.status" placeholder="状态"></el-input>
-    </el-form-item>
-    <el-form-item label="删除标志位" prop="flag">
-      <el-input v-model="dataForm.flag" placeholder="删除标志位"></el-input>
-    </el-form-item>
-    <el-form-item label="创建时间" prop="createTime">
-      <el-input v-model="dataForm.createTime" placeholder="创建时间"></el-input>
-    </el-form-item>
-    <el-form-item label="更新时间" prop="updateTime">
-      <el-input v-model="dataForm.updateTime" placeholder="更新时间"></el-input>
-    </el-form-item>
-    <el-form-item label="创建人" prop="createBy">
-      <el-input v-model="dataForm.createBy" placeholder="创建人"></el-input>
-    </el-form-item>
-    <el-form-item label="更新人" prop="updateBy">
-      <el-input v-model="dataForm.updateBy" placeholder="更新人"></el-input>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">

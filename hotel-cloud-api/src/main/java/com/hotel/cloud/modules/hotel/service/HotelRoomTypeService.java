@@ -16,5 +16,7 @@ import java.util.Map;
 public interface HotelRoomTypeService extends IService<HotelRoomTypeEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void saveRoomType(HotelRoomTypeEntity hotelRoomType);
 }
 
