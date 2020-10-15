@@ -79,7 +79,7 @@ public class HotelRoomTypeController {
     @RequestMapping("/delete")
     @RequiresPermissions("hotel:hotelRoomType:delete")
     public R delete(@RequestBody Long[] ids){
-		hotelRoomTypeService.removeByIds(Arrays.asList(ids));
+		hotelRoomTypeService.delete(Arrays.asList(ids));
 
         return R.ok();
     }

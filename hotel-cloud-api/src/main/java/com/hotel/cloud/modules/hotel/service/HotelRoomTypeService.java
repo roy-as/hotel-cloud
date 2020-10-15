@@ -21,5 +21,7 @@ public interface HotelRoomTypeService extends IService<HotelRoomTypeEntity> {
     void saveRoomType(HotelRoomTypeEntity hotelRoomType);
 
     List<HotelRoomTypeEntity> select();
+
+    void delete(List<Long> ids);
 }
 

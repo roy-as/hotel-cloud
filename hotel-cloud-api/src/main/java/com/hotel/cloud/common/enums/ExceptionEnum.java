@@ -8,6 +8,9 @@ public enum  ExceptionEnum {
     NOT_AUTHENTICATION(1004, "权限不足"),
     INTERNAL_SERVER_ERROR(1005, "二维码生成失败"),
     EQUIP_HAVE_QRCODE(1006, "设备已生成过二维码"),
+    EXIST_ROOM(1007, "存在关联房间，不能删除"),
+    EXIST_ROOM_TYPE(1008, "存在关联房型，不能删除"),
+    EXIST_EQUIP(1009, "存在关联设备，不能删除")
     ;
 
     private Integer code;

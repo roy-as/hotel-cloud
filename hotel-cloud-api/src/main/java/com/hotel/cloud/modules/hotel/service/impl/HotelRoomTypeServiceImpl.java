@@ -1,5 +1,6 @@
 package com.hotel.cloud.modules.hotel.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.hotel.cloud.common.enums.ExceptionEnum;
 import com.hotel.cloud.common.enums.FlagEnum;
 import com.hotel.cloud.common.exception.RRException;
@@ -7,7 +8,9 @@ import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.Query;
 import com.hotel.cloud.common.utils.ShiroUtils;
 import com.hotel.cloud.modules.hotel.entity.HotelInfoEntity;
+import com.hotel.cloud.modules.hotel.entity.HotelRoomEntity;
 import com.hotel.cloud.modules.hotel.service.HotelInfoService;
+import com.hotel.cloud.modules.hotel.service.HotelRoomService;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,9 @@ public class HotelRoomTypeServiceImpl extends ServiceImpl<HotelRoomTypeDao, Hote
 
     @Resource
     private HotelInfoService hotelInfoService;
+
+    @Resource
+    private HotelRoomService hotelRoomService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -70,6 +76,17 @@ public class HotelRoomTypeServiceImpl extends ServiceImpl<HotelRoomTypeDao, Hote
         return this.list(new QueryWrapper<HotelRoomTypeEntity>()
                 .eq(isAgent, "create_by", ShiroUtils.getLoginUser().getUsername())
                 .orderByDesc("create_time"));
+    }
+
+    @Override
+    public void delete(List<Long> ids) {
+        List<HotelRoomEntity> rooms = hotelRoomService.list(new QueryWrapper<HotelRoomEntity>()
+                .in(CollectionUtil.isNotEmpty(ids), "room_type_id", ids)
+        );
+        if(CollectionUtil.isNotEmpty(rooms)) {
+            throw new RRException(ExceptionEnum.EXIST_ROOM);
+        }
+        this.removeByIds(ids);
     }
 
     private void checkCreateAuth(HotelInfoEntity hotel) {

@@ -99,7 +99,7 @@ public class EquipModuleController {
     @RequestMapping("/delete")
     @RequiresPermissions("equipment:equipModule:delete")
     public R delete(@RequestBody Long[] ids){
-		equipModuleService.removeByIds(Arrays.asList(ids));
+		equipModuleService.delete(Arrays.asList(ids));
 
         return R.ok();
     }

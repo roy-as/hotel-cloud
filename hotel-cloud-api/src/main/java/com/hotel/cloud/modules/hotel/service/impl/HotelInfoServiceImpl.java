@@ -10,11 +10,16 @@ import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.common.utils.*;
 import com.hotel.cloud.common.vo.DisableVo;
 import com.hotel.cloud.common.vo.hotel.HotelInfoVo;
+import com.hotel.cloud.modules.equipment.entity.EquipEntity;
+import com.hotel.cloud.modules.equipment.service.EquipService;
 import com.hotel.cloud.modules.hotel.entity.HotelOssMappingEntity;
+import com.hotel.cloud.modules.hotel.entity.HotelRoomTypeEntity;
 import com.hotel.cloud.modules.hotel.service.HotelOssMappingService;
+import com.hotel.cloud.modules.hotel.service.HotelRoomTypeService;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import com.hotel.cloud.modules.oss.service.SysOssService;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
+import org.omg.CORBA.PRIVATE_MEMBER;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -42,10 +47,16 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
     @Resource
     private HotelOssMappingService hotelOssMappingService;
 
+    @Resource
+    private HotelRoomTypeService hotelRoomTypeService;
+
+    @Resource
+    private EquipService equipService;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<HotelInfoEntity> page = new Query<HotelInfoEntity>().getPage(params);
-        if(ShiroUtils.isAgent()) {
+        if (ShiroUtils.isAgent()) {
             SysUserEntity loginUser = ShiroUtils.getLoginUser();
             params.put("createBy", loginUser.getUsername());
         }
@@ -219,8 +230,20 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
 
     @Override
     public void deleteBatch(Long[] ids) {
+        List<Long> idLids = Arrays.asList(ids);
+        boolean notEmpty = CollectionUtil.isNotEmpty(idLids);
+        List<HotelRoomTypeEntity> roomTypes = hotelRoomTypeService.list(new QueryWrapper<HotelRoomTypeEntity>()
+                .in(notEmpty, "hotel_id", idLids));
+        if(CollectionUtil.isNotEmpty(roomTypes)) {
+            throw new RRException(ExceptionEnum.EXIST_ROOM_TYPE);
+        }
+        List<EquipEntity> equips = equipService.list(new QueryWrapper<EquipEntity>()
+                .in(notEmpty, "hotel_id", idLids));
+        if(CollectionUtil.isNotEmpty(equips)) {
+            throw new RRException(ExceptionEnum.EXIST_EQUIP);
+        }
         checkAuth(ids);
-        List<HotelInfoEntity> hotels = Arrays.stream(ids).map(id -> {
+        List<HotelInfoEntity> hotels = idLids.stream().map(id -> {
             HotelInfoEntity hotel = new HotelInfoEntity();
             hotel.setId(id);
             hotel.setFlag(FlagEnum.DELETE.getCode());
@@ -250,7 +273,7 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
     @Transactional
     public void deletePicture(HotelInfoVo vo) {
         HotelInfoEntity hotel = this.getById(vo.getId());
-        if(null != hotel) {
+        if (null != hotel) {
             checkAuth(hotel);
             hotelOssMappingService.getBaseMapper().delete(new QueryWrapper<HotelOssMappingEntity>()
                     .eq("hotel_id", vo.getId())
