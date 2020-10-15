@@ -124,7 +124,6 @@
                   }
                 }
                 this.$previewRefresh()
-                console.log(this.pictureList)
               }
             })
           }
@@ -177,8 +176,6 @@
         })
       },
       imgUpload (data) {
-        console.log(1111111111111111, data)
-
         const formData = new FormData()
         formData.append('id', this.dataForm.id)
         if (this.dataForm.pictureType === 1) {
@@ -222,11 +219,12 @@
       },
       beforeImgUpload (file) {
         const isJPGorPNG =
-          file.type === 'image/jpeg' || 'image/jpg' || 'image/png'
+          file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/png' || file.type === 'image/bmp' || file.type === 'image/tif' || file.type === 'image/tga'
         const isLt2M = file.size / 1024 / 1024 < 2
+        console.log(isJPGorPNG)
 
         if (!isJPGorPNG) {
-          this.$message.error('图片格式只能是JPG或png格式!')
+          this.$message.error('图片格式只能是JPG、png、jpeg、bmp、tif、tga格式!')
         }
         if (!isLt2M) {
           this.$message.error('图片大小不能超过2MB!')
