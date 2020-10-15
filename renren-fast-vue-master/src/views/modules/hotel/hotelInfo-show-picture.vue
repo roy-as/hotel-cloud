@@ -3,14 +3,55 @@
     :title="dataForm.pictureType == 1 ? '全景图' : '酒店图片'"
     :close-on-click-modal="false"
     :visible.sync="visible"
-    @open='openImgDialog'>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()"
-             label-width="80px">
+    class="imgDialog"
+  >
+    <el-form
+      :model="dataForm"
+      :rules="dataRule"
+      ref="dataForm"
+      @keyup.enter.native="dataFormSubmit()"
+      label-width="80px"
+    >
       <el-form-item>
-        <div v-for="pictures in pictureList">
-          <span v-for="(picture ,index) in pictures">
-            <img :src="picture.url" :preview="index" width="140" height="160" style="margin: 10px">
+        <div v-for="(pictures, index) in pictureList" :key="index">
+          <span
+            class="imgWrap"
+            v-for="(picture, index) in pictures"
+            :key="picture.id"
+          >
+            <span class="imgCheck">
+              <i class="el-icon-check"></i>
+            </span>
+            <img :src="picture.url" :preview="index" />
+          </span>
+          <span class="imgWrap icon" v-if="pictureList.length !== 0">
             <i class="el-icon-delete"></i>
+          </span>
+          <span class="imgWrap icon">
+            <el-upload
+              class="avatar-uploader"
+              action="https://jsonplaceholder.typicode.com/posts/"
+              :show-file-list="false"
+              :on-success="handleAvatarSuccess"
+              :before-upload="beforeAvatarUpload"
+            >
+              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
+          </span>
+        </div>
+        <div v-if="pictureList.length == 0">
+          <span class="imgWrap icon">
+            <el-upload
+              class="avatar-uploader"
+              action="https://jsonplaceholder.typicode.com/posts/"
+              :show-file-list="false"
+              :on-success="handleAvatarSuccess"
+              :before-upload="beforeAvatarUpload"
+            >
+              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            </el-upload>
           </span>
         </div>
       </el-form-item>
@@ -23,116 +64,170 @@
 </template>
 
 <script>
-  export default {
-    data () {
-      return {
-        visible: false,
-        pictureList: [],
-        dataForm: {
-          id: 0
-        },
-        dataRule: {}
-      }
-    },
-    methods: {
-      init: function (id, pictureType) {
-        this.pictureList = []
-        this.dataForm.id = id || 0
-        this.dataForm.pictureType = pictureType
-        this.visible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-          if (this.dataForm.id) {
-            this.$http({
-              url: this.$http.adornUrl(`/hotel/hotelInfo/getPicture`),
-              method: 'get',
-              params: this.$http.adornParams({
-                id: this.dataForm.id,
-                pictureType: pictureType
-
-              })
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                const result = data.data
-                let count = Math.ceil(result.length / 4)
-                for (let i = 1; i <= count; i++) {
-                  let index = i - 1
-                  if (i !== count) {
-                    this.pictureList.push(result.slice(index * 4, index * 4 + 4))
-                  } else {
-                    this.pictureList.push(result.slice(index * 4, result.length))
-                  }
+export default {
+  data() {
+    return {
+      visible: false,
+      pictureList: [],
+      dataForm: {
+        id: 0,
+      },
+      dataRule: {},
+    };
+  },
+  methods: {
+    init: function (id, pictureType) {
+      this.pictureList = [];
+      this.dataForm.id = id || 0;
+      this.dataForm.pictureType = pictureType;
+      this.visible = true;
+      this.$nextTick(() => {
+        this.$refs["dataForm"].resetFields();
+        if (this.dataForm.id) {
+          this.$http({
+            url: this.$http.adornUrl(`/hotel/hotelInfo/getPicture`),
+            method: "get",
+            params: this.$http.adornParams({
+              id: this.dataForm.id,
+              pictureType: pictureType,
+            }),
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              const result = data.data;
+              let count = Math.ceil(result.length / 4);
+              for (let i = 1; i <= count; i++) {
+                let index = i - 1;
+                if (i !== count) {
+                  this.pictureList.push(result.slice(index * 4, index * 4 + 4));
+                } else {
+                  this.pictureList.push(result.slice(index * 4, result.length));
                 }
-                console.log(this.pictureList)
               }
-            })
+              this.$previewRefresh();
+              console.log(this.pictureList);
+            }
+          });
+        }
+      });
+    },
+    // 表单提交
+    dataFormSubmit() {
+      this.$refs["dataForm"].validate((valid) => {
+        if (valid) {
+          const formData = new FormData();
+          if (this.dataForm.id) {
+            formData.append("id", this.dataForm.id);
           }
-        })
-      },
-      // 表单提交
-      dataFormSubmit () {
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            const formData = new FormData()
-            if (this.dataForm.id) {
-              formData.append('id', this.dataForm.id)
-            }
-            formData.append('name', this.dataForm.name)
-            const areas = this.dataForm.area
-            areas.forEach((area, index) => {
-              formData.append('area', area)
-            })
-            console.log(this.logoList)
-            formData.append('address', this.dataForm.address)
-            formData.append('mobile', this.dataForm.mobile)
-            formData.append('notice', this.dataForm.notice)
-            formData.append('service', this.dataForm.service)
-            formData.append('status', this.dataForm.status)
-            if (this.logoList[0]) {
-              formData.append('logo', this.logoList[0].raw)
-            }
-            if (this.fullViewList && this.fullViewList.length > 0) {
-              this.fullViewList.forEach((item, index) => {
-                formData.append('fullViews', item.raw)
-              })
-            }
-            if (this.hotelPictureList && this.hotelPictureList.length > 0) {
-              this.hotelPictureList.forEach((item, index) => {
-                formData.append('hotelPictures', item.raw)
-              })
-            }
-            this.$http({
-              url: this.$http.adornUrl(`/hotel/hotelInfo/${!this.dataForm.id ? 'save' : 'update'}`),
-              method: 'post',
-              headers: {'content-type': 'multipart/form-data'},
-              data: formData
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.logoList = []
-                    this.$emit('refreshDataList')
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
+          formData.append("name", this.dataForm.name);
+          const areas = this.dataForm.area;
+          areas.forEach((area, index) => {
+            formData.append("area", area);
+          });
+          console.log(this.logoList);
+          formData.append("address", this.dataForm.address);
+          formData.append("mobile", this.dataForm.mobile);
+          formData.append("notice", this.dataForm.notice);
+          formData.append("service", this.dataForm.service);
+          formData.append("status", this.dataForm.status);
+          if (this.logoList[0]) {
+            formData.append("logo", this.logoList[0].raw);
           }
-        })
-      },
-      openImgDialog () {
-        this.$previewRefresh()
+          if (this.fullViewList && this.fullViewList.length > 0) {
+            this.fullViewList.forEach((item, index) => {
+              formData.append("fullViews", item.raw);
+            });
+          }
+          if (this.hotelPictureList && this.hotelPictureList.length > 0) {
+            this.hotelPictureList.forEach((item, index) => {
+              formData.append("hotelPictures", item.raw);
+            });
+          }
+          this.$http({
+            url: this.$http.adornUrl(
+              `/hotel/hotelInfo/${!this.dataForm.id ? "save" : "update"}`
+            ),
+            method: "post",
+            headers: { "content-type": "multipart/form-data" },
+            data: formData,
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: "操作成功",
+                type: "success",
+                duration: 1500,
+                onClose: () => {
+                  this.visible = false;
+                  this.logoList = [];
+                  this.$emit("refreshDataList");
+                },
+              });
+            } else {
+              this.$message.error(data.msg);
+            }
+          });
+        }
+      });
+    },
+    handleAvatarSuccess(res, file) {
+      this.imageUrl = URL.createObjectURL(file.raw);
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error("图片格式只能是JPG格式!");
       }
-    }
-  }
+      if (!isLt2M) {
+        this.$message.error("图片大小不能超过2MB!");
+      }
+      return isJPG && isLt2M;
+    },
+  },
+};
 </script>
 <style lang="scss">
-  .pswp{
-    z-index: 9999 !important;
+.imgDialog {
+  .imgWrap {
+    position: relative;
+    display: inline-block;
+    width: 160px;
+    height: 90px;
+    margin: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    text-align: center;
+    vertical-align: top;
+    overflow: hidden;
+    &.icon {
+      i {
+        font-size: 36px;
+        line-height: 90px;
+        cursor: pointer;
+      }
+    }
+    img {
+      object-fit: contain;
+      height: 100%;
+    }
+    .imgCheck{
+      width: 50px;
+      height: 50px;
+      transform: rotate(45deg);
+      position: absolute;
+      right: -25px;
+      top: -25px;
+      background-color: rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+        i{
+          position: relative;
+          top: 22px;
+          transform: rotate(-45deg);
+          color: #fff;
+        }
+    }
   }
+}
+.pswp {
+  z-index: 9999 !important;
+}
 </style>
