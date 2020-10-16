@@ -16,21 +16,21 @@
       </el-form-item>
       <el-form-item label="IO类型" prop="ioType" :class="{ 'is-required': !dataForm.id }">
         <el-select v-model="dataForm.ioType" @change="$forceUpdate()" filterable clearable placeholder="请选择"
-                   style="width: 100%; position: relative" :disabled="!!dataForm.id">
+                   style="width: 100%; position: relative">
           <el-option v-for="io in ioTypes" :key="io.paramValue" :label="io.paramKey" :value="io.paramValue">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="开关类型" prop="switchType">
         <el-select v-model="dataForm.switchType" @change="switchChange" filterable clearable placeholder="请选择"
-                   style="width: 100%; position: relative" :disabled="!!dataForm.id">
+                   style="width: 100%; position: relative">
           <el-option v-for="switchType in switchTypes" :key="switchType.paramValue" :label="switchType.paramKey" :value="switchType.paramValue">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item v-if="keyTypeVisible" label="按键类型" prop="keyType">
         <el-select v-model="dataForm.keyType" @change="$forceUpdate()" filterable clearable placeholder="请选择"
-                   style="width: 100%; position: relative" :disabled="!!dataForm.id">
+                   style="width: 100%; position: relative">
           <el-option v-for="keyType in keyTypes" :key="keyType.paramValue" :label="keyType.paramKey" :value="keyType.paramValue">
           </el-option>
         </el-select>
@@ -112,9 +112,12 @@
               if (data && data.code === 0) {
                 this.dataForm.name = data.equipIo.name
                 this.dataForm.moduleId = data.equipIo.moduleId
-                this.dataForm.ioType = data.equipIo.ioType
-                this.dataForm.switchType = data.equipIo.switchType
-                this.dataForm.keyType = data.equipIo.keyType
+                this.dataForm.ioType = data.equipIo.ioType.toString()
+                this.dataForm.switchType = data.equipIo.switchType.toString()
+                this.dataForm.keyType = data.equipIo.keyType.toString()
+                if (data.equipIo.switchType === 2) {
+                  this.keyTypeVisible = true
+                }
               }
             })
           }
@@ -147,9 +150,9 @@
                 'ioType': this.dataForm.ioType,
                 'ioName': io.paramKey,
                 'switchType': this.dataForm.switchType,
-                'switchName': switchType.switchName,
-                'keyType': this.dataForm.keyType,
-                'keyName': key ? key.paramKey : null
+                'switchName': switchType.paramKey,
+                'keyType': this.dataForm.switchType === '2' ? this.dataForm.keyType : null,
+                'keyName': (key && this.dataForm.switchType === '2') ? key.paramKey : null
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -179,8 +182,10 @@
       },
       switchChange () {
         this.$forceUpdate()
-        if (this.dataForm.switchType !== 1) {
+        if (Number(this.dataForm.switchType) === 2) {
           this.keyTypeVisible = true
+        } else {
+          this.keyTypeVisible = false
         }
       }
     }

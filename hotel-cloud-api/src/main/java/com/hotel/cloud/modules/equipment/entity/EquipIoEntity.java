@@ -1,11 +1,13 @@
 package com.hotel.cloud.modules.equipment.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * 
@@ -52,10 +54,12 @@ public class EquipIoEntity implements Serializable {
 	/**
 	 *  按键类型
 	 */
+	@TableField(fill = FieldFill.UPDATE)
 	private Long keyType;
 	/**
 	 * 按键名称
 	 */
+	@TableField(fill = FieldFill.UPDATE)
 	private String keyName;
 	/**
 	 * 创建人

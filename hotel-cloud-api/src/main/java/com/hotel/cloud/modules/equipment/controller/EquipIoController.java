@@ -1,9 +1,12 @@
 package com.hotel.cloud.modules.equipment.controller;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
+import com.hotel.cloud.common.utils.ShiroUtils;
+import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,7 +61,11 @@ public class EquipIoController {
     @RequestMapping("/save")
     @RequiresPermissions("equipment:equipIo:save")
     public R save(@RequestBody EquipIoEntity equipIo){
-		equipIoService.save(equipIo);
+        equipIo.setCreateTime(new Date());
+        SysUserEntity loginUser = ShiroUtils.getLoginUser();
+        equipIo.setCreateBy(loginUser.getUsername());
+        equipIo.setUpdateBy(loginUser.getUsername());
+        equipIoService.save(equipIo);
 
         return R.ok();
     }
@@ -69,6 +76,7 @@ public class EquipIoController {
     @RequestMapping("/update")
     @RequiresPermissions("equipment:equipIo:update")
     public R update(@RequestBody EquipIoEntity equipIo){
+        equipIo.setUpdateBy(ShiroUtils.getLoginUser().getUsername());
 		equipIoService.updateById(equipIo);
 
         return R.ok();
