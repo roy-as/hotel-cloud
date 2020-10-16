@@ -281,8 +281,9 @@
         }
 
         &.checked {
+          background-color:rgba(23,179,163,.9);
           i {
-            color: #17b3a3;
+            color: #fff;
           }
         }
       }
