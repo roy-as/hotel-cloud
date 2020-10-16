@@ -17,21 +17,21 @@
       <el-form-item label="IO类型" prop="ioType" :class="{ 'is-required': !dataForm.id }">
         <el-select v-model="dataForm.ioType" @change="$forceUpdate()" filterable clearable placeholder="请选择"
                    style="width: 100%; position: relative" :disabled="!!dataForm.id">
-          <el-option v-for="io in ioTypes" :key="io.value" :label="io.paramKey" :value="io.value">
+          <el-option v-for="io in ioTypes" :key="io.paramValue" :label="io.paramKey" :value="io.paramValue">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="开关类型" prop="switchType">
         <el-select v-model="dataForm.switchType" @change="switchChange" filterable clearable placeholder="请选择"
                    style="width: 100%; position: relative" :disabled="!!dataForm.id">
-          <el-option v-for="switchType in switchTypes" :key="switchType.value" :label="switchType.paramKey" :value="switchType.value">
+          <el-option v-for="switchType in switchTypes" :key="switchType.paramValue" :label="switchType.paramKey" :value="switchType.paramValue">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item v-if="keyTypeVisible" label="按键类型" prop="keyType">
         <el-select v-model="dataForm.keyType" @change="$forceUpdate()" filterable clearable placeholder="请选择"
                    style="width: 100%; position: relative" :disabled="!!dataForm.id">
-          <el-option v-for="keyType in keyTypes" :key="keyType.value" :label="keyType.paramKey" :value="keyType.value">
+          <el-option v-for="keyType in keyTypes" :key="keyType.paramValue" :label="keyType.paramKey" :value="keyType.paramValue">
           </el-option>
         </el-select>
       </el-form-item>
@@ -128,13 +128,13 @@
               return item.id === this.dataForm.moduleId
             })
             const io = this.ioTypes.find((item) => {
-              return item.value === this.dataForm.ioType
+              return item.paramValue === this.dataForm.ioType
             })
             const switchType = this.switchTypes.find((item) => {
-              return item.value === this.dataForm.switchType
+              return item.paramValue === this.dataForm.switchType
             })
             const key = this.keyTypes.find((item) => {
-              return item.value === this.dataForm.keyType
+              return item.paramValue === this.dataForm.keyType
             })
             this.$http({
               url: this.$http.adornUrl(`/equipment/equipIo/${!this.dataForm.id ? 'save' : 'update'}`),
