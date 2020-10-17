@@ -12,10 +12,10 @@
       @keyup.enter.native="dataFormSubmit()"
       label-width="80px">
       <el-form-item>
-        <div v-for="(pictures, index0) in pictureList" :key="index0">
+        <div>
           <span
             class="imgWrap"
-            v-for="(picture, index) in pictures"
+            v-for="(picture, index) in pictureList"
             :key="picture.id">
             <span
               :class="[
@@ -25,7 +25,7 @@
               @click="selectPic(picture.id)">
               <i class="el-icon-check"></i>
             </span>
-            <img :src="picture.url" :preview="index0"/>
+            <img :src="picture.url" :preview="index"/>
           </span>
           <span class="imgWrap icon" v-if="pictureList.length !== 0">
             <el-popover
@@ -74,10 +74,6 @@
         </div>
       </el-form-item>
     </el-form>
-    <!-- <span slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
-    </span> -->
   </el-dialog>
 </template>
 
@@ -113,16 +109,7 @@
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
-                const result = data.data
-                let count = Math.ceil(result.length / 4)
-                for (let i = 1; i <= count; i++) {
-                  let index = i - 1
-                  if (i !== count) {
-                    this.pictureList.push(result.slice(index * 4, index * 4 + 4))
-                  } else {
-                    this.pictureList.push(result.slice(index * 4, result.length))
-                  }
-                }
+                this.pictureList = data.data
                 this.$previewRefresh()
               }
             })
@@ -184,17 +171,6 @@
         if (this.dataForm.pictureType === 2) {
           formData.append('hotelPictures', data.file)
         }
-
-        // if (this.fullViewList && this.fullViewList.length > 0) {
-        //   this.fullViewList.forEach((item, index) => {
-        //     formData.append("fullViews", item.raw);
-        //   });
-        // }
-        // if (this.hotelPictureList && this.hotelPictureList.length > 0) {
-        //   this.hotelPictureList.forEach((item, index) => {
-        //     formData.append("hotelPictures", item.raw);
-        //   });
-        // }
         this.$http({
           url: this.$http.adornUrl(`/hotel/hotelInfo/update`),
           method: 'post',
@@ -221,7 +197,6 @@
         const isJPGorPNG =
           file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/png' || file.type === 'image/bmp' || file.type === 'image/tif' || file.type === 'image/tga'
         const isLt2M = file.size / 1024 / 1024 < 2
-        console.log(isJPGorPNG)
 
         if (!isJPGorPNG) {
           this.$message.error('图片格式只能是JPG、png、jpeg、bmp、tif、tga格式!')

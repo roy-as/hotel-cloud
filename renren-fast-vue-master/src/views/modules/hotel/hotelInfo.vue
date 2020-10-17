@@ -43,9 +43,9 @@
         align="center"
         label="Logo">
         <template slot-scope="scope">
-          <span v-if="scope.row.logo && scope.row.logo.url">
-            <img :src="imgUrl(scope.row)" :preview="scope.$index" height="95" width="70"/>
-          </span>
+          <div v-if="scope.row.logo && scope.row.logo.url">
+            <img :src="imgUrl(scope.row)" :preview="scope.$index" height="95" style="width:100%;object-fit: cover;"/>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
