@@ -3,39 +3,38 @@ package com.hotel.cloud.modules.hotel.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hotel.cloud.common.enums.ExceptionEnum;
 import com.hotel.cloud.common.enums.FlagEnum;
 import com.hotel.cloud.common.enums.HotelPictureTypeEnum;
 import com.hotel.cloud.common.exception.RRException;
-import com.hotel.cloud.common.utils.*;
+import com.hotel.cloud.common.utils.CommonUtils;
+import com.hotel.cloud.common.utils.PageUtils;
+import com.hotel.cloud.common.utils.Query;
+import com.hotel.cloud.common.utils.ShiroUtils;
 import com.hotel.cloud.common.vo.DisableVo;
 import com.hotel.cloud.common.vo.hotel.HotelInfoVo;
 import com.hotel.cloud.modules.equipment.entity.EquipEntity;
 import com.hotel.cloud.modules.equipment.service.EquipService;
+import com.hotel.cloud.modules.hotel.dao.HotelInfoDao;
+import com.hotel.cloud.modules.hotel.entity.HotelInfoEntity;
 import com.hotel.cloud.modules.hotel.entity.HotelOssMappingEntity;
 import com.hotel.cloud.modules.hotel.entity.HotelRoomTypeEntity;
+import com.hotel.cloud.modules.hotel.service.HotelInfoService;
 import com.hotel.cloud.modules.hotel.service.HotelOssMappingService;
 import com.hotel.cloud.modules.hotel.service.HotelRoomTypeService;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import com.hotel.cloud.modules.oss.service.SysOssService;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
-import org.omg.CORBA.PRIVATE_MEMBER;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
-import com.hotel.cloud.modules.hotel.dao.HotelInfoDao;
-import com.hotel.cloud.modules.hotel.entity.HotelInfoEntity;
-import com.hotel.cloud.modules.hotel.service.HotelInfoService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service("hotelInfoService")
@@ -113,7 +112,7 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
     private HotelOssMappingEntity saveFile(Long hotelId, MultipartFile file, Integer pictureType) throws IOException {
         SysOssEntity oss = this.sysOssService.saveFile(file);
         return new HotelOssMappingEntity(
-                hotelId, oss.getId(), pictureType
+                hotelId, oss.getId(), pictureType, null
         );
     }
 
@@ -253,8 +252,8 @@ public class HotelInfoServiceImpl extends ServiceImpl<HotelInfoDao, HotelInfoEnt
     }
 
     @Override
-    public List<SysOssEntity> getPicture(Long id, Integer pictureType) {
-        return this.baseMapper.getPicture(id, pictureType);
+    public List<SysOssEntity> getPicture(HotelOssMappingEntity entity) {
+        return this.baseMapper.getPicture(entity);
     }
 
     @Override

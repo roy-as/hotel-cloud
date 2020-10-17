@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="dataForm.pictureType == 1 ? '全景图' : '酒店图片'"
+    :title="'房型图片'"
     :close-on-click-modal="false"
     :visible.sync="visible"
     class="imgDialog"
@@ -92,20 +92,18 @@
       }
     },
     methods: {
-      init: function (id, pictureType) {
+      init: function (id) {
         this.pictureList = []
         this.dataForm.id = id || 0
-        this.dataForm.pictureType = pictureType
         this.visible = true
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
             this.$http({
-              url: this.$http.adornUrl(`/hotel/hotelInfo/getPicture`),
+              url: this.$http.adornUrl(`/hotel/hotelRoomType/getPicture`),
               method: 'get',
               params: this.$http.adornParams({
-                hotelId: this.dataForm.id,
-                pictureType: pictureType
+                roomTypeId: this.dataForm.id
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -142,7 +140,7 @@
       delPicSubmit () {
         this.popoverVisible = false
         this.$http({
-          url: this.$http.adornUrl(`/hotel/hotelInfo/deletePicture`),
+          url: this.$http.adornUrl(`/hotel/hotelRoomType/deletePicture`),
           method: 'post',
           data: {
             id: this.dataForm.id,
@@ -165,14 +163,9 @@
       imgUpload (data) {
         const formData = new FormData()
         formData.append('id', this.dataForm.id)
-        if (this.dataForm.pictureType === 1) {
-          formData.append('fullViews', data.file)
-        }
-        if (this.dataForm.pictureType === 2) {
-          formData.append('hotelPictures', data.file)
-        }
+        formData.append('roomPictures', data.file)
         this.$http({
-          url: this.$http.adornUrl(`/hotel/hotelInfo/update`),
+          url: this.$http.adornUrl(`/hotel/hotelRoomType/update`),
           method: 'post',
           headers: {'content-type': 'multipart/form-data'},
           data: formData
@@ -197,6 +190,7 @@
         const isJPGorPNG =
           file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/png' || file.type === 'image/bmp' || file.type === 'image/tif' || file.type === 'image/tga'
         const isLt2M = file.size / 1024 / 1024 < 2
+        console.log(isJPGorPNG)
 
         if (!isJPGorPNG) {
           this.$message.error('图片格式只能是JPG、png、jpeg、bmp、tif、tga格式!')

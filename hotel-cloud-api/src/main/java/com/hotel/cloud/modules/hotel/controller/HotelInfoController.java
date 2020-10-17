@@ -8,6 +8,7 @@ import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
 import com.hotel.cloud.common.vo.DisableVo;
 import com.hotel.cloud.common.vo.hotel.HotelInfoVo;
+import com.hotel.cloud.modules.hotel.entity.HotelOssMappingEntity;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,8 +99,8 @@ public class HotelInfoController {
 
     @GetMapping("/getPicture")
     @RequiresPermissions("hotel:hotelInfo:info")
-    public R getPicture(Long id, Integer pictureType) {
-        List<SysOssEntity> oss = hotelInfoService.getPicture(id, pictureType);
+    public R getPicture(HotelOssMappingEntity entity) {
+        List<SysOssEntity> oss = hotelInfoService.getPicture(entity);
         return R.ok().put("data", oss);
     }
 

@@ -53,7 +53,16 @@
         select o.id, o.url from sys_oss o
         inner join t_hotel_oss_mapping m
         on m.oss_id = o.id
-        where m.hotel_id = #{id} and m.picture_type = #{pictureType}
+        where 1 = 1
+        <if test="hotelId != null">
+            and m.hotel_id = #{hotelId}
+        </if>
+        <if test="pictureType != null">
+            and m.picture_type = #{pictureType}
+        </if>
+        <if test="roomTypeId != null">
+            and m.room_type_id = #{roomTypeId}
+        </if>
     </select>
 
 

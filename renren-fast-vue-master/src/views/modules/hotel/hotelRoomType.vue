@@ -97,6 +97,7 @@
         <template slot-scope="scope">
           <el-button v-if="isAuth('hotel:hotelRoomType:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button v-if="isAuth('hotel:hotelRoomType:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('hotel:hotelInfo:info')" type="text" size="small" @click="showPictureHandle(scope.row.id)">房型图片</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -111,11 +112,13 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <show-picture v-if="showPictureVisible" ref="showPicture" @refreshDataList="getDataList"></show-picture>
   </div>
 </template>
 
 <script>
   import AddOrUpdate from './hotelRoomType-add-or-update'
+  import ShowPicture from './roomType-show-picture'
   export default {
     data () {
       return {
@@ -128,12 +131,14 @@
         pageSize: 10,
         totalPage: 0,
         dataListLoading: false,
+        showPictureVisible: false,
         dataListSelections: [],
         addOrUpdateVisible: false
       }
     },
     components: {
-      AddOrUpdate
+      AddOrUpdate,
+      ShowPicture
     },
     activated () {
       this.getDataList()
@@ -188,6 +193,12 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
+        })
+      },
+      showPictureHandle (id, pictureType) {
+        this.showPictureVisible = true
+        this.$nextTick(() => {
+          this.$refs.showPicture.init(id)
         })
       },
       // 删除

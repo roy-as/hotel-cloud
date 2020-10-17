@@ -1,11 +1,14 @@
 package com.hotel.cloud.modules.hotel.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
-import java.util.Date;
+
+import io.swagger.models.auth.In;
+import jdk.nashorn.internal.objects.annotations.Constructor;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 
@@ -16,6 +19,8 @@ import lombok.Data;
  */
 @Data
 @TableName("t_hotel_oss_mapping")
+@AllArgsConstructor
+@NoArgsConstructor
 public class HotelOssMappingEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -31,10 +36,13 @@ public class HotelOssMappingEntity implements Serializable {
 	 * 照片类型，1:酒店实景图 2:酒店照片 3:房间实景图 4:房间图片
 	 */
 	private Integer pictureType;
+	/**
+	 * 房型id
+	 */
+	private Long roomTypeId;
 
-	public HotelOssMappingEntity(Long hotelId, Long ossId, Integer pictureType) {
+	public HotelOssMappingEntity(Long hotelId, Integer pictureType) {
 		this.hotelId = hotelId;
-		this.ossId = ossId;
 		this.pictureType = pictureType;
 	}
 }
