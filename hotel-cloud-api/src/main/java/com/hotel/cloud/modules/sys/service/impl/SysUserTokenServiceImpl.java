@@ -47,7 +47,7 @@ public class SysUserTokenServiceImpl extends ServiceImpl<SysUserTokenDao, SysUse
 			this.updateById(tokenEntity);
 		}
 
-		R r = R.ok().put("token", token).put("expire", EXPIRE).put("id", userId);
+		R r = R.ok().put("token", token).put("expire", EXPIRE);
 
 		return r;
 	}

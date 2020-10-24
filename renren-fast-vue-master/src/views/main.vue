@@ -82,6 +82,7 @@
             this.loading = false
             this.userId = data.user.userId
             this.userName = data.user.username
+            sessionStorage.setItem('user', JSON.stringify(data.user))
           }
         })
       }

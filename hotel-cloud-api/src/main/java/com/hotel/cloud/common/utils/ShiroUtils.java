@@ -1,7 +1,8 @@
 package com.hotel.cloud.common.utils;
 
-import com.hotel.cloud.common.enums.AgentLevelEnum;
+import com.hotel.cloud.common.enums.AgentTypeEnum;
 import com.hotel.cloud.common.enums.ExceptionEnum;
+import com.hotel.cloud.common.enums.UserTypeEnum;
 import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import org.apache.shiro.SecurityUtils;
@@ -47,6 +48,10 @@ public class ShiroUtils {
 		return kaptcha.toString();
 	}
 
+	/**
+	 * 获取当前登陆用户
+	 * @return
+	 */
 	public static SysUserEntity getLoginUser() {
 		Object user = SecurityUtils.getSubject().getPrincipal();
 		if(null == user) {
@@ -55,10 +60,24 @@ public class ShiroUtils {
 		return (SysUserEntity) user;
 	}
 
+	/**
+	 * 判断当前用户是否是代理
+	 * @return
+	 */
 	public static boolean isAgent() {
 		SysUserEntity loginUser = getLoginUser();
-		Integer agentLevel = loginUser.getAgentLevel();
-		return !AgentLevelEnum.SYSTEM_USER.getLevel().equals(agentLevel);
+		Integer agentType = loginUser.getUserType();
+		return UserTypeEnum.AGENT.getLevel().equals(agentType);
+	}
+
+	/**
+	 * 判断登陆用户是否是系统用户
+	 * @return
+	 */
+	public static boolean isSysUser() {
+		SysUserEntity loginUser = getLoginUser();
+		Integer agentType = loginUser.getUserType();
+		return UserTypeEnum.SYSTEM_USER.getLevel().equals(agentType);
 	}
 
 }

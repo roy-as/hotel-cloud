@@ -14,14 +14,22 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="mac地址" prop="mac">
-        <el-input v-model="dataForm.mac" placeholder="设备mac地址"></el-input>
+      <el-form-item label="版本号" prop="versionNumber">
+        <el-input v-model="dataForm.versionNumber" placeholder="版本号"></el-input>
       </el-form-item>
-      <el-form-item label="序列号" prop="sn">
-        <el-input v-model="dataForm.sn" placeholder="序列号"></el-input>
+      <el-form-item label="mac地址" prop="mac">
+        <el-input v-model="dataForm.mac" placeholder="设备mac地址" :disabled="!!dataForm.id"></el-input>
       </el-form-item>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
+      </el-form-item>
+      <el-form-item label="过期时间" prop="expiredTime"  v-if="dataForm.id">
+        <el-date-picker
+          v-model="dataForm.expiredTime"
+          type="date"
+          style="width: 100%"
+          placeholder="选择日期">
+        </el-date-picker>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -44,7 +52,9 @@
           mac: '',
           remark: '',
           sn: '',
-          status: ''
+          status: '',
+          expiredTime: '',
+          versionNumber: ''
         },
         dataRule: {
           name: [
@@ -53,8 +63,8 @@
           moduleId: [
             { required: true, message: '设备模块不能为空', trigger: 'blur' }
           ],
-          sn: [
-            { required: true, message: '设备序列号不能为空', trigger: 'blur' }
+          mac: [
+            { required: true, message: 'mac地址不能为空', trigger: 'blur' }
           ],
           status: [
             { required: true, message: '状态不能为空', trigger: 'blur' }
@@ -86,7 +96,8 @@
                 this.dataForm.moduleId = data.equip.moduleId
                 this.dataForm.mac = data.equip.mac
                 this.dataForm.remark = data.equip.remark
-                this.dataForm.sn = data.equip.sn
+                this.dataForm.expiredTime = data.equip.expiredTime
+                this.dataForm.versionNumber = data.equip.versionNumber
               }
             })
           }
@@ -108,8 +119,9 @@
                 'moduleId': this.dataForm.moduleId,
                 'moduleName': chosenModule.name,
                 'mac': this.dataForm.mac,
-                'sn': this.dataForm.sn,
-                'remark': this.dataForm.remark
+                'remark': this.dataForm.remark,
+                'versionNumber': this.dataForm.versionNumber,
+                'expiredTime': this.dataForm.expiredTime ? this.dataForm.expiredTime.getTime() : null
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

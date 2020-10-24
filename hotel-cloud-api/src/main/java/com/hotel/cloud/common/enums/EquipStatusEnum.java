@@ -2,10 +2,12 @@ package com.hotel.cloud.common.enums;
 
 public enum  EquipStatusEnum {
 
-    DISABLE(0, "不可用"),
-    PENDING_RELEASE(1, "待下发"),
-    RELEASED(2, "已绑定"),
-    RECYCLE(3, "已回收")
+    DISABLE(0, "待绑定"),
+    PENDING_OLD(1, "待老化"),
+    PENDING_RELEASE(2, "待下发"),
+    PENDING_SET(3, "待安装"),
+    WORKING(4, "工作中"),
+    RECYCLE(5, "已回收"),
     ;
 
     private Integer code;

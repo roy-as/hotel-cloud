@@ -39,6 +39,22 @@
         label="用户名">
       </el-table-column>
       <el-table-column
+        prop="orgName"
+        header-align="center"
+        align="center"
+        show-overflow-tooltip
+        label="组织名称">
+        <template slot-scope="scope">
+          {{ scope.row.orgName || '-' }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="userTypeName"
+        header-align="center"
+        align="center"
+        label="用户类型">
+      </el-table-column>
+      <el-table-column
         prop="email"
         header-align="center"
         align="center"

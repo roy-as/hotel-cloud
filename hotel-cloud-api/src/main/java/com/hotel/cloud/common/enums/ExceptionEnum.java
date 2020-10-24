@@ -10,7 +10,10 @@ public enum  ExceptionEnum {
     EQUIP_HAVE_QRCODE(1006, "设备已生成过二维码"),
     EXIST_ROOM(1007, "存在关联房间，不能删除"),
     EXIST_ROOM_TYPE(1008, "存在关联房型，不能删除"),
-    EXIST_EQUIP(1009, "存在关联设备，不能删除")
+    EXIST_EQUIP(1009, "存在关联设备，不能删除"),
+    RELATE_HOTEL(1008, "已下发酒店，不能删除"),
+    ENUM_NOT_EXIST(1010, "不存在该枚举类型"),
+    SERVICE_NOT_EXIST(1011, "服务不存在")
     ;
 
     private Integer code;

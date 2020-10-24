@@ -1,14 +1,13 @@
 package com.hotel.cloud.modules.hotel.controller;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import com.hotel.cloud.common.enums.HotelPictureTypeEnum;
 import com.hotel.cloud.common.vo.hotel.RoomTypeVo;
 import com.hotel.cloud.modules.hotel.entity.HotelOssMappingEntity;
-import com.hotel.cloud.modules.hotel.service.HotelInfoService;
+import com.hotel.cloud.modules.org.service.HotelInfoService;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;

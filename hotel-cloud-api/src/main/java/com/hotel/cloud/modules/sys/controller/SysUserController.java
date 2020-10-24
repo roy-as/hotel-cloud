@@ -56,7 +56,10 @@ public class SysUserController extends AbstractController {
 	 */
 	@GetMapping("/info")
 	public R info(){
-		return R.ok().put("user", getUser());
+		SysUserEntity user = getUser();
+		user.setSalt(null);
+		user.setPassword(null);
+		return R.ok().put("user", user);
 	}
 	
 	/**

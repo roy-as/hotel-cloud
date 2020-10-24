@@ -9,11 +9,8 @@
           {{name}}
         </el-tag>
       </el-form-item>
-      <el-form-item label="前缀" prop="prefix">
-        <el-input v-model="dataForm.prefix" placeholder="二维码前缀，例如:酒店系统-CL500"></el-input>
-      </el-form-item>
-      <el-form-item label="起始值" prop="start">
-        <el-input v-model="dataForm.start" placeholder="16进制字符串"></el-input>
+      <el-form-item label="内容" prop="info">
+        <el-input v-model="dataForm.info" placeholder="二维码内容"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -32,15 +29,11 @@
         names: [],
         modules: [],
         dataForm: {
-          prefix: '',
-          start: ''
+          info: ''
         },
         dataRule: {
-          prefix: [
-              { required: true, message: '前缀不能为空', trigger: 'blur' }
-          ],
-          start: [
-            { required: true, message: '起始不能为空', trigger: 'blur' }
+          info: [
+              { required: true, message: '二维码不能为空', trigger: 'blur' }
           ]
         }
       }
@@ -62,9 +55,8 @@
               url: this.$http.adornUrl(`/equipment/equip/generateQrcode`),
               method: 'post',
               data: this.$http.adornData({
-                'ids': this.ids,
-                'prefix': this.dataForm.prefix,
-                'start': this.dataForm.start
+                'id': this.ids[0],
+                'info': this.dataForm.info
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

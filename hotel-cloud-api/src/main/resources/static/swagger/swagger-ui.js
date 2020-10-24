@@ -20741,11 +20741,11 @@ Request.prototype.responseType = function(val){
  *
  *      superagent.types.json = 'application/json';
  *
- *      request.get('/agent')
+ *      request.get('/org')
  *        .accept('json')
  *        .end(callback);
  *
- *      request.get('/agent')
+ *      request.get('/org')
  *        .accept('application/json')
  *        .end(callback);
  *

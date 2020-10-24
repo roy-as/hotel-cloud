@@ -29,3 +29,11 @@ export function isPhone (s) {
 export function isURL (s) {
   return /^http[s]?:\/\/.*/.test(s)
 }
+
+/**
+ * 校验是否是数字
+ * @param s
+ */
+export function isDigit (s) {
+  return !isNaN(s)
+}

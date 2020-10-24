@@ -51,8 +51,11 @@ public class Constants {
     public static final int DEFAULT_QRCODE_WIDTH = 240;
     // 默认二维码高度
     public static final int DEFAULT_QRCODE_HEIGHT = 240;
-    // 设备二维码信息格式
-    public static final String EQUIP_QRCODE_INFO = "{0}-{1}-{2}";
+    // 酒店角色ID
+    public static final Long HOTEL_ROLE_ID = 5L;
+    // 安装公司角色ID
+    public static final Long INSTALLATION_ROLE_ID = 6L;
+
 	/**
 	 * 菜单类型
 	 * 

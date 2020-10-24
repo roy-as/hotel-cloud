@@ -7,11 +7,11 @@ import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
 import com.hotel.cloud.common.utils.ShiroUtils;
 import com.hotel.cloud.common.vo.equip.QrcodeVo;
-import com.hotel.cloud.common.vo.equip.ReleaseEquipVo;
-import com.hotel.cloud.modules.agent.entity.AgentUserEntity;
-import com.hotel.cloud.modules.agent.service.AgentUserService;
-import com.hotel.cloud.modules.hotel.entity.HotelInfoEntity;
-import com.hotel.cloud.modules.hotel.service.HotelInfoService;
+import com.hotel.cloud.common.vo.equip.EquipVo;
+import com.hotel.cloud.modules.org.entity.AgentEntity;
+import com.hotel.cloud.modules.org.service.AgentService;
+import com.hotel.cloud.modules.org.entity.HotelInfoEntity;
+import com.hotel.cloud.modules.org.service.HotelInfoService;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class EquipController {
     private HotelInfoService hotelInfoService;
 
     @Autowired
-    private AgentUserService agentUserService;
+    private AgentService agentService;
 
     /**
      * 列表
@@ -98,7 +98,7 @@ public class EquipController {
     @RequestMapping("/delete")
     @RequiresPermissions("equipment:equip:delete")
     public R delete(@RequestBody Long[] ids){
-		equipService.removeByIds(Arrays.asList(ids));
+		equipService.batchDelete(Arrays.asList(ids));
 
         return R.ok();
     }
@@ -120,13 +120,13 @@ public class EquipController {
         } else {
             hotels = hotelInfoService.select();
         }
-        List<AgentUserEntity> agents = agentUserService.select(isAgent);
-        return R.ok().put("hotels", hotels).put("agents", agents).put("agentLevel", ShiroUtils.getLoginUser().getAgentLevel());
+        List<AgentEntity> agents = agentService.select(isAgent);
+        return R.ok().put("hotels", hotels).put("agents", agents).put("agentLevel", 1);
     }
 
     @PostMapping("release")
     @RequiresPermissions("equipment:equip:release")
-    public R release(@RequestBody @Validated ReleaseEquipVo vo) {
+    public R release(@RequestBody @Validated EquipVo vo) {
         equipService.releaseVo(vo);
         return R.ok();
     }
@@ -135,6 +135,13 @@ public class EquipController {
     @RequiresPermissions("equipment:equip:recycle")
     public R recycle(@RequestBody Long[] ids) {
         equipService.recycle(ids);
+        return R.ok();
+    }
+
+    @PostMapping("/old")
+    @RequiresPermissions("equipment:equip:old")
+    public R old(@RequestBody @Validated EquipVo vo) {
+        equipService.old(vo.getIds(), vo.getCount());
         return R.ok();
     }
 

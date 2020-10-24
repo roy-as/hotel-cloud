@@ -32,8 +32,16 @@
 </template>
 
 <script>
+  import { isDigit } from '@/utils/validate'
   export default {
     data () {
+      var validateNum = (rule, value, callback) => {
+        if (!isDigit(value)) {
+          callback(new Error('只能输入数字'))
+        } else {
+          callback()
+        }
+      }
       return {
         visible: false,
         hotels: [],
@@ -54,10 +62,12 @@
             { required: true, message: '房型名称不能为空', trigger: 'blur' }
           ],
           square: [
-            { required: true, message: '面积不能为空', trigger: 'blur' }
+            { required: true, message: '面积不能为空', trigger: 'blur' },
+            { validator: validateNum, trigger: 'blur' }
           ],
           price: [
-            { required: true, message: '价格不能为空', trigger: 'blur' }
+            { required: true, message: '价格不能为空', trigger: 'blur' },
+            { validator: validateNum, trigger: 'blur' }
           ],
           hotelId: [
             { required: true, message: '酒店ID不能为空', trigger: 'blur' }

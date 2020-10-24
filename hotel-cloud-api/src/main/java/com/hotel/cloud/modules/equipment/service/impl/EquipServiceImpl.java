@@ -1,35 +1,31 @@
 package com.hotel.cloud.modules.equipment.service.impl;
 
-import com.hotel.cloud.common.enums.AgentLevelEnum;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hotel.cloud.common.enums.EquipStatusEnum;
 import com.hotel.cloud.common.enums.ExceptionEnum;
+import com.hotel.cloud.common.enums.FlagEnum;
 import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.common.utils.*;
+import com.hotel.cloud.common.vo.equip.EquipVo;
 import com.hotel.cloud.common.vo.equip.QrcodeVo;
-import com.hotel.cloud.common.vo.equip.ReleaseEquipVo;
-import com.hotel.cloud.modules.agent.entity.AgentUserEntity;
-import com.hotel.cloud.modules.agent.service.AgentUserService;
+import com.hotel.cloud.modules.org.service.AgentService;
+import com.hotel.cloud.modules.equipment.dao.EquipDao;
+import com.hotel.cloud.modules.equipment.entity.EquipEntity;
+import com.hotel.cloud.modules.equipment.service.EquipService;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import com.hotel.cloud.modules.oss.service.SysOssService;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import com.hotel.cloud.modules.sys.service.SysUserService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.*;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
-import com.hotel.cloud.modules.equipment.dao.EquipDao;
-import com.hotel.cloud.modules.equipment.entity.EquipEntity;
-import com.hotel.cloud.modules.equipment.service.EquipService;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.*;
 
 
 @Service("equipService")
@@ -39,35 +35,46 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
     private SysOssService sysOssService;
 
     @Resource
-    private AgentUserService agentUserService;
+    private AgentService agentService;
 
     @Resource
     private SysUserService sysUserService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
-        String name = (String) params.get("name");
+        String mac = (String) params.get("mac");
         String moduleId = (String) params.get("moduleId");
         String hotelId = (String) params.get("hotelId");
+        String agentName = (String) params.get("agentName");
+        String expiredTimeFrom = (String) params.get("expiredTimeFrom");
+        String expiredTimeEnd = (String) params.get("expiredTimeEnd");
+        Date start = StringUtils.isNotBlank(expiredTimeFrom) ? new Date(Long.valueOf(expiredTimeFrom)) : null;
+        Date end = StringUtils.isNotBlank(expiredTimeEnd) ? new Date(Long.valueOf(expiredTimeEnd)) : null;
         boolean isAgent = ShiroUtils.isAgent();
+        String status = (String) params.get("status");
         SysUserEntity loginUser = ShiroUtils.getLoginUser();
         List<Long> agents = new ArrayList<>();
-        if(isAgent) {
+        if (isAgent) {
             agents.add(loginUser.getUserId());
             List<SysUserEntity> users = sysUserService.list(
                     new QueryWrapper<SysUserEntity>().eq("parent_id", loginUser.getUserId())
             );
-            for(SysUserEntity user : users) {
+            for (SysUserEntity user : users) {
                 agents.add(user.getUserId());
             }
         }
         IPage<EquipEntity> page = this.page(
                 new Query<EquipEntity>().getPage(params),
                 new QueryWrapper<EquipEntity>()
-                        .like(StringUtils.isNotBlank(name), "name", MessageFormat.format("%{0}%", name))
+                        .like(StringUtils.isNotBlank(mac), "mac", MessageFormat.format("%{0}%", mac))
                         .eq(StringUtils.isNotBlank(moduleId), "module_id", moduleId)
                         .eq(StringUtils.isNotBlank(hotelId), "hotel_id", hotelId)
                         .in(isAgent, "agent_id", agents)
+                        .like(StringUtils.isNotBlank(agentName), "agent_name", MessageFormat.format("%{0}%", agentName))
+                        .eq(StringUtils.isNotBlank(status), "status", status)
+                        .ge(null != start, "expired_time", start)
+                        .le(null != end, "expired_time",  end)
+                        .eq("flag", FlagEnum.OK.getCode())
                         .orderByDesc("create_time")
         );
 
@@ -77,57 +84,49 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
     @Override
     @Transactional
     public void generateQrcode(QrcodeVo vo) throws IOException {
-        List<Long> ids = vo.getIds();
-        List<EquipEntity> equips = this.baseMapper.selectBatchIds(ids);
+        Long id = vo.getId();
+        EquipEntity equip = this.baseMapper.selectById(id);
         // 校验是否有设备二维码已生成
-        for (EquipEntity equip : equips) {
-            if (StringUtils.isNotBlank(equip.getQrcodeInfo()) && null != equip.getOssId()) {
-                throw new RRException(ExceptionEnum.EQUIP_HAVE_QRCODE);
-            }
+        if (StringUtils.isNotBlank(equip.getQrcodeInfo()) && null != equip.getOssId()) {
+            throw new RRException(ExceptionEnum.EQUIP_HAVE_QRCODE);
         }
-        equips.clear();
-        for (Long id : ids) {
-            // 拼接二维码信息 前缀+起始值+随机12位UUID + 当前系统时间毫秒数
-            String suffix = this.getEquipQrcodeInfoSuffix();
-            String equipInfo = MessageFormat.format(
-                    Constants.EQUIP_QRCODE_INFO, vo.getPrefix(), vo.getStart(), suffix
-            );
-            byte[] qrCode = CommonUtils.createQrCode(equipInfo);
-            SysOssEntity oss = sysOssService.saveFile(qrCode, Constants.PNG_SUFFIX);
-            EquipEntity equip = new EquipEntity();
-            equip.setId(id);
-            equip.setQrcodeInfo(equipInfo);
-            equip.setOssId(oss.getId());
-            equip.setQrcodeUrl(oss.getUrl());
-            equips.add(equip);
-        }
-        this.updateBatchById(equips);
+        byte[] qrCode = CommonUtils.createQrCode(vo.getInfo());
+        SysOssEntity oss = sysOssService.saveFile(qrCode, Constants.PNG_SUFFIX);
+
+        equip.setId(id);
+        equip.setQrcodeInfo(vo.getInfo());
+        equip.setOssId(oss.getId());
+        equip.setQrcodeUrl(oss.getUrl());
+        equip.setUpdateBy(ShiroUtils.getLoginUser().getUsername());
+        equip.setStatus(EquipStatusEnum.PENDING_OLD.getCode());
+
+
+        this.updateById(equip);
     }
 
     @Override
     @Transactional
-    public void releaseVo(ReleaseEquipVo vo) {
+    public void releaseVo(EquipVo vo) {
         if (null == vo.getAgentId() && null == vo.getHotelId()) {
             throw new RRException("代理或者酒店不能为空");
         }
-        // 检查下发到代理是否越权
-        checkAuth(vo.getAgentId());
         List<EquipEntity> equips = this.baseMapper.selectBatchIds(vo.getIds());
         Long hotelId = vo.getHotelId();
         Long agentId = vo.getAgentId();
         for (EquipEntity equip : equips) {
             this.checkEquipOwner(equip.getAgentId());
-            if(null != agentId) {
+            if (null != agentId) {
                 equip.setAgentId(agentId);
                 equip.setAgentName(vo.getAgentName());
             }
-            if(null != hotelId) {
+            if (null != hotelId) {
                 equip.setHotelId(hotelId);
                 equip.setHotelName(vo.getHotelName());
-                equip.setStatus(EquipStatusEnum.RELEASED.getCode());
+                equip.setStatus(EquipStatusEnum.PENDING_SET.getCode());
             }
             equip.setUpdateBy(ShiroUtils.getLoginUser().getUsername());
             equip.setUpdateTime(new Date());
+            equip.setExpiredTime(vo.getExpiredTime());
         }
         this.updateBatchById(equips);
     }
@@ -136,32 +135,43 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
     @Transactional
     public void recycle(Long[] ids) {
         List<EquipEntity> equips = this.baseMapper.selectBatchIds(Arrays.asList(ids));
-        boolean isAgent = ShiroUtils.isAgent();
         SysUserEntity loginUser = ShiroUtils.getLoginUser();
-        for(EquipEntity equip : equips) {
-            if(isAgent) {
-                Long agentId = equip.getAgentId();
-                Long userId = loginUser.getUserId();
-                SysUserEntity user = this.sysUserService.getById(agentId);
-                Long parentId = user.getParentId();
-                if(!userId.equals(agentId) && !userId.equals(parentId)) {
-                    throw new RRException(ExceptionEnum.NOT_AUTHENTICATION);
-                }
-                if(userId.equals(parentId)){
-                    equip.setAgentId(userId);
-                    AgentUserEntity agentUser = agentUserService.getAgentUser(userId);
-                    equip.setAgentName(agentUser.getAgentName());
-                }
-            } else {
-                equip.setAgentName(null);
-                equip.setAgentId(null);
-            }
-            equip.setStatus(EquipStatusEnum.PENDING_RELEASE.getCode());
+        for (EquipEntity equip : equips) {
+            equip.setStatus(EquipStatusEnum.RECYCLE.getCode());
             equip.setUpdateBy(loginUser.getUsername());
             equip.setHotelId(null);
             equip.setHotelName(null);
+            equip.setAgentId(null);
+            equip.setAgentName(null);
         }
         this.baseMapper.updateBatchById(equips);
+    }
+
+    @Override
+    @Transactional
+    public void old(List<Long> ids, Long count) {
+        List<EquipEntity> equips = this.getBaseMapper().selectBatchIds(ids);
+        SysUserEntity loginUser = ShiroUtils.getLoginUser();
+        for(EquipEntity equip : equips) {
+            equip.setStatus(EquipStatusEnum.PENDING_RELEASE.getCode());
+            equip.setUpdateBy(loginUser.getUsername());
+        }
+        this.updateBatchById(equips);
+    }
+
+    @Override
+    @Transactional
+    public void batchDelete(List<Long> ids) {
+        List<EquipEntity> equips = this.baseMapper.selectBatchIds(ids);
+        SysUserEntity loginUser = ShiroUtils.getLoginUser();
+        for(EquipEntity equip : equips) {
+            if(null != equip.getHotelId()) {
+                throw new RRException(ExceptionEnum.RELATE_HOTEL);
+            }
+            equip.setFlag(FlagEnum.DELETE.getCode());
+            equip.setUpdateBy(loginUser.getUsername());
+        }
+        this.updateBatchById(equips);
     }
 
     /**
@@ -176,38 +186,5 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
                 throw new RRException(ExceptionEnum.NOT_AUTHENTICATION);
             }
         }
-    }
-
-    private void checkAuth(Long agentId) {
-        if (null != agentId) {
-            AgentUserEntity agentUser = agentUserService.getAgentUser(agentId);
-            SysUserEntity loginUser = ShiroUtils.getLoginUser();
-            Integer agentLevel = agentUser.getSysUser().getAgentLevel();
-            if (!ShiroUtils.isAgent()) { // 当前用户是系统用户时只能下发到省级代理和区域代理
-                if (!AgentLevelEnum.PROVINCE_AGENT.getLevel().equals(agentLevel)
-                        && !AgentLevelEnum.INDIVIDUAL_AGENT.getLevel().equals(agentLevel)) {
-                    throw new RRException(ExceptionEnum.NOT_AUTHENTICATION);
-                }
-            } else {// 当前用户为代理时，只能下发到下级代理
-                // 下发设备到代理不能下发到不是自己的下级代理
-                if (!agentUser.getSysUser().getParentId().equals(loginUser.getUserId())) {
-                    throw new RRException(ExceptionEnum.NOT_AUTHENTICATION);
-                }
-                // 县级代理,区域代理不能下发到代理
-                if (loginUser.getAgentLevel().equals(AgentLevelEnum.COUNTRY_AGENT.getLevel())
-                        || loginUser.getAgentLevel().equals(AgentLevelEnum.INDIVIDUAL_AGENT.getLevel())) {
-                    throw new RRException(ExceptionEnum.NOT_AUTHENTICATION);
-                }
-                // 当前代理只能下发到下级代理
-                if (!agentLevel.equals(loginUser.getAgentLevel() + 1)) {
-                    throw new RRException(ExceptionEnum.NOT_AUTHENTICATION);
-                }
-            }
-        }
-    }
-
-
-    private String getEquipQrcodeInfoSuffix() {
-        return UUID.randomUUID().toString().toUpperCase().substring(9, 24) + System.currentTimeMillis();
     }
 }

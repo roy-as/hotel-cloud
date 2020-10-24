@@ -4,6 +4,18 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+      <el-form-item label="用户类型"  prop="userType" :class="{ 'is-required': !dataForm.id }">
+        <el-select v-model="dataForm.userType" @change="userTypeChange" filterable clearable placeholder="请选择" style="width: 100%; position: relative" :disabled="!!dataForm.id">
+          <el-option v-for="userType in userTypeList" :key="userType.type" :label="userType.name" :value="userType.type">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="组织"  prop="orgId" :class="{ 'is-required': !dataForm.id }" v-if="orgVisible">
+        <el-select v-model="dataForm.orgId" @change="userTypeChange" filterable clearable placeholder="请选择" style="width: 100%; position: relative" :disabled="!!dataForm.id">
+          <el-option v-for="org in orgs" :key="org.id" :label="org.name" :value="org.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="用户名" prop="userName">
         <el-input v-model="dataForm.userName" placeholder="登录帐号"></el-input>
       </el-form-item>
@@ -19,7 +31,7 @@
       <el-form-item label="手机号" prop="mobile">
         <el-input v-model="dataForm.mobile" placeholder="手机号"></el-input>
       </el-form-item>
-      <el-form-item label="角色" size="mini" prop="roleIdList">
+      <el-form-item label="角色" size="mini" prop="roleIdList" v-if="roleVisible">
         <el-checkbox-group v-model="dataForm.roleIdList">
           <el-checkbox v-for="role in roleList" :key="role.roleId" :label="role.roleId">{{ role.roleName }}</el-checkbox>
         </el-checkbox-group>
@@ -40,6 +52,7 @@
 
 <script>
   import { isEmail, isMobile } from '@/utils/validate'
+  import { getUser } from '@/utils/index'
   export default {
     data () {
       var validatePassword = (rule, value, callback) => {
@@ -59,14 +72,14 @@
         }
       }
       var validateEmail = (rule, value, callback) => {
-        if (!isEmail(value)) {
+        if (value && !isEmail(value)) {
           callback(new Error('邮箱格式错误'))
         } else {
           callback()
         }
       }
       var validateMobile = (rule, value, callback) => {
-        if (!isMobile(value)) {
+        if (value && !isMobile(value)) {
           callback(new Error('手机号格式错误'))
         } else {
           callback()
@@ -75,6 +88,10 @@
       return {
         visible: false,
         roleList: [],
+        userTypeList: [],
+        orgs: [],
+        orgVisible: false,
+        roleVisible: false,
         dataForm: {
           id: 0,
           userName: '',
@@ -97,11 +114,9 @@
             { validator: validateComfirmPassword, trigger: 'blur' }
           ],
           email: [
-            { required: true, message: '邮箱不能为空', trigger: 'blur' },
             { validator: validateEmail, trigger: 'blur' }
           ],
           mobile: [
-            { required: true, message: '手机号不能为空', trigger: 'blur' },
             { validator: validateMobile, trigger: 'blur' }
           ]
         }
@@ -110,6 +125,21 @@
     methods: {
       init (id) {
         this.dataForm.id = id || 0
+        const user = getUser()
+        this.userTypeList = []
+        if (user.userType === 0) {
+          this.userTypeList.push({type: 0, name: '系统用户'})
+          this.userTypeList.push({type: 1, name: '代理商用户'})
+          this.userTypeList.push({type: 2, name: '酒店用户'})
+          this.userTypeList.push({type: 3, name: '安装公司用户'})
+        } else if (user.userType === 1) {
+          this.userTypeList.push({type: 1, name: '代理商用户'})
+          this.userTypeList.push({type: 4, name: '子用户'})
+        } else if (user.userType === 2) {
+          this.userTypeList.push({type: 4, name: '子用户'})
+        } else if (user.userType === 3) {
+          this.userTypeList.push({type: 4, name: '子用户'})
+        }
         this.$http({
           url: this.$http.adornUrl('/sys/role/select'),
           method: 'get',
@@ -144,6 +174,9 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            const org = this.orgs.find(item => {
+              return item.id === this.dataForm.orgId
+            })
             this.$http({
               url: this.$http.adornUrl(`/sys/user/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
@@ -155,7 +188,10 @@
                 'email': this.dataForm.email,
                 'mobile': this.dataForm.mobile,
                 'status': this.dataForm.status,
-                'roleIdList': this.dataForm.roleIdList
+                'roleIdList': this.dataForm.roleIdList,
+                'userType': this.dataForm.userType,
+                'orgId': org ? org.id : null,
+                'orgName': org ? org.name : null
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -174,6 +210,25 @@
             })
           }
         })
+      },
+      userTypeChange () {
+        this.$forceUpdate()
+        if (this.dataForm.userType !== 0 && this.dataForm.userType !== 4) {
+          this.roleVisible = false
+          this.orgVisible = true
+          this.$http({
+            url: this.$http.adornUrl('/org/select'),
+            method: 'get',
+            params: this.$http.adornParams({
+              userType: this.dataForm.userType
+            })
+          }).then(({data}) => {
+            this.orgs = data && data.code === 0 ? data.data : []
+          })
+        } else {
+          this.orgVisible = false
+          this.roleVisible = true
+        }
       }
     }
   }

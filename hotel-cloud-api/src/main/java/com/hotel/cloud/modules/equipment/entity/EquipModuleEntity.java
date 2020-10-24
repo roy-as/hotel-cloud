@@ -1,13 +1,11 @@
 package com.hotel.cloud.modules.equipment.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 设备模块表
@@ -24,12 +22,10 @@ public class EquipModuleEntity implements Serializable {
 	/**
 	 * ID
 	 */
-	@TableId
 	private Long id;
 	/**
 	 * 设备模块名称
 	 */
-	@NotBlank(message = "模块名称不能为空")
 	private String name;
 	/**
 	 * 房间名称
@@ -51,5 +47,21 @@ public class EquipModuleEntity implements Serializable {
 	 * 更新人
 	 */
 	private String updateBy;
+	/**
+	 * 价格
+	 */
+	private BigDecimal price;
+	/**
+	 * 文件id
+	 */
+	private Long ossId;
+	/**
+	 * 图片地址
+	 */
+	private String pictureUrl;
+	/**
+	 * 协议
+	 */
+	private String protocol;
 
 }

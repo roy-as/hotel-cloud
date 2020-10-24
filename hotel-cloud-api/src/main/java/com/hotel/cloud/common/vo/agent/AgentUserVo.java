@@ -3,31 +3,20 @@ package com.hotel.cloud.common.vo.agent;
 import com.alibaba.fastjson.JSON;
 import com.hotel.cloud.common.annotation.Length;
 import com.hotel.cloud.common.utils.Constants;
-import com.hotel.cloud.modules.agent.entity.AgentUserEntity;
-import com.hotel.cloud.modules.sys.entity.SysUserEntity;
+import com.hotel.cloud.modules.org.entity.AgentEntity;
 import lombok.Data;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.util.List;
 
 @Data
 public class AgentUserVo {
 
-    private Long userId;
+    private Long id;
 
-    @NotNull(message = "上级代理不能为空")
-    private Long parentId;
+    private Long parentId = 0L;
 
-    private String parentName;
-
-    @NotBlank(message = "账号不能为空")
-    private String username;
-
-    @NotBlank(message = "密码不能为空")
-    private String password;
+    private String parentName = Constants.NONE;
 
     @NotBlank(message = "手机号不能为空")
     @Pattern(regexp = Constants.MOBILE_PATTERN, message = "手机格式错误")
@@ -38,12 +27,11 @@ public class AgentUserVo {
     private String email;
 
     @NotBlank(message = "联系人不能为空")
-    private String contactPerson;
+    private String contact;
 
     @NotBlank(message = "代理名称不能为空")
-    private String agentName;
+    private String name;
 
-    private String province;
 
     @Length(size = 3, message = "地区格式错误")
     private String[] areas;
@@ -57,20 +45,8 @@ public class AgentUserVo {
 
     private String remark;
 
-    public void setPassword(String password) {
-        if(StringUtils.isNotBlank(password)) {
-            this.password = password;
-        }
-    }
-
-    public SysUserEntity getSysUserEntity() {
-        SysUserEntity entity = new SysUserEntity();
-        BeanUtils.copyProperties(this, entity);
-        return entity;
-    }
-
-    public AgentUserEntity getAgentUserEntity() {
-        AgentUserEntity entity = new AgentUserEntity();
+    public AgentEntity getEntity() {
+        AgentEntity entity = new AgentEntity();
         BeanUtils.copyProperties(this, entity);
         entity.setArea(JSON.toJSONString(this.getAreas()));
         return entity;

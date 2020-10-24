@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hotel.cloud.modules.org.dao.AgentUserDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hotel.cloud.modules.org.entity.AgentEntity" id="agentUserMap">
+        <result property="userId" column="user_id"/>
+        <result property="agentName" column="agent_name"/>
+        <result property="area" column="area"/>
+        <result property="address" column="address"/>
+        <result property="remark" column="remark"/>
+        <association property="sysUser" javaType="com.hotel.cloud.modules.sys.entity.SysUserEntity">
+            <result property="username" column="username"/>
+            <result property="email" column="email"/>
+            <result property="mobile" column="mobile"/>
+            <result property="createTime" column="create_time"/>
+            <result property="agentLevel" column="agent_level"/>
+            <result property="parentId" column="parent_id"/>
+            <result property="parentName" column="parent_name"/>
+            <result property="contactPerson" column="contact_person"/>
+            <result property="status" column="status"/>
+        </association>
+    </resultMap>
+
+</mapper>

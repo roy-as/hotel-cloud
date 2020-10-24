@@ -27,6 +27,7 @@
         header-align="center"
         align="center"
         width="80"
+        v-if="false"
         label="ID">
       </el-table-column>
       <el-table-column

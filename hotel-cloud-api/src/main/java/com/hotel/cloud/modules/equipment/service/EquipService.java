@@ -3,10 +3,11 @@ package com.hotel.cloud.modules.equipment.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.vo.equip.QrcodeVo;
-import com.hotel.cloud.common.vo.equip.ReleaseEquipVo;
+import com.hotel.cloud.common.vo.equip.EquipVo;
 import com.hotel.cloud.modules.equipment.entity.EquipEntity;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,8 +23,12 @@ public interface EquipService extends IService<EquipEntity> {
 
     void generateQrcode(QrcodeVo vo) throws IOException;
 
-    void releaseVo(ReleaseEquipVo vo);
+    void releaseVo(EquipVo vo);
 
     void recycle(Long[] ids);
+
+    void old(List<Long> ids, Long count);
+
+    void batchDelete(List<Long> ids);
 }
 

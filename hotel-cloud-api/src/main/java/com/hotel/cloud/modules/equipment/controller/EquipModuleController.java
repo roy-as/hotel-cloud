@@ -1,5 +1,6 @@
 package com.hotel.cloud.modules.equipment.controller;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Map;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hotel.cloud.common.utils.ShiroUtils;
+import com.hotel.cloud.common.vo.equip.EquipModuleVo;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,12 +74,8 @@ public class EquipModuleController {
      */
     @RequestMapping("/save")
     @RequiresPermissions("equipment:equipModule:save")
-    public R save(@RequestBody @Validated EquipModuleEntity equipModule){
-        SysUserEntity loginUser = ShiroUtils.getLoginUser();
-        equipModule.setCreateTime(new Date());
-        equipModule.setCreateBy(loginUser.getUsername());
-        equipModule.setUpdateBy(loginUser.getUsername());
-        equipModuleService.save(equipModule);
+    public R save(@Validated EquipModuleVo vo) throws IOException {
+        equipModuleService.save(vo);
 
         return R.ok();
     }
@@ -87,8 +85,8 @@ public class EquipModuleController {
      */
     @RequestMapping("/update")
     @RequiresPermissions("equipment:equipModule:update")
-    public R update(@RequestBody EquipModuleEntity equipModule){
-		equipModuleService.updateById(equipModule);
+    public R update(EquipModuleVo vo) throws IOException {
+		equipModuleService.update(vo);
 
         return R.ok();
     }

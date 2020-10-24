@@ -2,10 +2,12 @@ package com.hotel.cloud.common.exception;
 
 import com.hotel.cloud.common.enums.ExceptionEnum;
 
+import java.util.function.Supplier;
+
 /**
  * 自定义异常
  */
-public class RRException extends RuntimeException {
+public class RRException extends RuntimeException implements Supplier<RRException> {
 	private static final long serialVersionUID = 1L;
 	
     private String msg;
@@ -54,6 +56,10 @@ public class RRException extends RuntimeException {
 	public void setCode(int code) {
 		this.code = code;
 	}
-	
-	
+
+
+	@Override
+	public RRException get() {
+		return this;
+	}
 }

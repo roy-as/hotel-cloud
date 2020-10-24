@@ -1,5 +1,6 @@
 package com.hotel.cloud.modules.sys.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hotel.cloud.common.annotation.SysLog;
 import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.common.utils.Constants;
@@ -43,7 +44,7 @@ public class SysMenuController extends AbstractController {
 	@GetMapping("/list")
 	@RequiresPermissions("sys:menu:list")
 	public List<SysMenuEntity> list(){
-		List<SysMenuEntity> menuList = sysMenuService.list();
+		List<SysMenuEntity> menuList = sysMenuService.list(new QueryWrapper<SysMenuEntity>().orderByAsc( "order_num"));
 		for(SysMenuEntity sysMenuEntity : menuList){
 			SysMenuEntity parentMenuEntity = sysMenuService.getById(sysMenuEntity.getParentId());
 			if(parentMenuEntity != null){

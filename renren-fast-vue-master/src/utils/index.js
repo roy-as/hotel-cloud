@@ -19,8 +19,12 @@ export function isAuth (key) {
   return JSON.parse(sessionStorage.getItem('permissions') || '[]').indexOf(key) !== -1 || false
 }
 
+export function getUser () {
+  return JSON.parse(sessionStorage.getItem('user'))
+}
+
 export function getUserId () {
-  return sessionStorage.getItem('id')
+  return getUser().id
 }
 
 /**

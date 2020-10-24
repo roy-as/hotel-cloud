@@ -9,20 +9,28 @@
           {{name}}
         </el-tag>
       </el-form-item>
-      <el-form-item label="下发类型">
+      <el-form-item label="下发类型" prop="releaseType">
         <el-select v-model="dataForm.releaseType"  @change="select" filterable clearable placeholder="请选择" style="width: 100%; position: relative">
           <el-option v-for="agentType in agentTypes" :key="agentType.value" :label="agentType.label" :value="agentType.value"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="代理" v-if="agentVisible">
+      <el-form-item label="代理" v-if="agentVisible" prop="agentId">
         <el-select v-model="dataForm.agentId"  @change="$forceUpdate()" filterable clearable placeholder="请选择" style="width: 100%; position: relative">
           <el-option v-for="agent in agents" :key="agent.userId" :label="agent.agentName" :value="agent.userId"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="酒店" v-if="hotelVisible">
+      <el-form-item label="酒店" v-if="hotelVisible" prop="hotelId">
         <el-select v-model="dataForm.hotelId"  @change="$forceUpdate()" filterable clearable placeholder="请选择" style="width: 100%; position: relative">
           <el-option v-for="hotel in hotels" :key="hotel.id" :label="hotel.name" :value="hotel.id"></el-option>
         </el-select>
+      </el-form-item>
+      <el-form-item label="过期时间" prop="expiredTime">
+        <el-date-picker
+          v-model="dataForm.expiredTime"
+          type="date"
+          style="width: 100%"
+          placeholder="选择日期">
+        </el-date-picker>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -48,7 +56,8 @@
         dataForm: {
           releaseType: null,
           agentId: null,
-          hotelId: null
+          hotelId: null,
+          expiredTime: ''
         },
         dataRule: {}
       }
@@ -99,7 +108,8 @@
                 'hotelId': this.dataForm.hotelId,
                 'agentId': this.dataForm.agentId,
                 'agentName': chosenAgent ? chosenAgent.agentName : null,
-                'hotelName': chosenHotel ? chosenHotel.name : null
+                'hotelName': chosenHotel ? chosenHotel.name : null,
+                'expiredTime': this.dataForm.expiredTime ? this.dataForm.expiredTime.getTime() : null
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

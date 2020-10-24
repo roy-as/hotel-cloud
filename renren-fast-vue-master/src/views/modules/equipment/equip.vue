@@ -1,13 +1,13 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="设备名称">
-        <el-input v-model="dataForm.name" placeholder="设备名称" clearable></el-input>
-      </el-form-item>
-      <el-form-item prop="module" label="设备模块">
+      <el-form-item prop="module" label="模块">
         <el-select v-model="dataForm.moduleId" filterable clearable @change="$forceUpdate()">
           <el-option v-for="module in modules" :key="module.id" :label="module.name" :value="module.id"></el-option>
         </el-select>
+      </el-form-item>
+      <el-form-item label="代理">
+        <el-input v-model="dataForm.agentName" placeholder="代理" clearable></el-input>
       </el-form-item>
       <el-form-item label="酒店"  prop="hotelId">
         <el-select v-model="dataForm.hotelId" @change="$forceUpdate()" filterable clearable>
@@ -15,11 +15,30 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item prop="status" label="过期时间">
+        <el-date-picker
+          v-model="dataForm.expiredTimeRange"
+          type="datetimerange"
+          :picker-options="pickerOptions"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          align="right">
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="mac地址">
+        <el-input v-model="dataForm.mac" placeholder="mac地址" clearable></el-input>
+      </el-form-item>
+      <el-form-item prop="status" label="状态">
+        <el-select v-model="dataForm.status" filterable clearable>
+          <el-option v-for="status in statusList" :key="status.code" :label="status.label" :value="status.code"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('equipment:equip:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('equipment:equip:generateQrcode')" type="primary" @click="generateQrcode()" :disabled="dataListSelections.length <= 0">生成二维码</el-button>
-        <el-button v-if="isAuth('equipment:equip:release')" type="primary" @click="releaseEquip()" :disabled="dataListSelections.length <= 0">设备下发</el-button>
+        <el-button v-if="isAuth('equipment:equip:release')" type="primary" @click="releaseEquip()" :disabled="dataListSelections.length <= 0">批量下发</el-button>
+        <el-button v-if="isAuth('equipment:equip:old')" type="primary" @click="old()" :disabled="dataListSelections.length <= 0">批量老化</el-button>
         <el-button v-if="isAuth('equipment:equip:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
         <el-button v-if="isAuth('equipment:equip:recycle')" type="danger" @click="recycleHandle()" :disabled="dataListSelections.length <= 0">批量回收</el-button>
       </el-form-item>
@@ -59,7 +78,7 @@
         prop="qrcodeUrl"
         header-align="center"
         align="center"
-        label="Logo">
+        label="二维码">
         <template slot-scope="scope">
           <span v-if="scope.row.qrcodeUrl">
             <img :src="imgUrl(scope.row)" :preview="scope.$index" height="70" width="70"/>
@@ -94,17 +113,16 @@
         label="mac地址">
       </el-table-column>
       <el-table-column
-        prop="sn"
-        header-align="center"
-        align="center"
-        show-overflow-tooltip
-        label="序列号">
-      </el-table-column>
-      <el-table-column
         prop="versionNumber"
         header-align="center"
         align="center"
         label="版本号">
+      </el-table-column>
+      <el-table-column
+        prop="ip"
+        header-align="center"
+        align="center"
+        label="IP">
       </el-table-column>
       <el-table-column
         prop="remark"
@@ -118,10 +136,30 @@
         align="center"
         label="状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 0" size="small" type="danger">禁用</el-tag>
-          <el-tag v-if="scope.row.status === 1" size="small" type="warning">待下发</el-tag>
-          <el-tag v-if="scope.row.status === 2" size="small">已绑定</el-tag>
+          <el-tag v-if="scope.row.status === 0" size="small" type="danger">待绑定</el-tag>
+          <el-tag v-if="scope.row.status === 1" size="small" type="warning">待老化</el-tag>
+          <el-tag v-if="scope.row.status === 2" size="small" type="warning">待下发</el-tag>
+          <el-tag v-if="scope.row.status === 3" size="small" type="waning">待安装</el-tag>
+          <el-tag v-if="scope.row.status === 4" size="small">工作中</el-tag>
+          <el-tag v-if="scope.row.status === 5" size="small" type="warning">已回收</el-tag>
         </template>
+      </el-table-column>
+      <el-table-column
+        prop="status"
+        header-align="center"
+        align="center"
+        label="在线状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 0 || !scope.row.ip" size="small" type="danger">离线</el-tag>
+          <el-tag v-if="scope.row.status === 1 && scope.row.ip" size="small">在线</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="expiredTime"
+        header-align="center"
+        align="center"
+        show-overflow-tooltip
+        label="过期时间">
       </el-table-column>
       <el-table-column
         prop="createTime"
@@ -131,25 +169,11 @@
         label="创建时间">
       </el-table-column>
       <el-table-column
-        prop="updateTime"
-        header-align="center"
-        align="center"
-        show-overflow-tooltip
-        label="更新时间">
-      </el-table-column>
-      <el-table-column
         prop="createBy"
         header-align="center"
         align="center"
         show-overflow-tooltip
         label="创建人">
-      </el-table-column>
-      <el-table-column
-        prop="updateBy"
-        header-align="center"
-        align="center"
-        show-overflow-tooltip
-        label="更新人">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -159,8 +183,11 @@
         label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('equipment:equip:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button v-if="isAuth('equipment:equip:generateQrcode') && scope.row.status === 0" type="text" size="small" @click="generateQrcode(scope.row.id, scope.row.name)">绑定二维码</el-button>
+          <el-button v-if="isAuth('equipment:equip:old') && scope.row.status === 1" type="text" size="small" @click="old(scope.row.id, scope.row.name)">　老化</el-button>
+          <el-button v-if="isAuth('equipment:equip:release') && scope.row.status === 2 && checkIfRelease(scope.row)" type="text" size="small" @click="releaseEquip(scope.row.id, scope.row.name)">下发</el-button>
           <el-button v-if="isAuth('equipment:equip:delete')" type="text" size="small" @click="deleteHandle(scope.row.id, scope.row.name)">删除</el-button>
-          <el-button v-if="isAuth('equipment:equip:recycle')" type="text" size="small" @click="recycleHandle(scope.row.id, scope.row.name)"><span style="color: lightpink">回收</span></el-button>
+          <el-button v-if="isAuth('equipment:equip:recycle') && scope.row.status !== 3" type="text" size="small" @click="recycleHandle(scope.row.id, scope.row.name)"><span style="color: lightpink">回收</span></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -177,6 +204,7 @@
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <generate-qrcode v-if="generateQrcodeVisible" ref="generateQrcode" @refreshDataList="getDataList"></generate-qrcode>
     <release v-if="releaseVisible" ref="release"  @refreshDataList="getDataList"></release>
+    <old v-if="oldVisible" ref="old"  @refreshDataList="getDataList"></old>
   </div>
 </template>
 
@@ -185,12 +213,58 @@
   import GenerateQrcode from './equip-generate-qrcode'
   import Release from './equip-release'
   import { getUserId } from '@/utils/index'
+  import Old from './equip-old'
   export default {
     data () {
       return {
+        pickerOptions: {
+          shortcuts: [{
+            text: '昨天',
+            onClick (picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24)
+              picker.$emit('pick', [start, end])
+            }
+          }, {
+            text: '上周',
+            onClick (picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            }
+          }, {
+            text: '前一个月',
+            onClick (picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
+            }
+          }, {
+            text: '前三个月',
+            onClick (picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
+            }
+          }]
+        },
+        value1: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
+        value2: '',
         dataForm: {
           key: ''
         },
+        statusList: [
+          {code: 0, label: '待绑定'},
+          {code: 1, label: '待老化'},
+          {code: 2, label: '待下发'},
+          {code: 3, label: '待安装'},
+          {code: 4, label: '工作中'},
+          {code: 5, label: '已回收'}
+        ],
         dataList: [],
         modules: [],
         hotels: [],
@@ -201,13 +275,15 @@
         dataListSelections: [],
         addOrUpdateVisible: false,
         generateQrcodeVisible: false,
-        releaseVisible: false
+        releaseVisible: false,
+        oldVisible: false
       }
     },
     components: {
       AddOrUpdate,
       GenerateQrcode,
-      Release
+      Release,
+      Old
     },
     activated () {
       this.getDataList()
@@ -222,9 +298,13 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'name': this.dataForm.name,
+            'mac': this.dataForm.mac,
             'moduleId': this.dataForm.moduleId,
-            'hotelId': this.dataForm.hotelId
+            'hotelId': this.dataForm.hotelId,
+            'agentName': this.dataForm.agentName,
+            'status': this.dataForm.status,
+            'expiredTimeFrom': this.dataForm.expiredTimeRange ? this.dataForm.expiredTimeRange[0].getTime() : null,
+            'expiredTimeEnd': this.dataForm.expiredTimeRange ? this.dataForm.expiredTimeRange[1].getTime() : null
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -373,14 +453,31 @@
       },
       releaseEquip (id, name) {
         let valid = true
+        let qrcode = true
         let devices = []
-        const userId = getUserId()
+        let qrcodeDevice = []
         this.dataListSelections.forEach((item, index) => {
-          if (item.agentId && (item.hotelId || item.agentId !== Number(userId))) {
+          if (this.checkIfRelease(item)) {
             valid = false
             devices.push(item.name)
           }
+          if (item.status !== 1) {
+            qrcode = false
+            qrcodeDevice.push(item.name)
+          }
         })
+        if (!qrcode) {
+          this.$alert(`设备:  [${qrcodeDevice.join(',')}] 状态不能下发`, '提示', {
+            confirmButtonText: '确定',
+            callback: () => {
+              this.$message({
+                type: 'warning',
+                message: `设备:  [${qrcodeDevice.join(',')}] 状态不能下发`
+              })
+            }
+          })
+          return
+        }
         const msg = `设备:  [${devices.join(',')}] 已下发`
         if (!valid) {
           this.$alert(msg, '提示', {
@@ -410,6 +507,60 @@
           return ''
         }
         return row.qrcodeUrl
+      },
+      checkIfRelease (item) {
+        const userId = getUserId()
+        return !item.agentId && (item.hotelId || item.agentId !== Number(userId))
+      },
+      old (id, name) {
+        let valid = true
+        let devices = []
+        let qrcode = true
+        let qrcodeDevices = []
+        this.dataListSelections.forEach((item, index) => {
+          if (item.status > 1) {
+            valid = false
+            devices.push(item.name)
+          } else if (item.status < 1) {
+            qrcode = false
+            qrcodeDevices.push(item.name)
+          }
+        })
+        if (!qrcode) {
+          this.$alert(`设备:  [${qrcodeDevices.join(',')}] 未绑定二维码`, '提示', {
+            confirmButtonText: '确定',
+            callback: () => {
+              this.$message({
+                type: 'warning',
+                message: `设备:  [${qrcodeDevices.join(',')}] 未绑定二维码`
+              })
+            }
+          })
+          return
+        }
+        const msg = `设备:  [${devices.join(',')}] 已老化`
+        if (!valid) {
+          this.$alert(msg, '提示', {
+            confirmButtonText: '确定',
+            callback: () => {
+              this.$message({
+                type: 'warning',
+                message: msg
+              })
+            }
+          })
+          return
+        }
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        var names = name ? [name] : this.dataListSelections.map(item => {
+          return item.name
+        })
+        this.oldVisible = true
+        this.$nextTick(() => {
+          this.$refs.old.init(ids, names)
+        })
       }
     }
   }

@@ -2,7 +2,7 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-input v-model="dataForm.name" placeholder="模块名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -36,6 +36,30 @@
         label="模块名称">
       </el-table-column>
       <el-table-column
+        prop="pictureUrl"
+        header-align="center"
+        align="center"
+        label="图片">
+        <template slot-scope="scope">
+          <span v-if="scope.row.pictureUrl">
+            <img :src="imgUrl(scope.row)" :preview="scope.$index" height="70" width="70"/>
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="price"
+        header-align="center"
+        align="center"
+        label="价格">
+      </el-table-column>
+      <el-table-column
+        prop="protocol"
+        header-align="center"
+        align="center"
+        show-overflow-tooltip
+        label="协议">
+      </el-table-column>
+      <el-table-column
         prop="remark"
         header-align="center"
         align="center"
@@ -50,23 +74,10 @@
         label="创建时间">
       </el-table-column>
       <el-table-column
-        prop="updateTime"
-        header-align="center"
-        align="center"
-        show-overflow-tooltip
-        label="更新时间">
-      </el-table-column>
-      <el-table-column
         prop="createBy"
         header-align="center"
         align="center"
         label="创建人">
-      </el-table-column>
-      <el-table-column
-        prop="updateBy"
-        header-align="center"
-        align="center"
-        label="更新人">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -127,7 +138,7 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'name': this.dataForm.name
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -194,6 +205,12 @@
             }
           })
         })
+      },
+      imgUrl: function (row) {
+        if (!row.pictureUrl) {
+          return ''
+        }
+        return row.pictureUrl
       }
     }
   }

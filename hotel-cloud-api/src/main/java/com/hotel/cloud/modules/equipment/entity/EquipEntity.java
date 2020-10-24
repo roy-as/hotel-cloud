@@ -7,6 +7,8 @@ import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * 设备表
  * 
@@ -27,6 +29,7 @@ public class EquipEntity implements Serializable {
 	/**
 	 * 设备名称
 	 */
+	@NotBlank(message = "设备名称不能为空")
 	private String name;
 	/**
 	 * 设备模块id
@@ -47,6 +50,7 @@ public class EquipEntity implements Serializable {
 	/**
 	 * 设备mac地址
 	 */
+	@NotBlank(message = "mac地址不能为空")
 	private String mac;
 	/**
 	 * 版本号
@@ -97,12 +101,20 @@ public class EquipEntity implements Serializable {
 	 */
 	private String agentName;
 	/**
-	 * 序列号
-	 */
-	private String sn;
-	/**
 	 * 二维码地址
 	 */
 	private String qrcodeUrl;
+	/**
+	 * 设备ip
+	 */
+	private String ip;
+	/**
+	 * 过期时间
+	 */
+	private Date expiredTime;
+	/**
+	 * 0:在线，1:离线
+	 */
+	private Integer online;
 
 }
