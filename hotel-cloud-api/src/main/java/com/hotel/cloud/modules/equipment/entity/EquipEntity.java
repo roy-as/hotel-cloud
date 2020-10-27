@@ -1,9 +1,11 @@
 package com.hotel.cloud.modules.equipment.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 
@@ -116,5 +118,8 @@ public class EquipEntity implements Serializable {
 	 * 0:在线，1:离线
 	 */
 	private Integer online;
+
+	@TableField(exist = false)
+	private BigDecimal price;
 
 }

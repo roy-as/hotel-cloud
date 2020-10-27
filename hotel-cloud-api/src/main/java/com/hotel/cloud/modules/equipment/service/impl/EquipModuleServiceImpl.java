@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hotel.cloud.common.enums.ExceptionEnum;
+import com.hotel.cloud.common.enums.FlagEnum;
 import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.Query;
@@ -55,6 +56,7 @@ public class EquipModuleServiceImpl extends ServiceImpl<EquipModuleDao, EquipMod
     public void delete(List<Long> ids) {
         List<EquipEntity> equips = equipService.list(new QueryWrapper<EquipEntity>()
                 .in(CollectionUtil.isNotEmpty(ids), "module_id", ids)
+                .eq("flag", FlagEnum.OK.getCode())
         );
         if (CollectionUtil.isNotEmpty(equips)) {
             throw new RRException(ExceptionEnum.EXIST_EQUIP);

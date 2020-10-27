@@ -81,4 +81,9 @@ public class OrderController {
         return R.ok();
     }
 
+    @GetMapping("/equipList")
+    public R equipList() {
+        return orderService.equipList();
+    }
+
 }
