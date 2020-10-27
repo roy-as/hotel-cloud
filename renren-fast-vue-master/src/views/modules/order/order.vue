@@ -1,21 +1,13 @@
 <template>
-  <div class="mod-user">
+  <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.userName" placeholder="用户名" clearable></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="dataForm.name" placeholder="姓名" clearable></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-input v-model="dataForm.orgName" placeholder="组织名称" clearable></el-input>
+        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('sys:user:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('sys:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button v-if="isAuth('agentUser:update')" type="primary" @click="disable(null, null, 1)" :disabled="dataListSelections.length <= 0">批量启用</el-button>
-        <el-button v-if="isAuth('agentUser:update')" type="danger" @click="disable(null, null, 0)" :disabled="dataListSelections.length <= 0">批量禁用</el-button>
+        <el-button v-if="isAuth('order:order:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('order:order:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -31,52 +23,28 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="userId"
+        prop="id"
         header-align="center"
         align="center"
-        width="80"
-        v-if="false"
-        label="ID">
+        label="订单号">
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="agentName"
         header-align="center"
         align="center"
-        label="姓名">
+        label="代理">
       </el-table-column>
       <el-table-column
-        prop="username"
+        prop="hotelName"
         header-align="center"
         align="center"
-        label="用户名">
+        label="酒店">
       </el-table-column>
       <el-table-column
-        prop="orgName"
+        prop="installationName"
         header-align="center"
         align="center"
-        show-overflow-tooltip
-        label="组织名称">
-        <template slot-scope="scope">
-          {{ scope.row.orgName || '-' }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="userTypeName"
-        header-align="center"
-        align="center"
-        label="用户类型">
-      </el-table-column>
-      <el-table-column
-        prop="email"
-        header-align="center"
-        align="center"
-        label="邮箱">
-      </el-table-column>
-      <el-table-column
-        prop="mobile"
-        header-align="center"
-        align="center"
-        label="手机号">
+        label="安装公司">
       </el-table-column>
       <el-table-column
         prop="status"
@@ -84,16 +52,75 @@
         align="center"
         label="状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 0" size="small" type="danger">禁用</el-tag>
-          <el-tag v-else size="small">正常</el-tag>
+          <el-tag v-if="scope.row.status === 0" size="small" >待审核</el-tag>
+          <el-tag v-if="scope.row.status === 1" size="small" type="danger" >待发货</el-tag>
+          <el-tag v-if="scope.row.status === 2" size="small" type="warning">完成</el-tag>
         </template>
+      </el-table-column>
+      <el-table-column
+        prop="delivery"
+        header-align="center"
+        align="center"
+        label="物流">
+      </el-table-column>
+      <el-table-column
+        prop="deliveryNo"
+        header-align="center"
+        align="center"
+        label="物流单号">
+      </el-table-column>
+      <el-table-column
+        prop="payType"
+        header-align="center"
+        align="center"
+        label="支付方式">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 1" size="small" >支付宝</el-tag>
+          <el-tag v-if="scope.row.status === 2" size="small" type="danger" >微信</el-tag>
+          <el-tag v-if="scope.row.status === 3" size="small" type="warning">银行卡</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="amount"
+        header-align="center"
+        align="center"
+        label="支付金额">
+      </el-table-column>
+      <el-table-column
+        prop="realAmount"
+        header-align="center"
+        align="center"
+        label="实际支付">
+      </el-table-column>
+      <el-table-column
+        prop="couponSn"
+        header-align="center"
+        align="center"
+        label="优惠券">
+      </el-table-column>
+      <el-table-column
+        prop="payOrderNo"
+        header-align="center"
+        align="center"
+        label="流水号">
+      </el-table-column>
+      <el-table-column
+        prop="createBy"
+        header-align="center"
+        align="center"
+        label="创建人">
       </el-table-column>
       <el-table-column
         prop="createTime"
         header-align="center"
         align="center"
-        width="180"
         label="创建时间">
+      </el-table-column>
+      <el-table-column
+        prop="remark"
+        header-align="center"
+        align="center"
+        label="备注">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -102,10 +129,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('sys:user:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.userId)">修改</el-button>
-          <el-button v-if="isAuth('sys:user:delete')" type="text" size="small" @click="deleteHandle(scope.row.userId)">删除</el-button>
-          <el-button v-if="scope.row.status === 0" type="text" size="small" @click="disable(scope.row.userId, scope.row.username, 1)">启用</el-button>
-          <el-button v-else type="text" size="small" @click="disable(scope.row.userId, scope.row.username, 0)"><span style="color: lightpink">禁用</span></el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -124,12 +149,12 @@
 </template>
 
 <script>
-  import AddOrUpdate from './user-add-or-update'
+  import AddOrUpdate from './order-add-or-update'
   export default {
     data () {
       return {
         dataForm: {
-          userName: ''
+          key: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -151,14 +176,12 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/sys/user/list'),
+          url: this.$http.adornUrl('/order/order/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'username': this.dataForm.userName,
-            'name': this.dataForm.name,
-            'orgName': this.dataForm.orgName
+            'key': this.dataForm.key
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -195,57 +218,18 @@
       },
       // 删除
       deleteHandle (id) {
-        var userIds = id ? [id] : this.dataListSelections.map(item => {
-          return item.userId
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
         })
-        this.$confirm(`确定对[id=${userIds.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/sys/user/delete'),
+            url: this.$http.adornUrl('/order/order/delete'),
             method: 'post',
-            data: this.$http.adornData(userIds, false)
-          }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }).catch(() => {})
-      },
-      disable (userId, username, status) {
-        var userIds = userId ? [userId] : this.dataListSelections.map(item => {
-          return item.userId
-        })
-        var userNames = username ? [username] : this.dataListSelections.map(item => {
-          return item.username
-        })
-        let text = '启用'
-        if (status === 0) {
-          text = '禁用'
-        }
-        this.$confirm(`确定对[登录名:${userNames.join(',')}]进行[${username ? text : '批量' + text}]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/agentUser/disable'),
-            method: 'post',
-            data: this.$http.adornData({
-              'id': userIds,
-              'status': status
-            })
+            data: this.$http.adornData(ids, false)
           }).then(({data}) => {
             if (data && data.code === 0) {
               this.$message({

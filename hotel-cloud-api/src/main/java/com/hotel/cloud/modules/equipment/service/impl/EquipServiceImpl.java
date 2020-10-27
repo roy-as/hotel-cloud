@@ -10,7 +10,6 @@ import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.common.utils.*;
 import com.hotel.cloud.common.vo.equip.EquipVo;
 import com.hotel.cloud.common.vo.equip.QrcodeVo;
-import com.hotel.cloud.modules.org.service.AgentService;
 import com.hotel.cloud.modules.equipment.dao.EquipDao;
 import com.hotel.cloud.modules.equipment.entity.EquipEntity;
 import com.hotel.cloud.modules.equipment.service.EquipService;
@@ -24,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.*;
 
 
@@ -33,9 +31,6 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
 
     @Resource
     private SysOssService sysOssService;
-
-    @Resource
-    private AgentService agentService;
 
     @Resource
     private SysUserService sysUserService;
@@ -66,14 +61,14 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
         IPage<EquipEntity> page = this.page(
                 new Query<EquipEntity>().getPage(params),
                 new QueryWrapper<EquipEntity>()
-                        .like(StringUtils.isNotBlank(mac), "mac", MessageFormat.format("%{0}%", mac))
+                        .like(StringUtils.isNotBlank(mac), "mac", mac)
                         .eq(StringUtils.isNotBlank(moduleId), "module_id", moduleId)
                         .eq(StringUtils.isNotBlank(hotelId), "hotel_id", hotelId)
                         .in(isAgent, "agent_id", agents)
-                        .like(StringUtils.isNotBlank(agentName), "agent_name", MessageFormat.format("%{0}%", agentName))
+                        .like(StringUtils.isNotBlank(agentName), "agent_name", agentName)
                         .eq(StringUtils.isNotBlank(status), "status", status)
                         .ge(null != start, "expired_time", start)
-                        .le(null != end, "expired_time",  end)
+                        .le(null != end, "expired_time", end)
                         .eq("flag", FlagEnum.OK.getCode())
                         .orderByDesc("create_time")
         );
@@ -152,7 +147,7 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
     public void old(List<Long> ids, Long count) {
         List<EquipEntity> equips = this.getBaseMapper().selectBatchIds(ids);
         SysUserEntity loginUser = ShiroUtils.getLoginUser();
-        for(EquipEntity equip : equips) {
+        for (EquipEntity equip : equips) {
             equip.setStatus(EquipStatusEnum.PENDING_RELEASE.getCode());
             equip.setUpdateBy(loginUser.getUsername());
         }
@@ -164,8 +159,8 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
     public void batchDelete(List<Long> ids) {
         List<EquipEntity> equips = this.baseMapper.selectBatchIds(ids);
         SysUserEntity loginUser = ShiroUtils.getLoginUser();
-        for(EquipEntity equip : equips) {
-            if(null != equip.getHotelId()) {
+        for (EquipEntity equip : equips) {
+            if (null != equip.getHotelId()) {
                 throw new RRException(ExceptionEnum.RELATE_HOTEL);
             }
             equip.setFlag(FlagEnum.DELETE.getCode());

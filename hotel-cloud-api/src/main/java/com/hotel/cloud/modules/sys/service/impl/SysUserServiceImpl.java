@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -58,13 +59,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         String username = (String) params.get("username");
+        String name = (String) params.get("name");
         Long createUserId = (Long) params.get("createUserId");
+        String orgName = (String) params.get("orgName");
 
         IPage<SysUserEntity> page = this.page(
                 new Query<SysUserEntity>().getPage(params),
                 new QueryWrapper<SysUserEntity>()
                         .like(StringUtils.isNotBlank(username), "username", username)
+                        .like(StringUtils.isNotBlank(name), "name", name)
                         .eq(createUserId != null, "create_user_id", createUserId)
+                        .like(StringUtils.isNotBlank(orgName), "org_name", orgName)
                         .eq("flag", FlagEnum.OK.getCode())
         );
 
@@ -95,7 +100,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
         user.setPassword(new Sha256Hash(user.getPassword(), salt).toHex());
         user.setSalt(salt);
         Integer userType = user.getUserType();
-        if(userType.equals(UserTypeEnum.CHILD_USER.getLevel())) {
+        if (userType.equals(UserTypeEnum.CHILD_USER.getLevel())) {
             SysUserEntity loginUser = ShiroUtils.getLoginUser();
             AgentEntity agent = agentService.getById(loginUser.getOrgId());
             user.setOrgId(agent.getId());
@@ -115,7 +120,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
                     } else {
                         SysUserEntity loginUser = ShiroUtils.getLoginUser();
                         AgentEntity agent = agentService.getById(loginUser.getOrgId());
-                        roleIdList.add(Long.valueOf(agent.getAgentLevel()));
+                        roleIdList.add(Long.valueOf(agent.getAgentLevel()) + 1);
                     }
                     break;
                 case 2:

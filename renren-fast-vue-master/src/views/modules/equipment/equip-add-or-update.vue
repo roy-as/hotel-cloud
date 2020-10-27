@@ -20,9 +20,6 @@
       <el-form-item label="mac地址" prop="mac">
         <el-input v-model="dataForm.mac" placeholder="设备mac地址" :disabled="!!dataForm.id"></el-input>
       </el-form-item>
-      <el-form-item label="备注" prop="remark">
-        <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
-      </el-form-item>
       <el-form-item label="过期时间" prop="expiredTime"  v-if="dataForm.id">
         <el-date-picker
           v-model="dataForm.expiredTime"
@@ -30,6 +27,9 @@
           style="width: 100%"
           placeholder="选择日期">
         </el-date-picker>
+      </el-form-item>
+      <el-form-item label="备注" prop="remark">
+        <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">

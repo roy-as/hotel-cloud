@@ -13,7 +13,8 @@ public enum  ExceptionEnum {
     EXIST_EQUIP(1009, "存在关联设备，不能删除"),
     RELATE_HOTEL(1008, "已下发酒店，不能删除"),
     ENUM_NOT_EXIST(1010, "不存在该枚举类型"),
-    SERVICE_NOT_EXIST(1011, "服务不存在")
+    SERVICE_NOT_EXIST(1011, "服务不存在"),
+    NOT_LESS_NOW(1022, "不能小于当前时间")
     ;
 
     private Integer code;

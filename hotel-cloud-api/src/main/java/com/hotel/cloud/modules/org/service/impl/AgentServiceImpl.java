@@ -23,7 +23,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,10 +39,10 @@ public class AgentServiceImpl extends ServiceImpl<AgentUserDao, AgentEntity> imp
         String agentLevel = (String) params.get("agentLevel");
         String status = (String) params.get("status");
         IPage<AgentEntity> page = this.page(new Query<AgentEntity>().getPage(params), new QueryWrapper<AgentEntity>()
-                .like(StringUtils.isNotBlank(name), "name", MessageFormat.format("%{0}%", name))
+                .like(StringUtils.isNotBlank(name), "name", name)
                 .eq(null != orgId, "parent_id", orgId)
-                .like(StringUtils.isNotBlank(contact), "contact", MessageFormat.format("%{0}%", contact))
-                .like(StringUtils.isNotBlank(parentName), "parent_name", MessageFormat.format("%{0}%", parentName))
+                .like(StringUtils.isNotBlank(contact), "contact", contact)
+                .like(StringUtils.isNotBlank(parentName), "parent_name",parentName)
                 .eq(StringUtils.isNotBlank(agentLevel), "agent_level", agentLevel)
                 .eq(StringUtils.isNotBlank(status), "status", status)
                 .eq("flag", FlagEnum.OK.getCode())

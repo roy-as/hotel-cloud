@@ -28,6 +28,11 @@ public class SysUserEntity implements Serializable {
     private Long userId;
 
     /**
+     * 姓名
+     */
+    private String name;
+
+    /**
      * 用户名
      */
     @NotBlank(message = "用户名不能为空", groups = {AddGroup.class, UpdateGroup.class})

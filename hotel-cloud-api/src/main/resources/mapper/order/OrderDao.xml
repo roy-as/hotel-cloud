@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hotel.cloud.modules.order.dao.OrderDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hotel.cloud.modules.order.entity.OrderEntity" id="orderMap">
+        <result property="id" column="id"/>
+        <result property="agentId" column="agent_id"/>
+        <result property="agentName" column="agent_name"/>
+        <result property="hotelId" column="hotel_id"/>
+        <result property="hotelName" column="hotel_name"/>
+        <result property="status" column="status"/>
+        <result property="installationId" column="installation_id"/>
+        <result property="installationName" column="installation_name"/>
+        <result property="deliveryNo" column="delivery_no"/>
+        <result property="delivery" column="delivery"/>
+        <result property="payType" column="pay_type"/>
+        <result property="account" column="account"/>
+        <result property="accountName" column="account_name"/>
+        <result property="amount" column="amount"/>
+        <result property="realAmount" column="real_amount"/>
+        <result property="couponSn" column="coupon_sn"/>
+        <result property="couponId" column="coupon_id"/>
+        <result property="payOrderNo" column="pay_order_no"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="auditBy" column="audit_by"/>
+        <result property="deliveryBy" column="delivery_by"/>
+        <result property="remakr" column="remakr"/>
+    </resultMap>
+
+
+</mapper>

@@ -1,36 +1,33 @@
 package com.hotel.cloud.modules.equipment.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hotel.cloud.common.enums.ExceptionEnum;
 import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.Query;
 import com.hotel.cloud.common.utils.ShiroUtils;
 import com.hotel.cloud.common.vo.equip.EquipModuleVo;
+import com.hotel.cloud.modules.equipment.dao.EquipModuleDao;
 import com.hotel.cloud.modules.equipment.entity.EquipEntity;
+import com.hotel.cloud.modules.equipment.entity.EquipModuleEntity;
+import com.hotel.cloud.modules.equipment.service.EquipModuleService;
 import com.hotel.cloud.modules.equipment.service.EquipService;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import com.hotel.cloud.modules.oss.service.SysOssService;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hotel.cloud.modules.equipment.dao.EquipModuleDao;
-import com.hotel.cloud.modules.equipment.entity.EquipModuleEntity;
-import com.hotel.cloud.modules.equipment.service.EquipModuleService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 @Service("equipModuleService")
@@ -48,7 +45,7 @@ public class EquipModuleServiceImpl extends ServiceImpl<EquipModuleDao, EquipMod
         IPage<EquipModuleEntity> page = this.page(
                 new Query<EquipModuleEntity>().getPage(params),
                 new QueryWrapper<EquipModuleEntity>()
-                .like(StringUtils.isNotBlank(name), "name", MessageFormat.format("%{0}%", name))
+                        .like(StringUtils.isNotBlank(name), "name", name)
         );
 
         return new PageUtils(page);
@@ -69,7 +66,7 @@ public class EquipModuleServiceImpl extends ServiceImpl<EquipModuleDao, EquipMod
     @Transactional
     public void save(EquipModuleVo vo) throws IOException {
         EquipModuleEntity entity = vo.getEntity();
-        if(null != vo.getPicture()) {
+        if (null != vo.getPicture()) {
             saveFile(vo.getPicture(), entity);
         }
         SysUserEntity loginUser = ShiroUtils.getLoginUser();
@@ -82,7 +79,7 @@ public class EquipModuleServiceImpl extends ServiceImpl<EquipModuleDao, EquipMod
     @Override
     public void update(EquipModuleVo vo) throws IOException {
         EquipModuleEntity entity = vo.getEntity();
-        if(null != vo.getPicture()) {
+        if (null != vo.getPicture()) {
             this.saveFile(vo.getPicture(), entity);
         }
         SysUserEntity loginUser = ShiroUtils.getLoginUser();

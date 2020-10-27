@@ -10,19 +10,19 @@ import com.hotel.cloud.common.utils.ShiroUtils;
 import com.hotel.cloud.modules.org.dao.InstallationCompanyDao;
 import com.hotel.cloud.modules.org.entity.InstallationCompanyEntity;
 import com.hotel.cloud.modules.org.service.InstallationCompanyService;
+import com.hotel.cloud.modules.org.service.OrgService;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 
-@Service("installationCompanyService")
-public class InstallationCompanyServiceImpl extends ServiceImpl<InstallationCompanyDao, InstallationCompanyEntity> implements InstallationCompanyService {
+@Service("installation")
+public class InstallationCompanyServiceImpl extends ServiceImpl<InstallationCompanyDao, InstallationCompanyEntity> implements InstallationCompanyService, OrgService<InstallationCompanyEntity> {
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -32,11 +32,10 @@ public class InstallationCompanyServiceImpl extends ServiceImpl<InstallationComp
                 new Query<InstallationCompanyEntity>().getPage(params),
                 new QueryWrapper<InstallationCompanyEntity>()
                         .eq("flag", FlagEnum.OK.getCode())
-                        .like(StringUtils.isNotBlank(name), "name", MessageFormat.format("%{0}%", name))
-                        .like(StringUtils.isNotBlank(contact), "contact", MessageFormat.format("%{0}%", contact))
+                        .like(StringUtils.isNotBlank(name), "name", name)
+                        .like(StringUtils.isNotBlank(contact), "contact", contact)
                         .orderByDesc("create_time")
         );
-
         return new PageUtils(page);
     }
 
@@ -54,4 +53,8 @@ public class InstallationCompanyServiceImpl extends ServiceImpl<InstallationComp
         this.updateBatchById(entities);
     }
 
+    @Override
+    public List<InstallationCompanyEntity> select() {
+        return this.list(new QueryWrapper<InstallationCompanyEntity>().orderByDesc("create_time"));
+    }
 }
