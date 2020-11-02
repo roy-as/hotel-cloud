@@ -1,174 +1,144 @@
 <template>
-  <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
-    :close-on-click-modal="false"
-    :visible.sync="visible"
-  >
-    <el-form
-      :model="dataForm"
-      :rules="dataRule"
-      ref="dataForm"
-      @keyup.enter.native="dataFormSubmit()"
-      label-width="80px"
+  <div>
+    <el-dialog
+      :title="!dataForm.id ? '新增' : '修改'"
+      :close-on-click-modal="false"
+      :visible.sync="visible"
     >
-      <el-form-item
-        label="酒店"
-        prop="hotelId"
-        :class="{ 'is-required': !dataForm.id }"
+      <el-form
+        :model="dataForm"
+        :rules="dataRule"
+        ref="dataForm"
+        @keyup.enter.native="dataFormSubmit()"
+        label-width="80px"
       >
-        <el-select
-          v-model="dataForm.hotelId"
-          @change="$forceUpdate()"
-          filterable
-          clearable
-          placeholder="请选择"
-          style="width: 100%; position: relative"
-          :disabled="!!dataForm.id"
+        <el-form-item
+          label="酒店"
+          prop="hotelId"
+          :class="{ 'is-required': !dataForm.id }"
         >
-          <el-option
-            v-for="hotel in hotels"
-            :key="hotel.id"
-            :label="hotel.name"
-            :value="hotel.id"
+          <el-select
+            v-model="dataForm.hotelId"
+            @change="$forceUpdate()"
+            filterable
+            clearable
+            placeholder="请选择"
+            style="width: 100%; position: relative"
+            :disabled="!!dataForm.id"
           >
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item
-        label="安装公司"
-        prop="installationId"
-        :class="{ 'is-required': !dataForm.id }"
-      >
-        <el-select
-          v-model="dataForm.installationId"
-          @change="$forceUpdate()"
-          filterable
-          clearable
-          placeholder="请选择"
-          style="width: 100%; position: relative"
-          :disabled="!!dataForm.id"
-        >
-          <el-option
-            v-for="installation in installations"
-            :key="installation.id"
-            :label="installation.name"
-            :value="installation.id"
-          >
-          </el-option>
-        </el-select>
-      </el-form-item>
-
-      <el-row :gutter="20">
-        <el-col :span="8">
-          <el-form-item
-            label="设备类型"
-            prop="deviceType"
-            :class="{ 'is-required': !dataForm.id }"
-          >
-            <el-select
-              v-model="dataForm.deviceType"
-              @change="deviceTypeChange()"
-              placeholder="请选择"
-              style="width: 100%; position: relative"
-              :disabled="!!dataForm.id"
+            <el-option
+              v-for="hotel in hotels"
+              :key="hotel.id"
+              :label="hotel.name"
+              :value="hotel.id"
             >
-              <el-option
-                v-for="type in deviceType"
-                :key="type.id"
-                :label="type.name"
-                :value="type.id"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-        </el-col>
-
-        <el-col :span="16">
-          <el-form-item
-            label="设备名称"
-            prop="deviceName"
-            :class="{ 'is-required': !dataForm.id }"
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          label="安装公司"
+          prop="installationId"
+          :class="{ 'is-required': !dataForm.id }"
+        >
+          <el-select
+            v-model="dataForm.installationId"
+            @change="$forceUpdate()"
+            filterable
+            clearable
+            placeholder="请选择"
+            style="width: 100%; position: relative"
+            :disabled="!!dataForm.id"
           >
-            <el-select
-              v-model="dataForm.deviceName"
-              @change="deviceChange"
-              filterable
-              clearable
-              placeholder="请选择"
-              style="width: 100%; position: relative"
-              :disabled="!!dataForm.id"
+            <el-option
+              v-for="installation in installations"
+              :key="installation.id"
+              :label="installation.name"
+              :value="installation.id"
             >
-              <el-option
-                v-for="d in deviceList"
-                :key="d.id"
-                :label="d.name"
-                :value="d.id"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-form-item
-        label="设备数量"
-        prop="deviceNum"
-        :class="{ 'is-required': !dataForm.id }"
-      >
-        <el-input-number
-          v-model="dataForm.deviceNum"
-          :min="1"
-          :max="max"
-          placeholder="请填写设备数量"
-        ></el-input-number>
-      </el-form-item>
+            </el-option>
+          </el-select>
+        </el-form-item>
 
-      <el-form-item
-        label="支付方式"
-        prop="payType"
-        :class="{ 'is-required': !dataForm.id }"
-      >
-        <el-select
-          v-model="dataForm.payType"
-          @change="$forceUpdate()"
-          filterable
-          clearable
+        <el-form-item
+          label="设备类型"
+          prop="deviceType"
+          :class="{ 'is-required': !dataForm.id }"
+        >
+          <!-- <el-select
+          v-model="dataForm.deviceType"
+          @change="deviceTypeChange()"
           placeholder="请选择"
           style="width: 100%; position: relative"
           :disabled="!!dataForm.id"
         >
           <el-option
-            v-for="payType in payTypes"
-            :key="payType.value"
-            :label="payType.label"
-            :value="payType.value"
+            v-for="type in deviceType"
+            :key="type.id"
+            :label="type.name"
+            :value="type.id"
           >
           </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="优惠券" prop="couponSn">
-        <el-input
-          v-model="dataForm.couponSn"
-          placeholder="优惠券序列号"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="支付金额" prop="amount">
-        <el-input v-model="dataForm.amount" :disabled="true"></el-input>
-      </el-form-item>
-      <el-form-item label="实际金额" prop="realAmount">
-        <el-input v-model="dataForm.realAmount" :disabled="true"></el-input>
-      </el-form-item>
-      <el-form-item label="备注" prop="remark">
-        <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
-      </el-form-item>
-    </el-form>
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
-    </span>
-  </el-dialog>
+        </el-select> -->
+
+          <div class="flex" style="flex-wrap: wrap;">
+            <div v-for="(val,key) in deviceTypeList" class="flex device-box">
+            {{ val.name }}*{{ val.shopNumber }}
+            <i class="el-icon-circle-close-outline" @click="clearDevice(key)" style="cursor: pointer;"></i>
+            </div>
+          </div>
+          <el-button type="primary" @click="openchild">请选择</el-button>
+        </el-form-item>
+
+        <el-form-item
+          label="支付方式"
+          prop="payType"
+          :class="{ 'is-required': !dataForm.id }"
+        >
+          <el-select
+            v-model="dataForm.payType"
+            @change="$forceUpdate()"
+            filterable
+            clearable
+            placeholder="请选择"
+            style="width: 100%; position: relative"
+            :disabled="!!dataForm.id"
+          >
+            <el-option
+              v-for="payType in payTypes"
+              :key="payType.value"
+              :label="payType.label"
+              :value="payType.value"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="优惠券" prop="couponSn">
+          <el-input
+            v-model="dataForm.couponSn"
+            placeholder="优惠券序列号"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="支付金额" prop="amount">
+          <el-input v-model="dataForm.amount" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="实际金额" prop="realAmount">
+          <el-input v-model="dataForm.realAmount" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="visible = false">取消</el-button>
+        <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      </span>
+    </el-dialog>
+    <device-choose ref="chooseDevice"></device-choose>
+  </div>
 </template>
 
 <script>
+import DeviceChoose from "./devicechoose";
 export default {
   data() {
     return {
@@ -226,9 +196,29 @@ export default {
       deviceList: [], // 设备名称select
       device: [], // 智能设备
       equip: [], // 智能主机
+      deviceTypeList:[]
     };
   },
+  components: {
+    DeviceChoose,
+  },
   methods: {
+    clearDevice(key){
+      let arr = this.deviceTypeList.splice(key,1)[0];
+      for(let i=0;i<this.$refs.chooseDevice.tableData.length;i++){
+          if(arr.type==this.$refs.chooseDevice.tableData[i].type){
+            for(let j=0;j<this.$refs.chooseDevice.tableData[i].data.length;j++){
+              console.log()
+              if(this.$refs.chooseDevice.tableData[i].data[j].name==arr.name){
+                this.$refs.chooseDevice.tableData[i].data[j].shopNumber=0
+              }
+            }
+          }
+        }
+    },
+    openchild() {
+      this.$refs.chooseDevice.openModal();
+    },
     init(id) {
       this.dataForm.id = id || 0;
       this.visible = true;
@@ -366,3 +356,12 @@ export default {
   },
 };
 </script>
+
+<style>
+.device-box{
+  border: 1px solid #eee;
+  padding: 0 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+</style>
