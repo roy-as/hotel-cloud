@@ -17,7 +17,7 @@
       </thead>
       <tbody v-for="(val, j) in tableData">
         <tr v-for="(item, key) in val.data">
-          <td v-if="key == 0" :rowspan="val.data.length">{{ val.type }}</td>
+          <td v-if="key === 0" :rowspan="val.data.length">{{ val.type }}</td>
           <td>{{ item.name }}{{ val.key }}</td>
           <td>{{ item.price }}</td>
           <td>{{ item.maxNumber }}</td>
@@ -51,64 +51,66 @@
 
 <script>
 export default {
-  name: "devicechoose",
-  data() {
+  name: 'devicechoose',
+  data () {
     return {
       dialogVisible: false,
       tableData: [
         {
-          type: "智能主机",
+          type: '智能主机',
           data: [
-            { name: "空调", price: 1000, maxNumber: 1, shopNumber: 0 },
-            { name: "空调2", price: 988, maxNumber: 1, shopNumber: 0 },
-          ],
+            { name: '空调', price: 1000, maxNumber: 1, shopNumber: 0 },
+            { name: '空调2', price: 988, maxNumber: 1, shopNumber: 0 }
+          ]
         },
         {
-          type: "智能设备",
+          type: '智能设备',
           data: [
-            { name: "风扇", price: 500, maxNumber: 20, shopNumber: 0 },
-            { name: "冰箱", price: 500, maxNumber: 40, shopNumber: 0 },
-            { name: "洗衣机", price: 600, maxNumber: 10, shopNumber: 0 },
-          ],
-        },
-      ],
-    };
+            { name: '风扇', price: 500, maxNumber: 20, shopNumber: 0 },
+            { name: '冰箱', price: 500, maxNumber: 40, shopNumber: 0 },
+            { name: '洗衣机', price: 600, maxNumber: 10, shopNumber: 0 }
+          ]
+        }
+      ]
+    }
   },
   methods: {
-    ok() {
-      let arr = [];
+    ok () {
+      let arr = []
       for (let i = 0; i < this.tableData.length; i++) {
-        for(let j=0;j<this.tableData[i].data.length;j++){
-            if(this.tableData[i].data[j].shopNumber>0){
-                let obj = this.tableData[i].data[j];
-                obj.type=this.tableData[i].type;
-                arr.push(obj)
-            }
+        for (let j = 0; j < this.tableData[i].data.length; j++) {
+          if (this.tableData[i].data[j].shopNumber > 0) {
+            let obj = this.tableData[i].data[j]
+            obj.type = this.tableData[i].type
+            arr.push(obj)
+          }
         }
       }
-      this.$parent.deviceTypeList = arr;
-      this.dialogVisible=false;
+      this.$parent.deviceTypeList = arr
+      arr.forEach((item, index) => {
+        this.$parent.dataForm.amount += item.price
+        this.$parent.dataForm.realAmount += item.price
+      })
+      this.dialogVisible = false
     },
-    onlyNumber(val, key, key1) {
+    onlyNumber (val, key, key1) {
       if (!Number(val)) {
-        this.tableData[key].data[key1].shopNumber = 0;
-        return;
+        this.tableData[key].data[key1].shopNumber = 0
+        return
       }
       if (val <= 0) {
-        this.tableData[key].data[key1].shopNumber = 0;
-        return;
+        this.tableData[key].data[key1].shopNumber = 0
+        return
       }
       if (val >= this.tableData[key].data[key1].maxNumber) {
-        this.tableData[key].data[key1].shopNumber = this.tableData[key].data[
-          key1
-        ].maxNumber;
+        this.tableData[key].data[key1].shopNumber = this.tableData[key].data[key1].maxNumber
       }
     },
-    openModal() {
-      this.dialogVisible = true;
-    },
-  },
-};
+    openModal () {
+      this.dialogVisible = true
+    }
+  }
+}
 </script>
 
 <style>
