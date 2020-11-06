@@ -122,4 +122,10 @@ public class EquipEntity implements Serializable {
 	@TableField(exist = false)
 	private BigDecimal price;
 
+	@TableField(exist = false)
+	private Integer shopNumber = 0;
+
+	@TableField(exist = false)
+	private Integer maxNumber = 1;
+
 }

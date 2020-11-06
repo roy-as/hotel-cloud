@@ -66,6 +66,7 @@
         prop="name"
         header-align="center"
         align="center"
+        show-overflow-tooltip
         label="设备名称">
       </el-table-column>
       <el-table-column

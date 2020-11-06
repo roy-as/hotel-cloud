@@ -23,7 +23,7 @@ spring:
       max-request-size: 100MB
       enabled: true
   redis:
-    open: false  # 是否开启redis缓存  true开启   false关闭
+    open: true  # 是否开启redis缓存  true开启   false关闭
     database: 0
     host: localhost
     port: 6379
@@ -60,14 +60,8 @@ mybatis-plus:
     cache-enabled: false
     call-setters-on-nulls: true
     jdbc-type-for-null: 'null'
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-
-renren:
-  redis:
-    open: false
-  shiro:
-    redis: false
   # APP模块，是通过jwt认证的，如果要使用APP模块，则需要修改【加密秘钥】
   jwt:
     # 加密秘钥

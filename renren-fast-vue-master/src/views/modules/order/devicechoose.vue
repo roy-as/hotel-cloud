@@ -55,28 +55,14 @@ export default {
   data () {
     return {
       dialogVisible: false,
-      tableData: [
-        {
-          type: '智能主机',
-          data: [
-            { name: '空调', price: 1000, maxNumber: 1, shopNumber: 0 },
-            { name: '空调2', price: 988, maxNumber: 1, shopNumber: 0 }
-          ]
-        },
-        {
-          type: '智能设备',
-          data: [
-            { name: '风扇', price: 500, maxNumber: 20, shopNumber: 0 },
-            { name: '冰箱', price: 500, maxNumber: 40, shopNumber: 0 },
-            { name: '洗衣机', price: 600, maxNumber: 10, shopNumber: 0 }
-          ]
-        }
-      ]
+      tableData: []
     }
   },
   methods: {
     ok () {
       let arr = []
+      this.$parent.dataForm.amount = 0
+      this.$parent.dataForm.realAmount = 0
       for (let i = 0; i < this.tableData.length; i++) {
         for (let j = 0; j < this.tableData[i].data.length; j++) {
           if (this.tableData[i].data[j].shopNumber > 0) {
@@ -88,8 +74,8 @@ export default {
       }
       this.$parent.deviceTypeList = arr
       arr.forEach((item, index) => {
-        this.$parent.dataForm.amount += item.price
-        this.$parent.dataForm.realAmount += item.price
+        this.$parent.dataForm.amount += item.price * item.shopNumber
+        this.$parent.dataForm.realAmount += item.price * item.shopNumber
       })
       this.dialogVisible = false
     },
@@ -106,8 +92,10 @@ export default {
         this.tableData[key].data[key1].shopNumber = this.tableData[key].data[key1].maxNumber
       }
     },
-    openModal () {
+    openModal (data) {
       this.dialogVisible = true
+      this.tableData = data
+      console.log(this.tableData)
     }
   }
 }

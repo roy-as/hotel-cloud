@@ -1,7 +1,10 @@
 package com.hotel.cloud.modules.order.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.hotel.cloud.common.enums.OrderStatusEnum;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
+import com.hotel.cloud.common.vo.order.OrderVo;
 import com.hotel.cloud.modules.order.entity.OrderEntity;
 import com.hotel.cloud.modules.order.service.OrderService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -53,8 +56,8 @@ public class OrderController {
      */
     @RequestMapping("/save")
     @RequiresPermissions("order:order:save")
-    public R save(@RequestBody OrderEntity order){
-		orderService.saveOrder(order);
+    public R save(@RequestBody OrderVo vo){
+        orderService.saveOrder(vo);
 
         return R.ok();
     }
@@ -84,6 +87,51 @@ public class OrderController {
     @GetMapping("/equipList")
     public R equipList() {
         return orderService.equipList();
+    }
+
+    @PostMapping("/audit")
+    @RequiresPermissions("order:order:audit")
+    public R audit(@RequestBody OrderEntity entity) {
+        this.orderService.update(
+                new UpdateWrapper<OrderEntity>().set("status", entity.getStatus()).eq("id", entity.getId()));
+        return R.ok();
+    }
+
+    @GetMapping("/deviceList")
+    @RequiresPermissions("order:order:info")
+    public R deviceList(@RequestParam Map<String, Object> params) {
+        PageUtils page = orderService.deviceList(params);
+        return R.ok().put("page", page);
+    }
+
+    @PostMapping("/delivery")
+    @RequiresPermissions("order:order:delivery")
+    public R delivery(@RequestBody OrderVo vo) {
+        orderService.delivery(vo);
+        return R.ok();
+    }
+
+    @PostMapping("/installed")
+    @RequiresPermissions("order:order:installed")
+    public R installed (@RequestBody OrderEntity entity) {
+        this.orderService.update(
+                new UpdateWrapper<OrderEntity>().set("status", OrderStatusEnum.INSTALLED.getCode()).eq("id", entity.getId()));
+        return R.ok();
+    }
+
+    @PostMapping("/confirm")
+    @RequiresPermissions("order:order:confirmInstall")
+    public R confirmInstall (@RequestBody OrderEntity entity) {
+        this.orderService.update(
+                new UpdateWrapper<OrderEntity>().set("status", OrderStatusEnum.CONFIRM_INSTALL.getCode()).eq("id", entity.getId()));
+        return R.ok();
+    }
+
+    @PostMapping("/pay")
+    @RequiresPermissions("order:order:pay")
+    public R pay (@RequestBody OrderVo vo) {
+        this.orderService.pay(vo);
+        return R.ok();
     }
 
 }

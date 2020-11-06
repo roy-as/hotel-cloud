@@ -1,12 +1,13 @@
 package com.hotel.cloud.modules.order.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.math.BigDecimal;
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 
@@ -23,7 +24,7 @@ public class OrderEntity implements Serializable {
 	/**
 	 * 订单号
 	 */
-	@TableId
+	@TableId(type = IdType.INPUT)
 	private String id;
 	/**
 	 * 代理id
@@ -113,5 +114,4 @@ public class OrderEntity implements Serializable {
 	 * 备注
 	 */
 	private String remark;
-
 }

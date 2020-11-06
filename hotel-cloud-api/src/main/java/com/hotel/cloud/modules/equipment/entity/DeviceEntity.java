@@ -1,5 +1,6 @@
 package com.hotel.cloud.modules.equipment.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -75,6 +76,20 @@ public class DeviceEntity implements Serializable {
 	 * 标志位
 	 */
 	private Integer flag;
+
+	@TableField(exist = false)
+	private Integer shopNumber = 0;
+
+	@TableField(exist = false)
+	private Integer maxNumber;
+
+	@TableField(exist = false)
+	private Integer deviceType;
+
+	public void setAmount(Integer amount) {
+		this.amount = amount;
+		this.maxNumber = amount;
+	}
 
 	public DeviceEntity(Long id, Integer flag) {
 		this.id = id;

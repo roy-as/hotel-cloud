@@ -9,11 +9,17 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.hotel.cloud.common.enums.ExceptionEnum;
 import com.hotel.cloud.common.exception.RRException;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.IntStream;
 
 import static com.google.zxing.client.j2se.MatrixToImageWriter.toBufferedImage;
 
@@ -110,4 +116,24 @@ public class CommonUtils {
         image.flush();
         return image;
     }
+
+    public static String genOrderId() {
+        return LocalDateTime.now().format(Constants.FORMATTER) + subUUID();
+    }
+
+    public static String subUUID() {
+        StringBuilder uuid = new StringBuilder(UUID.randomUUID().toString().toUpperCase().replaceAll("-", "").substring(8, 20));
+        for(int i =0; i < 2; i++) {
+            int num = (int) (Math.random() * 10);
+            uuid.append(num);
+        }
+        return uuid.toString();
+    }
+
+    public static String[] subUUID(Integer count) {
+        return IntStream.range(0, count).mapToObj(
+                index -> subUUID()
+        ).toArray(String[]::new);
+    }
 }
+

@@ -12,6 +12,8 @@ import com.hotel.cloud.common.vo.equip.EquipVo;
 import com.hotel.cloud.common.vo.equip.QrcodeVo;
 import com.hotel.cloud.modules.equipment.dao.EquipDao;
 import com.hotel.cloud.modules.equipment.entity.EquipEntity;
+import com.hotel.cloud.modules.equipment.entity.EquipModuleEntity;
+import com.hotel.cloud.modules.equipment.service.EquipModuleService;
 import com.hotel.cloud.modules.equipment.service.EquipService;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import com.hotel.cloud.modules.oss.service.SysOssService;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service("equipService")
@@ -34,6 +37,9 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
 
     @Resource
     private SysUserService sysUserService;
+
+    @Resource
+    private EquipModuleService equipModuleService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -167,6 +173,18 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
             equip.setUpdateBy(loginUser.getUsername());
         }
         this.updateBatchById(equips);
+    }
+
+    @Override
+    public List<EquipEntity> get(QueryWrapper<EquipEntity> wrapper) {
+        List<EquipEntity> equips = this.list(wrapper);
+        Set<Long> moduleIds = equips.stream().map(EquipEntity::getModuleId).collect(Collectors.toSet());
+        List<EquipModuleEntity> modules = equipModuleService.getBaseMapper().selectBatchIds(moduleIds);
+        Map<Long, EquipModuleEntity> moduleMap = modules.stream().collect(Collectors.toMap(EquipModuleEntity::getId, module -> module));
+        for(EquipEntity equip: equips) {
+            equip.setPrice(moduleMap.get(equip.getModuleId()).getPrice());
+        }
+        return equips;
     }
 
     /**

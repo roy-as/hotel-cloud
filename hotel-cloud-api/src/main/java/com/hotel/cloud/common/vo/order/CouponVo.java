@@ -54,4 +54,9 @@ public class CouponVo {
     private Date expiredTime;
     @NotNull(message = "优惠券数量不能为空")
     private Integer count;
+
+    /**
+     * 使用范围 0所有，1智能主机，2智能设备
+     */
+    private Integer scope;
 }

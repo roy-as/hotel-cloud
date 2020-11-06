@@ -15,6 +15,7 @@ import com.hotel.cloud.modules.equipment.service.DeviceService;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import com.hotel.cloud.modules.oss.service.SysOssService;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,11 +37,13 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        String name = (String) params.get("name");
         IPage<DeviceEntity> page = this.page(
                 new Query<DeviceEntity>().getPage(params),
                 new QueryWrapper<DeviceEntity>()
-                .eq("flag", FlagEnum.OK.getCode())
-                .orderByDesc("create_time")
+                        .eq("flag", FlagEnum.OK.getCode())
+                        .like(StringUtils.isNotBlank(name), "name", name)
+                        .orderByDesc("create_time")
         );
 
         return new PageUtils(page);
@@ -50,7 +53,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
     @Transactional
     public void save(DeviceVo vo) throws IOException {
         DeviceEntity entity = vo.getEntity();
-        if(null != vo.getPicture()) {
+        if (null != vo.getPicture()) {
             this.saveFile(vo.getPicture(), entity);
         }
         SysUserEntity loginUser = ShiroUtils.getLoginUser();
@@ -64,7 +67,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
     @Transactional
     public void update(DeviceVo vo) throws IOException {
         DeviceEntity entity = vo.getEntity();
-        if(null != vo.getPicture()) {
+        if (null != vo.getPicture()) {
             this.saveFile(vo.getPicture(), entity);
         }
         entity.setUpdateBy(ShiroUtils.getLoginUser().getUsername());

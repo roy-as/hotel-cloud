@@ -54,6 +54,17 @@
         label="名称">
       </el-table-column>
       <el-table-column
+        prop="scope"
+        header-align="center"
+        align="center"
+        label="商品范围">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.scope === 0" size="small" >所有</el-tag>
+          <el-tag v-if="scope.row.scope === 1" size="small">智能主机</el-tag>
+          <el-tag v-if="scope.row.scope === 2" size="small">智能设备</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
         prop="type"
         header-align="center"
         align="center"

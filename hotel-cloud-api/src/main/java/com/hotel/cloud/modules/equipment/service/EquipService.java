@@ -1,5 +1,6 @@
 package com.hotel.cloud.modules.equipment.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.vo.equip.QrcodeVo;
@@ -30,5 +31,7 @@ public interface EquipService extends IService<EquipEntity> {
     void old(List<Long> ids, Long count);
 
     void batchDelete(List<Long> ids);
+
+    List<EquipEntity> get(QueryWrapper<EquipEntity> wrapper);
 }
 

@@ -7,6 +7,12 @@
       <el-form-item label="名称" prop="name">
         <el-input v-model="dataForm.name" placeholder="名称"></el-input>
       </el-form-item>
+      <el-form-item label="商品范围" prop="scope">
+        <el-select v-model="dataForm.scope" @change="$forceUpdate()" filterable clearable placeholder="请选择" style="width: 100%; position: relative">
+          <el-option v-for="scope in scopes" :key="scope.type" :label="scope.name" :value="scope.type">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="类型" prop="type">
         <el-select v-model="dataForm.type" @change="typeChange" filterable clearable placeholder="请选择" style="width: 100%; position: relative">
           <el-option v-for="type in types" :key="type.type" :label="type.name" :value="type.type">
@@ -52,11 +58,23 @@
           callback()
         }
       }
+      var validateDiscount = (rule, value, callback) => {
+        if (/[0]\.\d+/.test(value) && Number(value) > 0) {
+          callback()
+        } else {
+          callback(new Error('只能输入0-1之间的小数'))
+        }
+      }
       return {
         visible: false,
         amountVisible: true,
         couponAmountVisible: true,
         discountVisible: true,
+        scopes: [
+          {type: 0, name: '所有'},
+          {type: 1, name: '智能主机'},
+          {type: 2, name: '智能设备'}
+        ],
         types: [
           {type: 1, name: '满减'},
           {type: 2, name: '每满减'},
@@ -73,7 +91,8 @@
           count: 1,
           amount: '',
           couponAmount: '',
-          discount: ''
+          discount: '',
+          scope: 0
         },
         dataRule: {
           name: [
@@ -95,13 +114,17 @@
           ],
           discount: [
             { required: true, message: '折扣不能为空', trigger: 'blur' },
-            { validator: validateNum, trigger: 'blur' }
+            { validator: validateDiscount, trigger: 'blur' }
           ]
         }
       }
     },
     methods: {
       init (id) {
+        this.visible = true
+        this.amountVisible = true
+        this.couponAmountVisible = true
+        this.discountVisible = true
         this.dataForm.id = id || 0
         this.visible = true
         this.$nextTick(() => {
@@ -120,6 +143,7 @@
                 this.dataForm.couponAmount = data.coupon.couponAmount
                 this.dataForm.discount = data.coupon.discount
                 this.dataForm.expiredTime = data.coupon.expiredTime
+                this.dataForm.scope = data.coupon.scope
               }
             })
           }
@@ -138,9 +162,10 @@
                 'type': this.dataForm.type,
                 'count': this.dataForm.count,
                 'amount': this.dataForm.amount,
-                'expiredTime': this.dataForm.expiredTime.getTime(),
+                'expiredTime': this.dataForm.expiredTime ? this.dataForm.expiredTime.getTime() : null,
                 'couponAmount': this.dataForm.couponAmount,
-                'discount': this.dataForm.discount
+                'discount': this.dataForm.discount,
+                'scope': this.dataForm.scope
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

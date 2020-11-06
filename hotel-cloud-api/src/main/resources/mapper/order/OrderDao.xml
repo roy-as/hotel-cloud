@@ -3,7 +3,7 @@
 
 <mapper namespace="com.hotel.cloud.modules.order.dao.OrderDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.hotel.cloud.modules.order.entity.OrderEntity" id="orderMap">
         <result property="id" column="id"/>
         <result property="agentId" column="agent_id"/>
@@ -30,5 +30,34 @@
         <result property="remakr" column="remakr"/>
     </resultMap>
 
+    <resultMap type="com.hotel.cloud.modules.equipment.entity.DeviceEntity" id="deviceMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="ossId" column="oss_id"/>
+        <result property="pictureUrl" column="picture_url"/>
+        <result property="price" column="price"/>
+        <result property="remark" column="remark"/>
+        <result property="amount" column="amount"/>
+        <result property="saleAmount" column="sale_amount"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="shopNumber" column="shopping_number"/>
+        <result property="deviceType" column="device_type"/>
+    </resultMap>
+
+
+    <select id="deviceList" resultMap="deviceMap">
+      select device_type, shopping_number,ifnull(d.name,e.name) name, ifnull(d.price, em.price) price, ifnull(d.picture_url, em.picture_url) picture_url
+      from t_order_device_mapping m
+      left join t_device d on d.id = m.device_id
+      left join t_equip e on e.id = m.device_id
+      left join t_equip_module em on e.module_id = em.id
+      where 1 = 1
+      <if test="params.orderId != null and params.orderId != ''">
+        and m.order_id = #{params.orderId}
+      </if>
+      order by m.device_type asc
+    </select>
 
 </mapper>

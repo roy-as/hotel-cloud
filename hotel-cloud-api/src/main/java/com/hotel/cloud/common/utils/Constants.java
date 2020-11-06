@@ -1,5 +1,8 @@
 package com.hotel.cloud.common.utils;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 /**
  * 常量
  */
@@ -55,6 +58,10 @@ public class Constants {
     public static final Long HOTEL_ROLE_ID = 5L;
     // 安装公司角色ID
     public static final Long INSTALLATION_ROLE_ID = 6L;
+    // 请求r信息edis的key
+    public static final String REQUST_REDIS_KEY = "{0}:{1}";
+    // LocalDate的格式化
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMM").withZone(ZoneId.systemDefault());
 
 	/**
 	 * 菜单类型

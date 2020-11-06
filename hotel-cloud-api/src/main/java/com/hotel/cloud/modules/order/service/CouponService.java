@@ -2,9 +2,10 @@ package com.hotel.cloud.modules.order.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hotel.cloud.common.utils.PageUtils;
+import com.hotel.cloud.common.vo.order.CouponValidate;
 import com.hotel.cloud.common.vo.order.CouponVo;
+import com.hotel.cloud.common.vo.order.OrderDeviceVo;
 import com.hotel.cloud.modules.order.entity.CouponEntity;
-
 import java.util.Map;
 
 /**
@@ -19,5 +20,7 @@ public interface CouponService extends IService<CouponEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     void create(CouponVo vo);
+
+    OrderDeviceVo check(CouponValidate validate, boolean hasSn);
 }
 

@@ -31,6 +31,13 @@ public class OrderDeviceMappingEntity implements Serializable {
 	/**
 	 * 订单id
 	 */
-	private Long orderId;
-
+	private String orderId;
+	/**
+	 * 够买数量
+	 */
+	private Integer shoppingNumber;
+	/**
+	 * 1：智能主机 2：智能设备
+	 */
+	private Integer deviceType;
 }

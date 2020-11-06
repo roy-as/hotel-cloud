@@ -1,21 +1,23 @@
 package com.hotel.cloud.modules.order.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hotel.cloud.common.annotation.Delay;
+import com.hotel.cloud.common.enums.ExceptionEnum;
+import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
-import com.hotel.cloud.common.utils.ShiroUtils;
+import com.hotel.cloud.common.vo.order.CouponValidate;
 import com.hotel.cloud.common.vo.order.CouponVo;
+import com.hotel.cloud.common.vo.order.CouponValidateVo;
 import com.hotel.cloud.modules.order.entity.CouponEntity;
 import com.hotel.cloud.modules.order.service.CouponService;
-import com.hotel.cloud.modules.sys.entity.SysUserEntity;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-
+import java.util.*;
 
 
 /**
@@ -66,25 +68,27 @@ public class CouponController {
     }
 
     /**
-     * 修改
-     */
-//    @RequestMapping("/update")
-//    @RequiresPermissions("order:coupon:update")
-//    public R update(@RequestBody CouponEntity coupon){
-//		couponService.updateById(coupon);
-//
-//        return R.ok();
-//    }
-
-    /**
      * 删除
      */
     @RequestMapping("/delete")
     @RequiresPermissions("order:coupon:delete")
     public R delete(@RequestBody Long[] ids){
-		couponService.removeByIds(Arrays.asList(ids));
+        List<Long> idList = Arrays.asList(ids);
+        List<CouponEntity> coupons = couponService.getBaseMapper().selectBatchIds(idList);
+        for (CouponEntity coupon : coupons) {
+            if(null != coupon.getOrderId()) {
+                throw new RRException(ExceptionEnum.COUPON_USED);
+            }
+        }
+        couponService.removeByIds(idList);
 
         return R.ok();
+    }
+
+    @PostMapping("check")
+    @Delay(time = 1000 * 60)
+    public R check(@RequestBody @Validated CouponValidate validate) {
+        return R.ok().put("data", this.couponService.check(validate, true).getCoupon());
     }
 
 }

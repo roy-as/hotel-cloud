@@ -1,11 +1,14 @@
 package com.hotel.cloud.modules.order.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -24,6 +27,7 @@ public class CouponEntity implements Serializable {
 	 * 主键
 	 */
 	@TableId
+	@JsonIgnore
 	private Long id;
 	/**
 	 * 名称
@@ -52,7 +56,7 @@ public class CouponEntity implements Serializable {
 	/**
 	 * 订单id
 	 */
-	private Long orderId;
+	private String orderId;
 	/**
 	 * 满减金额
 	 */
@@ -69,4 +73,20 @@ public class CouponEntity implements Serializable {
 	 * 过期时间
 	 */
 	private Date expiredTime;
+
+	/**
+	 * 使用范围 0所有，1智能主机，2智能设备
+	 */
+	private Integer scope;
+	/**
+	 * 实际金额
+	 */
+	@TableField(exist = false)
+	private BigDecimal realAmount;
+
+	/**
+	 * 总金额
+	 */
+	@TableField(exist = false)
+	private BigDecimal totalAmount;
 }
