@@ -1,8 +1,12 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+      <el-form-item label="IO类型" prop="ioType">
+        <el-select v-model="dataForm.ioType" @change="$forceUpdate()" filterable clearable placeholder="请选择"
+                   style="width: 100%; position: relative">
+          <el-option v-for="io in ioTypes" :key="io.paramValue" :label="io.paramKey" :value="io.paramValue">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -121,6 +125,7 @@
         dataForm: {
           key: ''
         },
+        ioTypes: [],
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -157,6 +162,14 @@
             this.totalPage = 0
           }
           this.dataListLoading = false
+        })
+        this.$http({
+          url: this.$http.adornUrl('/sys/config/select?paramTypes=keyType&paramTypes=ioType&paramTypes=switchType'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          const isRight = data && data.code === 0
+          this.ioTypes = isRight && data.data.ioType ? data.data.ioType : []
         })
       },
       // 每页数
