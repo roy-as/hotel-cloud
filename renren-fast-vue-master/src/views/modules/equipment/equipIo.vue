@@ -151,7 +151,7 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'ioType': this.dataForm.ioType
           })
         }).then(({data}) => {
           if (data && data.code === 0) {

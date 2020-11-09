@@ -2,6 +2,7 @@ package com.hotel.cloud.modules.equipment.service.impl;
 
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.Query;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -17,9 +18,11 @@ public class EquipIoServiceImpl extends ServiceImpl<EquipIoDao, EquipIoEntity> i
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        String ioType = (String) params.get("ioType");
         IPage<EquipIoEntity> page = this.page(
                 new Query<EquipIoEntity>().getPage(params),
                 new QueryWrapper<EquipIoEntity>()
+                .eq(StringUtils.isNotBlank(ioType), "io_type", ioType)
         );
 
         return new PageUtils(page);
