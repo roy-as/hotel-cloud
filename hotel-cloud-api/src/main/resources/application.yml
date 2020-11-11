@@ -40,6 +40,15 @@ spring:
 #  resources:
 #    add-mappings: false
 
+  mqtt:
+    username: YunZhuUserName_Az1
+    password: yun_zhu_password_Az1
+    server-uri: tcp://yunzhu.store:1883
+    client-id: hotel-cloud-api
+    publish-topic: /yunzhuA/{0}/down
+    time-out: 30
+    qos: 1
+
 
 #mybatis
 mybatis-plus:

@@ -13,11 +13,13 @@ public class MqttProperty {
 
     private String password;
 
-    private String serverURI;
+    private String serverUri;
 
     private String clientId;
 
     private String subscribeTopic = "";
+
+    private String publishTopic;
 
     private Integer timeOut;
 

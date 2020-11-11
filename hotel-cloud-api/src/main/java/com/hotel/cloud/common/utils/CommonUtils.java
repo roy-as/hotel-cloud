@@ -18,6 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -157,6 +158,19 @@ public class CommonUtils {
             bytes[i] = Byte.parseByte(String.valueOf(new char[]{chars[x], chars[x + 1]}), 16);
         }
         return bytes;
+    }
+
+    public static byte[] string2Bytes(String ... strs) {
+        int length =  strs.length;
+        int totalLength = Arrays.stream(strs).mapToInt(String::length).sum();
+        byte[] data = new byte[length + totalLength];
+        int index = 0;
+        for (String str : strs) {
+            data[index] = (byte) str.length();
+            System.arraycopy(str.getBytes(), 0, data, index + 1, str.length());
+            index = index + str.length() + 1;
+        }
+        return data;
     }
 }
 

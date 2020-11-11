@@ -37,6 +37,9 @@
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('equipment:equip:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-for="command in commands" type="primary" @click="releaseCommand(command)">
+          {{ command.name }}
+        </el-button>
         <el-button v-if="isAuth('equipment:equip:release')" type="primary" @click="releaseEquip()" :disabled="dataListSelections.length <= 0">批量下发</el-button>
         <el-button v-if="isAuth('equipment:equip:old')" type="primary" @click="old()" :disabled="dataListSelections.length <= 0">批量老化</el-button>
         <el-button v-if="isAuth('equipment:equip:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
@@ -206,6 +209,7 @@
     <generate-qrcode v-if="generateQrcodeVisible" ref="generateQrcode" @refreshDataList="getDataList"></generate-qrcode>
     <release v-if="releaseVisible" ref="release"  @refreshDataList="getDataList"></release>
     <old v-if="oldVisible" ref="old"  @refreshDataList="getDataList"></old>
+    <command v-if="commandVisible" ref="command"></command>
   </div>
 </template>
 
@@ -215,6 +219,7 @@
   import Release from './equip-release'
   import { getUserId } from '@/utils/index'
   import Old from './equip-old'
+  import Command from './equip-command'
   export default {
     data () {
       return {
@@ -266,6 +271,7 @@
           {code: 4, label: '工作中'},
           {code: 5, label: '已回收'}
         ],
+        commands: [],
         dataList: [],
         modules: [],
         hotels: [],
@@ -277,14 +283,16 @@
         addOrUpdateVisible: false,
         generateQrcodeVisible: false,
         releaseVisible: false,
-        oldVisible: false
+        oldVisible: false,
+        commandVisible: false
       }
     },
     components: {
       AddOrUpdate,
       GenerateQrcode,
       Release,
-      Old
+      Old,
+      Command
     },
     activated () {
       this.getDataList()
@@ -330,6 +338,13 @@
           params: this.$http.adornParams()
         }).then(({data}) => {
           this.hotels = data && data.code === 0 ? data.data : []
+        })
+        this.$http({
+          url: this.$http.adornUrl('/sys/command/data'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({data}) => {
+          this.commands = data && data.code === 0 ? data.data : []
         })
       },
       // 每页数
@@ -561,6 +576,17 @@
         this.oldVisible = true
         this.$nextTick(() => {
           this.$refs.old.init(ids, names)
+        })
+      },
+      releaseCommand (command) {
+        console.log(command)
+        const names = []
+        this.dataListSelections.forEach((item, index) => {
+          names.push(item.name)
+        })
+        this.commandVisible = true
+        this.$nextTick(() => {
+          this.$refs.command.init(command, names)
         })
       }
     }

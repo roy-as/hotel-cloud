@@ -54,10 +54,8 @@ public class TopicCallback implements MqttCallback {
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         //订阅消息字符
-        String msg = new String(message.getPayload());
-        byte[] bytes = getBytesFromObject(msg);
-        log.info("topic:{0}", topic);
-        log.info("msg:{0}", msg);
+        byte[] payload = message.getPayload();
+        log.info("topic:{},payload:{}", topic, payload);
     }
 
     @Override

@@ -2,13 +2,17 @@ package com.hotel.cloud.modules.sys.controller;
 
 import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.utils.R;
+import com.hotel.cloud.common.utils.ShiroUtils;
 import com.hotel.cloud.modules.sys.entity.CommandEntity;
+import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import com.hotel.cloud.modules.sys.service.CommandService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 
@@ -58,6 +62,12 @@ public class CommandController {
         String commandStr = command.getCommand();
         String[] commands = commandStr.split(",");
         command.setCommand(Arrays.toString(commands));
+        String[] datas = command.getData().split(",");
+        command.setData(Arrays.toString(datas));
+        SysUserEntity loginUser = ShiroUtils.getLoginUser();
+        command.setCreateBy(loginUser.getUsername());
+        command.setUpdateBy(loginUser.getUsername());
+        command.setCreateTime(new Date());
         commandService.save(command);
 
         return R.ok();
@@ -83,6 +93,13 @@ public class CommandController {
 		commandService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
+    }
+
+    @GetMapping("/data")
+    @RequiresPermissions("sys:command:list")
+    public R list() {
+        List<CommandEntity> list = this.commandService.list();
+        return R.ok().put("data", list);
     }
 
 }

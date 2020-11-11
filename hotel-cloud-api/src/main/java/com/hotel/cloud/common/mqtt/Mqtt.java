@@ -10,22 +10,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+import java.text.MessageFormat;
 
 
-//@Component
 @Slf4j
+@Component
 public class Mqtt implements ApplicationRunner {
 
-    private MqttClient client;
+    private static MqttClient client;
 
-    private MqttConnectOptions options;
     // 0至多一次，不保证消息到达，可能会丢失或重复,1至少一次，确保消息到达，但是可能会有重复
     private final static int DEFAULT_QOS = 1;
 
     @Autowired
     private MqttProperty mqttProperty;
 
-    public void setMqttProperty(MqttProperty mqttProperty) {
+
+    public Mqtt() {
+    }
+
+    public Mqtt(MqttProperty mqttProperty) {
         this.mqttProperty = mqttProperty;
     }
 
@@ -44,13 +48,13 @@ public class Mqtt implements ApplicationRunner {
         if (null == mqttProperty) {
             return;
         }
-        this.client = new MqttClient(mqttProperty.getServerURI(), mqttProperty.getClientId(), new MemoryPersistence());
-        this.options = new MqttConnectOptions();
-        this.options.setCleanSession(false);
-        this.options.setUserName(mqttProperty.getUsername());
-        this.options.setPassword(mqttProperty.getPassword().toCharArray());
-        this.options.setConnectionTimeout(null != mqttProperty.getTimeOut() ? mqttProperty.getTimeOut() : 30);
-        this.options.setKeepAliveInterval(20);
+        client = new MqttClient(mqttProperty.getServerUri(), mqttProperty.getClientId(), new MemoryPersistence());
+        MqttConnectOptions options = new MqttConnectOptions();
+        options.setCleanSession(false);
+        options.setUserName(mqttProperty.getUsername());
+        options.setPassword(mqttProperty.getPassword().toCharArray());
+        options.setConnectionTimeout(null != mqttProperty.getTimeOut() ? mqttProperty.getTimeOut() : 30);
+        options.setKeepAliveInterval(20);
         String[] topics = mqttProperty.getSubscribeTopic().split(",");
         try {
             int[] qosArray = new int[topics.length];
@@ -59,10 +63,12 @@ public class Mqtt implements ApplicationRunner {
                 qosArray[i] = qos;
             }
             if(CommonUtils.isNotEmpty(topics)) {
-                client.setCallback(new TopicCallback(client, this.options, topics, qosArray));
+                client.setCallback(new TopicCallback(client, options, topics, qosArray));
             }
-            client.connect(this.options);
-            client.subscribe(topics, qosArray);
+            client.connect(options);
+            if(CommonUtils.isEmpty(topics)) {
+                client.subscribe(topics, qosArray);
+            }
             log.info("mqtt连接成功");
         } catch (Exception e) {
             log.error("连接异常", e);
@@ -72,15 +78,16 @@ public class Mqtt implements ApplicationRunner {
     /**
      * 发布消息
      *
-     * @param topicName
+     * @param target
      * @param message
      * @param qos
      */
-    public void publish(String topicName, byte[] message, int qos) {
-        if (null != this.client && this.client.isConnected()) {
+    public void publish(String target, byte[] message, int qos) {
+        if (null != client && client.isConnected()) {
             MqttMessage mqttMessage = new MqttMessage();
             mqttMessage.setQos(qos);
             mqttMessage.setPayload(message);
+            String topicName = MessageFormat.format(mqttProperty.getPublishTopic(), target);
 
             MqttTopic topic = client.getTopic(topicName);
 
@@ -89,10 +96,10 @@ public class Mqtt implements ApplicationRunner {
                     MqttDeliveryToken publish = topic.publish(mqttMessage);
                     publish.waitForCompletion();
                     if (publish.isComplete()) {
-                        log.info("消息发布成功:{0}", new String(message));
+                        log.info("消息发布成功:"+ new String(message));
                         MqttWireMessage response = publish.getResponse();
                         byte[] payload = response.getPayload();
-                        log.info("返回信息为:{0}", new String(payload));
+                        log.info("返回信息为:" + new String(payload));
                     }
                 } catch (MqttException e) {
                     e.printStackTrace();
@@ -108,8 +115,19 @@ public class Mqtt implements ApplicationRunner {
         this.publish(topicName, CommonUtils.hexStr2bytes(message), qos);
     }
 
+    /**
+     * 发布消息
+     * @param target
+     * @param data
+     */
+    public void publish(String target, String ... data) {
+        this.publish(target, CommonUtils.string2Bytes(data), 1);
+    }
 
-    //	重新连接
+
+    /**
+     * 重连
+     */
     private void reConnect() {
         if (!client.isConnected()) {
             while (true) {
@@ -118,25 +136,9 @@ public class Mqtt implements ApplicationRunner {
                     connect();
                     break;
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
         }
-    }
-
-    public static void main(String[] args) throws MqttException {
-        MqttProperty property = new MqttProperty();
-        property.setServerURI("tcp://yunzhu.store:1883");
-        property.setClientId("hebo_test");
-        property.setUsername("YunZhuUserName_Az1");
-        property.setPassword("yun_zhu_password_Az1");
-        property.setSubscribeTopic("/yunzhuA/12F1CEB8A989/up");
-        property.setQos(1);
-        Mqtt mqtt = new Mqtt();
-        mqtt.setMqttProperty(property);
-        mqtt.connect();
-        byte[] message = {0x25, 0x04, 0x59, 0x6f, 0x67, 0x6f, 0x08, 0x79, 0x79, 0x67, 0x67, 0x31, 0x32, 0x33, 0x34};
-        mqtt.publish("/yunzhuA/12F1CEB8A989/down",message, 1);
     }
 }

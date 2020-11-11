@@ -11,7 +11,7 @@
       <el-input v-model="dataForm.command" placeholder="16进制指令，不能带有0x，多个数字用英文逗号隔开"></el-input>
     </el-form-item>
     <el-form-item label="数据包" prop="data">
-      <el-input v-model="dataForm.data" placeholder='数据包，JSON格式，例如{"按键":2(代表两个字节)}'></el-input>
+      <el-input v-model="dataForm.data" placeholder='数据名称，例如:用户名,密码；多个数据名称用英文逗号隔开'></el-input>
     </el-form-item>
     <el-form-item label="备注" prop="remark">
       <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
