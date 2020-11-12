@@ -596,7 +596,7 @@
           return
         }
         const names = []
-        const macs =[]
+        const macs = []
         this.dataListSelections.forEach((item, index) => {
           names.push(item.name)
           macs.push(item.mac)
