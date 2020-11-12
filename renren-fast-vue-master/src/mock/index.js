@@ -8,6 +8,7 @@ import * as sysMenu from './modules/sys-menu'
 import * as sysRole from './modules/sys-role'
 import * as sysUser from './modules/sys-user'
 import * as order from './modules/order'
+import * as command from './modules/command'
 
 // tips
 // 1. 开启/关闭[业务模块]拦截, 通过调用fnCreate方法[isOpen参数]设置.
@@ -21,6 +22,7 @@ fnCreate(sysMenu, false)
 fnCreate(sysRole, false)
 fnCreate(sysUser, false)
 fnCreate(order, false)
+fnCreate(command, true)
 
 /**
  * 创建mock模拟数据

@@ -37,7 +37,7 @@
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('equipment:equip:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-for="command in commands" type="primary" @click="releaseCommand(command)">
+        <el-button v-for="command in commands" type="primary" @click="releaseCommand(command)"  :disabled="dataListSelections.length <= 0">
           {{ command.name }}
         </el-button>
         <el-button v-if="isAuth('equipment:equip:release')" type="primary" @click="releaseEquip()" :disabled="dataListSelections.length <= 0">批量下发</el-button>

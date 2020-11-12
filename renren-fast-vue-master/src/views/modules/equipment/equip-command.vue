@@ -10,7 +10,7 @@
         </el-tag>
       </el-form-item>
       <el-form-item v-for="body in bodies" :label="body" :prop="body">
-        <el-input :v-model="body" :placeholder="body"></el-input>
+        <el-input  v-model="dynamicFormInfo[body]"  :placeholder="body"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -32,17 +32,19 @@
         dataForm: {
           command: {}
         },
-        dataRule: {
-          count: [
-              { required: true, message: '次数不能为空', trigger: 'blur' }
-          ]
-        }
+        dataRule: {},
+        dynamicFormInfo:{} //动态表单数据
       }
     },
     methods: {
       init (command, names) {
         this.dataForm.command = command
         this.bodies = JSON.parse(command.data)
+
+          this.bodies.forEach((body,idx)=>{
+              this.$set(this.dynamicFormInfo,body,'');
+          })
+
         this.names = names
         this.visible = true
         this.$nextTick(() => {
@@ -53,6 +55,7 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            console.log(111,this.dynamicFormInfo)
             this.$http({
               url: this.$http.adornUrl(`/equipment/equip/old`),
               method: 'post',
