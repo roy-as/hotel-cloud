@@ -38,9 +38,11 @@
     },
     methods: {
       init (command, names) {
+        console.log('init')
         this.dataForm.command = command
         this.bodies = JSON.parse(command.data)
         this.bodies.forEach((body,idx)=>{
+            this.dynamicFormInfo = {}
             this.$set(this.dynamicFormInfo,body,'');
         })
         this.names = names
