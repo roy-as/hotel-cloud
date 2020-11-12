@@ -2,7 +2,7 @@
   <el-dialog
     title="设备选择"
     :visible.sync="dialogVisible"
-    width="30%"
+    width="50%"
     :show-close="true"
   >
     <table cellspacing="0" class="device-table">
