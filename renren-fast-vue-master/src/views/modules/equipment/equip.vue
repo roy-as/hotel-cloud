@@ -44,7 +44,7 @@
       </el-form-item>
       <div>
         <el-form-item label="下发指令">
-          <el-button v-for="command in commands" type="primary" @click="releaseCommand(command)">
+          <el-button v-for="command in commands" type="primary" @click="releaseCommand(command)" :disabled="dataListSelections.length <= 0">
             {{ command.name }}
           </el-button>
         </el-form-item>
