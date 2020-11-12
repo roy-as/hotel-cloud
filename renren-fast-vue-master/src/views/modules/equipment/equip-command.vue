@@ -38,7 +38,6 @@
     },
     methods: {
       init (command, names) {
-        console.log('init')
         this.dataForm.command = command
         this.bodies = JSON.parse(command.data)
         this.bodies.forEach((body,idx)=>{
