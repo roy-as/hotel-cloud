@@ -40,11 +40,9 @@
       init (command, names) {
         this.dataForm.command = command
         this.bodies = JSON.parse(command.data)
-
-          this.bodies.forEach((body,idx)=>{
-              this.$set(this.dynamicFormInfo,body,'');
-          })
-
+        this.bodies.forEach((body,idx)=>{
+            this.$set(this.dynamicFormInfo,body,'');
+        })
         this.names = names
         this.visible = true
         this.$nextTick(() => {
