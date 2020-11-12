@@ -63,6 +63,7 @@ public class Constants {
     // LocalDate的格式化
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMM").withZone(ZoneId.systemDefault());
 
+    public static final String HEX_PREFIX = "0x";
 	/**
 	 * 菜单类型
 	 * 

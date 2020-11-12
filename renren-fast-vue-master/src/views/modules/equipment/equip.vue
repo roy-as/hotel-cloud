@@ -37,14 +37,18 @@
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('equipment:equip:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-for="command in commands" type="primary" @click="releaseCommand(command)"  :disabled="dataListSelections.length <= 0">
-          {{ command.name }}
-        </el-button>
         <el-button v-if="isAuth('equipment:equip:release')" type="primary" @click="releaseEquip()" :disabled="dataListSelections.length <= 0">批量下发</el-button>
         <el-button v-if="isAuth('equipment:equip:old')" type="primary" @click="old()" :disabled="dataListSelections.length <= 0">批量老化</el-button>
         <el-button v-if="isAuth('equipment:equip:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
         <el-button v-if="isAuth('equipment:equip:recycle')" type="danger" @click="recycleHandle()" :disabled="dataListSelections.length <= 0">批量回收</el-button>
       </el-form-item>
+      <div>
+        <el-form-item label="下发指令">
+          <el-button v-for="command in commands" type="primary" @click="releaseCommand(command)">
+            {{ command.name }}
+          </el-button>
+        </el-form-item>
+      </div>
     </el-form>
     <el-table
       :data="dataList"
@@ -579,14 +583,27 @@
         })
       },
       releaseCommand (command) {
-        console.log(command)
+        if (this.dataListSelections.length === 0) {
+          this.$alert('请选择主机', '提示', {
+            confirmButtonText: '确定',
+            callback: () => {
+              this.$message({
+                type: 'warning',
+                message: '请选择设备'
+              })
+            }
+          })
+          return
+        }
         const names = []
+        const macs =[]
         this.dataListSelections.forEach((item, index) => {
           names.push(item.name)
+          macs.push(item.mac)
         })
         this.commandVisible = true
         this.$nextTick(() => {
-          this.$refs.command.init(command, names)
+          this.$refs.command.init(command, names, macs)
         })
       }
     }

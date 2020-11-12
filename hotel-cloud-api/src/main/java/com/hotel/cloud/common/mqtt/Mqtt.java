@@ -11,6 +11,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import java.text.MessageFormat;
+import java.util.Arrays;
 
 
 @Slf4j
@@ -87,11 +88,12 @@ public class Mqtt implements ApplicationRunner {
             MqttMessage mqttMessage = new MqttMessage();
             mqttMessage.setQos(qos);
             mqttMessage.setPayload(message);
-            String topicName = MessageFormat.format(mqttProperty.getPublishTopic(), target);
-
+            String topicName = MessageFormat.format(mqttProperty.getPublishTopic(), target.replaceAll("-", ""));
+            System.out.println(Arrays.toString(message));
             MqttTopic topic = client.getTopic(topicName);
 
             if (null != topic) {
+                log.info("发布主题:{},消息题为:{}", topicName, message);
                 try {
                     MqttDeliveryToken publish = topic.publish(mqttMessage);
                     publish.waitForCompletion();
@@ -101,7 +103,7 @@ public class Mqtt implements ApplicationRunner {
                         byte[] payload = response.getPayload();
                         log.info("返回信息为:" + new String(payload));
                     }
-                } catch (MqttException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

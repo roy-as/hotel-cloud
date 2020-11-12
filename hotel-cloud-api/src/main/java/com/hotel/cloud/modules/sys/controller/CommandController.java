@@ -1,25 +1,19 @@
 package com.hotel.cloud.modules.sys.controller;
 
-import com.hotel.cloud.common.utils.PageUtils;
-import com.hotel.cloud.common.utils.R;
-import com.hotel.cloud.common.utils.ShiroUtils;
+import com.hotel.cloud.common.utils.*;
+import com.hotel.cloud.common.vo.CommandVo;
 import com.hotel.cloud.modules.sys.entity.CommandEntity;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import com.hotel.cloud.modules.sys.service.CommandService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 
 /**
- * 
- *
  * @author ${author}
  * @email ${email}
  * @date 2020-11-09 17:38:13
@@ -35,7 +29,7 @@ public class CommandController {
      */
     @RequestMapping("/list")
     @RequiresPermissions("sys:command:list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = commandService.queryPage(params);
 
         return R.ok().put("page", page);
@@ -47,8 +41,8 @@ public class CommandController {
      */
     @RequestMapping("/info/{id}")
     @RequiresPermissions("sys:command:info")
-    public R info(@PathVariable("id") Long id){
-		CommandEntity command = commandService.getById(id);
+    public R info(@PathVariable("id") Long id) {
+        CommandEntity command = commandService.getById(id);
 
         return R.ok().put("command", command);
     }
@@ -58,12 +52,17 @@ public class CommandController {
      */
     @RequestMapping("/save")
     @RequiresPermissions("sys:command:save")
-    public R save(@RequestBody CommandEntity command){
-        String commandStr = command.getCommand();
-        String[] commands = commandStr.split(",");
+    public R save(@RequestBody CommandEntity command) {
+        String[] commandStr = command.getCommand().split(",");
+        byte[] commands = new byte[commandStr.length];
+        for (int i = 0; i < commandStr.length; i++) {
+            commands[i] = Objects.requireNonNull(CommonUtils.hexStr2bytes(commandStr[i]))[0];
+        }
         command.setCommand(Arrays.toString(commands));
-        String[] datas = command.getData().split(",");
-        command.setData(Arrays.toString(datas));
+        if(!command.getData().contains("[") && !command.getData().contains("]")) {
+            String[] datas = command.getData().split(",");
+            command.setData(Arrays.toString(datas));
+        }
         SysUserEntity loginUser = ShiroUtils.getLoginUser();
         command.setCreateBy(loginUser.getUsername());
         command.setUpdateBy(loginUser.getUsername());
@@ -78,8 +77,12 @@ public class CommandController {
      */
     @RequestMapping("/update")
     @RequiresPermissions("sys:command:update")
-    public R update(@RequestBody CommandEntity command){
-		commandService.updateById(command);
+    public R update(@RequestBody CommandEntity command) {
+        if(!command.getData().contains("[") && !command.getData().contains("]")) {
+            String[] datas = command.getData().split(",");
+            command.setData(Arrays.toString(datas));
+        }
+        commandService.updateById(command);
 
         return R.ok();
     }
@@ -89,8 +92,8 @@ public class CommandController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("sys:command:delete")
-    public R delete(@RequestBody Long[] ids){
-		commandService.removeByIds(Arrays.asList(ids));
+    public R delete(@RequestBody Long[] ids) {
+        commandService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }
@@ -102,4 +105,9 @@ public class CommandController {
         return R.ok().put("data", list);
     }
 
+    @PostMapping("/release")
+    public R release(@Validated @RequestBody CommandVo vo) {
+        this.commandService.release(vo);
+        return R.ok();
+    }
 }
