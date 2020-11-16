@@ -9,7 +9,7 @@
       <el-form-item label="代理">
         <el-input v-model="dataForm.agentName" placeholder="代理" clearable></el-input>
       </el-form-item>
-      <el-form-item label="酒店"  prop="hotelId">
+      <el-form-item label="酒店" prop="hotelId">
         <el-select v-model="dataForm.hotelId" @change="$forceUpdate()" filterable clearable>
           <el-option v-for="hotel in hotels" :key="hotel.id" :label="hotel.name" :value="hotel.id">
           </el-option>
@@ -31,20 +31,33 @@
       </el-form-item>
       <el-form-item prop="status" label="状态">
         <el-select v-model="dataForm.status" filterable clearable>
-          <el-option v-for="status in statusList" :key="status.code" :label="status.label" :value="status.code"></el-option>
+          <el-option v-for="status in statusList" :key="status.code" :label="status.label"
+                     :value="status.code"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('equipment:equip:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('equipment:equip:release')" type="primary" @click="releaseEquip()" :disabled="dataListSelections.length <= 0">批量下发</el-button>
-        <el-button v-if="isAuth('equipment:equip:old')" type="primary" @click="old()" :disabled="dataListSelections.length <= 0">批量老化</el-button>
-        <el-button v-if="isAuth('equipment:equip:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button v-if="isAuth('equipment:equip:recycle')" type="danger" @click="recycleHandle()" :disabled="dataListSelections.length <= 0">批量回收</el-button>
+        <el-button v-if="isAuth('equipment:equip:release')" type="primary" @click="releaseEquip()"
+                   :disabled="dataListSelections.length <= 0">批量下发
+        </el-button>
+        <el-button v-if="isAuth('equipment:equip:old')" type="primary" @click="old()"
+                   :disabled="dataListSelections.length <= 0">批量老化
+        </el-button>
+        <el-button v-if="isAuth('equipment:equip:delete')" type="danger" @click="deleteHandle()"
+                   :disabled="dataListSelections.length <= 0">批量删除
+        </el-button>
+        <el-button v-if="isAuth('equipment:equip:recycle')" type="danger" @click="recycleHandle()"
+                   :disabled="dataListSelections.length <= 0">批量回收
+        </el-button>
+        <el-button v-if="isAuth('equipment:equip:recycle')" type="primary" @click="download()"
+                   :disabled="dataListSelections.length <= 0">二维码下载
+        </el-button>
       </el-form-item>
       <div>
         <el-form-item label="下发指令">
-          <el-button v-for="command in commands" type="primary" @click="releaseCommand(command)" :disabled="dataListSelections.length <= 0">
+          <el-button v-for="command in commands" type="primary" @click="releaseCommand(command)"
+                     :disabled="(command.commandType !== 3 && dataListSelections.length <= 0) || (command.commandType === 3 && dataListSelections.length !== 1)">
             {{ command.name }}
           </el-button>
         </el-form-item>
@@ -190,12 +203,24 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('equipment:equip:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="isAuth('equipment:equip:generateQrcode') && scope.row.status === 0" type="text" size="small" @click="generateQrcode(scope.row.id, scope.row.name)">绑定二维码</el-button>
-          <el-button v-if="isAuth('equipment:equip:old') && scope.row.status === 1" type="text" size="small" @click="old(scope.row.id, scope.row.name)">　老化</el-button>
-          <el-button v-if="isAuth('equipment:equip:release') && scope.row.status === 2 && checkIfRelease(scope.row)" type="text" size="small" @click="releaseEquip(scope.row.id, scope.row.name)">下发</el-button>
-          <el-button v-if="isAuth('equipment:equip:delete')" type="text" size="small" @click="deleteHandle(scope.row.id, scope.row.name)">删除</el-button>
-          <el-button v-if="isAuth('equipment:equip:recycle') && scope.row.status !== 3" type="text" size="small" @click="recycleHandle(scope.row.id, scope.row.name)"><span style="color: lightpink">回收</span></el-button>
+          <el-button v-if="isAuth('equipment:equip:update')" type="text" size="small"
+                     @click="addOrUpdateHandle(scope.row.id)">修改
+          </el-button>
+          <el-button v-if="isAuth('equipment:equip:generateQrcode') && scope.row.status === 0" type="text" size="small"
+                     @click="generateQrcode(scope.row.id, scope.row.name)">绑定二维码
+          </el-button>
+          <el-button v-if="isAuth('equipment:equip:old') && scope.row.status === 1" type="text" size="small"
+                     @click="old(scope.row.id, scope.row.name)">　老化
+          </el-button>
+          <el-button v-if="isAuth('equipment:equip:release') && scope.row.status === 2 && checkIfRelease(scope.row)"
+                     type="text" size="small" @click="releaseEquip(scope.row.id, scope.row.name)">下发
+          </el-button>
+          <el-button v-if="isAuth('equipment:equip:delete')" type="text" size="small"
+                     @click="deleteHandle(scope.row.id, scope.row.name)">删除
+          </el-button>
+          <el-button v-if="isAuth('equipment:equip:recycle') && scope.row.status !== 3" type="text" size="small"
+                     @click="recycleHandle(scope.row.id, scope.row.name)"><span style="color: lightpink">回收</span>
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -211,9 +236,11 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <generate-qrcode v-if="generateQrcodeVisible" ref="generateQrcode" @refreshDataList="getDataList"></generate-qrcode>
-    <release v-if="releaseVisible" ref="release"  @refreshDataList="getDataList"></release>
-    <old v-if="oldVisible" ref="old"  @refreshDataList="getDataList"></old>
+    <release v-if="releaseVisible" ref="release" @refreshDataList="getDataList"></release>
+    <old v-if="oldVisible" ref="old" @refreshDataList="getDataList"></old>
     <command v-if="commandVisible" ref="command"></command>
+    <command-view v-if="commandViewVisible" ref="commandView"></command-view>
+    <command-execute v-if="commandExecuteVisible" ref="commandExecute"></command-execute>
   </div>
 </template>
 
@@ -221,9 +248,12 @@
   import AddOrUpdate from './equip-add-or-update'
   import GenerateQrcode from './equip-generate-qrcode'
   import Release from './equip-release'
-  import { getUserId } from '@/utils/index'
+  import {getUserId} from '@/utils/index'
   import Old from './equip-old'
   import Command from './equip-command'
+  import CommandView from './equip-command-view'
+  import CommandExecute from './equip-command-execute'
+
   export default {
     data () {
       return {
@@ -288,7 +318,9 @@
         generateQrcodeVisible: false,
         releaseVisible: false,
         oldVisible: false,
-        commandVisible: false
+        commandVisible: false,
+        commandViewVisible: false,
+        commandExecuteVisible: false
       }
     },
     components: {
@@ -296,7 +328,9 @@
       GenerateQrcode,
       Release,
       Old,
-      Command
+      Command,
+      CommandView,
+      CommandExecute
     },
     activated () {
       this.getDataList()
@@ -601,9 +635,33 @@
           names.push(item.name)
           macs.push(item.mac)
         })
-        this.commandVisible = true
-        this.$nextTick(() => {
-          this.$refs.command.init(command, names, macs)
+        if (command.commandType === 1) {
+          this.commandVisible = true
+          this.$nextTick(() => {
+            this.$refs.command.init(command, names, macs)
+          })
+        } else if (command.commandType === 2) {
+          this.commandExecuteVisible = true
+          this.$nextTick(() => {
+            this.$refs.commandExecute.init(command, names, macs)
+          })
+        } else if (command.commandType === 3) {
+          this.commandViewVisible = true
+          this.$nextTick(() => {
+            this.$refs.commandView.init(command, names, macs)
+          })
+        }
+      },
+      download () {
+        let params = ''
+        this.dataListSelections.forEach((item, index) => {
+          params = 'ids=' + item.id + '&'
+        })
+        this.$http({
+          url: this.$http.adornUrl('/equipment/equip/download?' + params + 't=' + new Date().getTime()),
+          method: 'get',
+          responseType: 'blob'
+        }).then(({data}) => {
         })
       }
     }

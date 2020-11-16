@@ -1,14 +1,27 @@
 package com.hotel.cloud.common.mqtt;
 
+import com.hotel.cloud.common.utils.Constants;
+import com.hotel.cloud.common.utils.RedisUtils;
+import com.hotel.cloud.common.utils.SpringContextUtils;
+import com.hotel.cloud.common.vo.CommandStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class TopicCallback implements MqttCallback {
+
+    private static RedisUtils redisUtils;
+
+    static {
+        redisUtils = SpringContextUtils.getBean("redisUtils", RedisUtils.class);
+    }
 
     private MqttClient client;
 
@@ -17,7 +30,6 @@ public class TopicCallback implements MqttCallback {
     private String[] topics;
 
     private int[] qos;
-
 
     public TopicCallback() {
     }
@@ -39,11 +51,9 @@ public class TopicCallback implements MqttCallback {
         log.info("MQTT连接断开，发起重连");
         while (true) {
             try {
-                Thread.sleep(30000);
+                Thread.sleep(5000);
                 client.connect(options);
-                //订阅消息
-                client.subscribe(topics, qos);
-                log.info("MQTT重新连接成功:{0}", client);
+                log.info("MQTT重新连接成功:{}", client);
                 break;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -56,6 +66,20 @@ public class TopicCallback implements MqttCallback {
         //订阅消息字符
         byte[] payload = message.getPayload();
         log.info("topic:{},payload:{}", topic, payload);
+        String mac = topic.split("/")[2];
+        String redisKey = MessageFormat.format(Constants.REDIS_COMMAND_KEY, mac);
+        CommandStatus commandStatus = redisUtils.get(redisKey, CommandStatus.class);
+        if(null == commandStatus) {
+            commandStatus = new CommandStatus();
+            commandStatus.setMac(mac);
+        }
+        if (topic.endsWith("down")) {
+            commandStatus.setDownBody(payload);
+        } else if (topic.endsWith("up")) {
+            commandStatus.setCommand(payload);
+            commandStatus.setUpBody(payload);
+        }
+        redisUtils.set(redisKey, commandStatus, 10 * 1000);
     }
 
     @Override

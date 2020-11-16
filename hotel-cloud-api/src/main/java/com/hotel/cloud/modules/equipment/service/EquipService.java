@@ -6,7 +6,9 @@ import com.hotel.cloud.common.utils.PageUtils;
 import com.hotel.cloud.common.vo.equip.QrcodeVo;
 import com.hotel.cloud.common.vo.equip.EquipVo;
 import com.hotel.cloud.modules.equipment.entity.EquipEntity;
+import org.eclipse.paho.client.mqttv3.MqttException;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -33,5 +35,9 @@ public interface EquipService extends IService<EquipEntity> {
     void batchDelete(List<Long> ids);
 
     List<EquipEntity> get(QueryWrapper<EquipEntity> wrapper);
+
+    void saveEquip(EquipEntity equip) throws MqttException;
+
+    void download(Long[] ids, HttpServletResponse response) throws IOException;
 }
 

@@ -2,6 +2,7 @@ package com.hotel.cloud.modules.sys.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hotel.cloud.common.utils.PageUtils;
+import com.hotel.cloud.common.vo.CommandStatus;
 import com.hotel.cloud.common.vo.CommandVo;
 import com.hotel.cloud.modules.sys.entity.CommandEntity;
 
@@ -18,6 +19,6 @@ public interface CommandService extends IService<CommandEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
 
-    void release(CommandVo vo);
+    Map<String, CommandStatus> release(CommandVo vo) throws Exception;
 }
 

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="this.dataForm.command.name"
+    :title="this.command.name"
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
@@ -9,8 +9,8 @@
           {{name}}
         </el-tag>
       </el-form-item>
-      <el-form-item v-for="body in bodies" :label="body" :prop="body">
-        <el-input  v-model="dataForm[body]"  :placeholder="body"></el-input>
+      <el-form-item label="数据包" prop="body">
+        <el-input  v-model="dataForm.body" placeholder="16进制的数据包,例如:256f"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -27,28 +27,21 @@
         visible: false,
         command: {},
         names: [],
-        bodies: [],
-        modules: [],
         dataForm: {
-          command: {}
+          body: ''
         },
-        dataRule: {},
-        macs: [],
-        dynamicFormInfo: {
-        }
+        dataRule: {
+          body: [
+            {required: true, msg: '数据包不能为空', trigger: 'blur'}
+          ]
+        },
+        macs: []
       }
     },
     methods: {
       init (command, names, macs) {
-        this.dataForm = {}
-        this.dataForm.command = command
+        this.command = command
         this.macs = macs
-        this.bodies = JSON.parse(command.data)
-        this.bodies.forEach((body, idx) => {
-          this.$set(this.dataForm, body, '')
-          this.$set(this.dataRule, body, [{ required: true, message: body + '不能为空', trigger: 'blur' }])
-        })
-        console.log(this.dataRule)
         this.names = names
         this.visible = true
         this.$nextTick(() => {
@@ -59,18 +52,12 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            const data = []
-            for (let key in this.dataForm) {
-              if (key !== 'command') {
-                data.push(this.dataForm[key])
-              }
-            }
             this.$http({
               url: this.$http.adornUrl(`/sys/command/release`),
               method: 'post',
               data: this.$http.adornData({
-                'commandId': this.dataForm.command.id,
-                'datas': data,
+                'commandId': this.command.id,
+                'datas': [this.dataForm.body],
                 'macs': this.macs
               })
             }).then(({data}) => {
@@ -87,7 +74,7 @@
                 }
                 if (flag) {
                   this.$message({
-                    message: '执行成功',
+                    message: '执行失败',
                     type: 'success',
                     duration: time,
                     onClose: () => {
@@ -99,7 +86,7 @@
                   this.$message.error(msg)
                 }
               } else {
-                this.$message.error('执行成功')
+                this.$message.error('执行失败')
               }
             })
           }

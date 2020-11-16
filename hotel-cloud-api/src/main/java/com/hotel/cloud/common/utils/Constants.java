@@ -63,7 +63,13 @@ public class Constants {
     // LocalDate的格式化
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMM").withZone(ZoneId.systemDefault());
 
+    public static final DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.systemDefault());
+
     public static final String HEX_PREFIX = "0x";
+
+    public static final String REDIS_COMMAND_KEY = "command:{0}";
+
+    public static final String ZIP_SUFFIX = ".zip";
 	/**
 	 * 菜单类型
 	 * 

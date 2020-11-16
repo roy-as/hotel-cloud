@@ -27,6 +27,7 @@
     "mathjs": "^7.6.0",
     "node-sass": "4.9.0",
     "npm": "^6.9.0",
+    "qs": "^6.9.4",
     "sass-loader": "6.0.6",
     "svg-sprite-loader": "3.7.3",
     "vue": "2.5.16",

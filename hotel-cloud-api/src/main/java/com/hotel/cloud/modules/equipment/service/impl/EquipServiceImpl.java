@@ -10,6 +10,7 @@ import com.hotel.cloud.common.exception.RRException;
 import com.hotel.cloud.common.utils.*;
 import com.hotel.cloud.common.vo.equip.EquipVo;
 import com.hotel.cloud.common.vo.equip.QrcodeVo;
+import com.hotel.cloud.config.property.SysProperty;
 import com.hotel.cloud.modules.equipment.dao.EquipDao;
 import com.hotel.cloud.modules.equipment.entity.EquipEntity;
 import com.hotel.cloud.modules.equipment.entity.EquipModuleEntity;
@@ -18,15 +19,24 @@ import com.hotel.cloud.modules.equipment.service.EquipService;
 import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import com.hotel.cloud.modules.oss.service.SysOssService;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
+import com.hotel.cloud.modules.sys.service.MqttService;
 import com.hotel.cloud.modules.sys.service.SysUserService;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.io.IOException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import java.util.zip.ZipOutputStream;
 
 
 @Service("equipService")
@@ -40,6 +50,21 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
 
     @Resource
     private EquipModuleService equipModuleService;
+
+    @Resource
+    private MqttService mqttService;
+
+    @Resource
+    private SysProperty sysProperty;
+
+    @PostConstruct
+    public void init() {
+        String temDir = sysProperty.getTempDir();
+        File file = new File(temDir);
+        if(!file.exists() || file.isFile()) {
+            file.mkdirs();
+        }
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -185,6 +210,41 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
             equip.setPrice(moduleMap.get(equip.getModuleId()).getPrice());
         }
         return equips;
+    }
+
+    @Override
+    @Transactional
+    public void saveEquip(EquipEntity equip) throws MqttException {
+        SysUserEntity loginUser = ShiroUtils.getLoginUser();
+        equip.setCreateTime(new Date());
+        equip.setCreateBy(loginUser.getUsername());
+        equip.setUpdateBy(loginUser.getUsername());
+        mqttService.subscribe(equip.getMac());
+    }
+
+    @Override
+    public void download(Long[] ids, HttpServletResponse response) throws IOException {
+        List<EquipEntity> equips = this.baseMapper.selectBatchIds(Arrays.asList(ids));
+        List<Callable<InputStream>> tasks = new ArrayList<>(equips.size());
+        for (EquipEntity equip : equips) {
+            tasks.add(() -> HttpUtils.get(equip.getQrcodeUrl()));
+        }
+        List<InputStream> isList = ThreadPoolUtils.execute(tasks);
+        Set<String> filePathList = new LinkedHashSet<>(isList.size());
+        for (InputStream is : isList) {
+            String filePath = sysProperty.getTempDir() + CommonUtils.uuid() + Constants.PNG_SUFFIX;
+            FileOutputStream os = new FileOutputStream(new File(filePath));
+            IOUtils.copy(is, os);
+            os.close();
+            is.close();
+            filePathList.add(filePath);
+        }
+        String fileName = LocalDateTime.now().format(Constants.FORMATTER_TIME) + Constants.ZIP_SUFFIX;
+        response.setCharacterEncoding(Constants.DEFAULT_CHARSET);
+        response.setContentType("application/x-msdownload");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
+        CommonUtils.zip(filePathList, zos);
     }
 
     /**

@@ -106,8 +106,7 @@ public class CommandController {
     }
 
     @PostMapping("/release")
-    public R release(@Validated @RequestBody CommandVo vo) {
-        this.commandService.release(vo);
-        return R.ok();
+    public R release(@Validated @RequestBody CommandVo vo) throws Exception {
+        return R.ok().put("data", this.commandService.release(vo));
     }
 }

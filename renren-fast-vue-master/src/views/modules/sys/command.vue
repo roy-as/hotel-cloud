@@ -36,6 +36,17 @@
         label="名称">
       </el-table-column>
       <el-table-column
+        prop="commandType"
+        header-align="center"
+        align="center"
+        label="指令类型">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.commandType === 1" size="small">设置类</el-tag>
+          <el-tag v-if="scope.row.commandType === 2" size="small">直发指令类</el-tag>
+          <el-tag v-if="scope.row.commandType === 3" size="small">查询类</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
         prop="command"
         header-align="center"
         align="center"

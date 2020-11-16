@@ -41,6 +41,10 @@ public class CommandEntity implements Serializable {
 	 */
 	private String remark;
 	/**
+	 * 指令类型，1：设置类，2：
+	 */
+	private Integer commandType;
+	/**
 	 * 创建人
 	 */
 	private String createBy;

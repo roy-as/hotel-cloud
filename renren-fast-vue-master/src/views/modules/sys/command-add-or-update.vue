@@ -7,6 +7,13 @@
     <el-form-item label="名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="名称"></el-input>
     </el-form-item>
+      <el-form-item label="指令类型" prop="commandType" :class="{ 'is-required': !dataForm.id }">
+        <el-select v-model="dataForm.commandType" @change="$forceUpdate()" filterable clearable placeholder="请选择"
+                   style="width: 100%; position: relative">
+          <el-option v-for="tyoe in commandTypes" :key="tyoe.value" :label="tyoe.label" :value="tyoe.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
     <el-form-item label="指令" prop="command">
       <el-input v-model="dataForm.command" placeholder="16进制指令，不能带有0x，多个数字用英文逗号隔开"></el-input>
     </el-form-item>
@@ -28,13 +35,19 @@
   export default {
     data () {
       return {
+        commandTypes: [
+          {label: '设置类', value: 1},
+          {label: '直发指令类', value: 2},
+          {label: '查询类', value: 3}
+        ],
         visible: false,
         dataForm: {
           id: 0,
           name: '',
           command: '',
           data: '',
-          remark: ''
+          remark: '',
+          commandType: ''
         },
         dataRule: {
           name: [
@@ -66,6 +79,7 @@
                 this.dataForm.command = data.command.command
                 this.dataForm.data = data.command.data
                 this.dataForm.remark = data.command.remark
+                this.dataForm.commandType = data.command.commandType
               }
             })
           }
@@ -83,7 +97,8 @@
                 'name': this.dataForm.name,
                 'command': this.dataForm.command,
                 'data': this.dataForm.data,
-                'remark': this.dataForm.remark
+                'remark': this.dataForm.remark,
+                'commandType': this.dataForm.commandType
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

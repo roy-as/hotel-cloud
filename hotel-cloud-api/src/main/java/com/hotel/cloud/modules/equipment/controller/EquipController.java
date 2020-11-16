@@ -14,6 +14,7 @@ import com.hotel.cloud.modules.org.entity.HotelInfoEntity;
 import com.hotel.cloud.modules.org.service.HotelInfoService;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import com.hotel.cloud.modules.equipment.entity.EquipEntity;
 import com.hotel.cloud.modules.equipment.service.EquipService;
 
+import javax.servlet.http.HttpServletResponse;
 
 
 /**
@@ -71,13 +73,8 @@ public class EquipController {
      */
     @RequestMapping("/save")
     @RequiresPermissions("equipment:equip:save")
-    public R save(@RequestBody EquipEntity equip){
-        SysUserEntity loginUser = ShiroUtils.getLoginUser();
-        equip.setCreateTime(new Date());
-        equip.setCreateBy(loginUser.getUsername());
-        equip.setUpdateBy(loginUser.getUsername());
-        equipService.save(equip);
-
+    public R save(@RequestBody EquipEntity equip) throws MqttException {
+        equipService.saveEquip(equip);
         return R.ok();
     }
 
@@ -143,6 +140,13 @@ public class EquipController {
     public R old(@RequestBody @Validated EquipVo vo) {
         equipService.old(vo.getIds(), vo.getCount());
         return R.ok();
+    }
+
+    @GetMapping("/download")
+    public void download(Long[] ids, HttpServletResponse response) throws IOException {
+
+        equipService.download(ids, response);
+
     }
 
 
