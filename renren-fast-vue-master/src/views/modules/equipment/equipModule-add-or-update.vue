@@ -106,6 +106,7 @@
             formData.append('name', this.dataForm.name)
             formData.append('price', this.dataForm.price)
             formData.append('protocol', this.dataForm.protocol)
+            formData.append('remark', this.dataForm.remark)
             if (this.pictureList && this.pictureList[0]) {
               formData.append('picture', this.pictureList[0].raw)
             }
