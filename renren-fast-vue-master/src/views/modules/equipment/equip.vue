@@ -401,71 +401,71 @@
 </template>
 
 <script>
-import AddOrUpdate from "./equip-add-or-update";
-import GenerateQrcode from "./equip-generate-qrcode";
-import Release from "./equip-release";
-import { getUserId } from "@/utils/index";
-import Old from "./equip-old";
-import Command from "./equip-command";
-import CommandView from "./equip-command-view";
-import CommandExecute from "./equip-command-execute";
+import AddOrUpdate from './equip-add-or-update'
+import GenerateQrcode from './equip-generate-qrcode'
+import Release from './equip-release'
+import { getUserId } from '@/utils/index'
+import Old from './equip-old'
+import Command from './equip-command'
+import CommandView from './equip-command-view'
+import CommandExecute from './equip-command-execute'
 import { isURL } from '@/utils/validate'
 
 export default {
-  data() {
+  data () {
     return {
       pickerOptions: {
         shortcuts: [
           {
-            text: "昨天",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24);
-              picker.$emit("pick", [start, end]);
-            },
+            text: '昨天',
+            onClick (picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24)
+              picker.$emit('pick', [start, end])
+            }
           },
           {
-            text: "上周",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", [start, end]);
-            },
+            text: '上周',
+            onClick (picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            }
           },
           {
-            text: "前一个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit("pick", [start, end]);
-            },
+            text: '前一个月',
+            onClick (picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
+            }
           },
           {
-            text: "前三个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit("pick", [start, end]);
-            },
-          },
-        ],
+            text: '前三个月',
+            onClick (picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
+            }
+          }
+        ]
       },
       value1: [new Date(2000, 10, 10, 10, 10), new Date(2000, 10, 11, 10, 10)],
-      value2: "",
+      value2: '',
       dataForm: {
-        key: "",
+        key: ''
       },
       statusList: [
-        { code: 0, label: "待绑定" },
-        { code: 1, label: "待老化" },
-        { code: 2, label: "待下发" },
-        { code: 3, label: "待安装" },
-        { code: 4, label: "工作中" },
-        { code: 5, label: "已回收" },
+        { code: 0, label: '待绑定' },
+        { code: 1, label: '待老化' },
+        { code: 2, label: '待下发' },
+        { code: 3, label: '待安装' },
+        { code: 4, label: '工作中' },
+        { code: 5, label: '已回收' }
       ],
       commands: [],
       dataList: [],
@@ -482,8 +482,8 @@ export default {
       oldVisible: false,
       commandVisible: false,
       commandViewVisible: false,
-      commandExecuteVisible: false,
-    };
+      commandExecuteVisible: false
+    }
   },
   components: {
     AddOrUpdate,
@@ -492,18 +492,18 @@ export default {
     Old,
     Command,
     CommandView,
-    CommandExecute,
+    CommandExecute
   },
-  activated() {
-    this.getDataList();
+  activated () {
+    this.getDataList()
   },
   methods: {
     // 获取数据列表
-    getDataList() {
-      this.dataListLoading = true;
+    getDataList () {
+      this.dataListLoading = true
       this.$http({
-        url: this.$http.adornUrl("/equipment/equip/list"),
-        method: "get",
+        url: this.$http.adornUrl('/equipment/equip/list'),
+        method: 'get',
         params: this.$http.adornParams({
           page: this.pageIndex,
           limit: this.pageSize,
@@ -517,392 +517,411 @@ export default {
             : null,
           expiredTimeEnd: this.dataForm.expiredTimeRange
             ? this.dataForm.expiredTimeRange[1].getTime()
-            : null,
-        }),
+            : null
+        })
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.dataList = data.page.list;
-          this.totalPage = data.page.totalCount;
+          this.dataList = data.page.list
+          this.totalPage = data.page.totalCount
         } else {
-          this.dataList = [];
-          this.totalPage = 0;
+          this.dataList = []
+          this.totalPage = 0
         }
-        this.dataListLoading = false;
-      });
+        this.dataListLoading = false
+      })
       this.$http({
-        url: this.$http.adornUrl("/equipment/equipModule/select"),
-        method: "get",
-        params: this.$http.adornParams(),
+        url: this.$http.adornUrl('/equipment/equipModule/select'),
+        method: 'get',
+        params: this.$http.adornParams()
       }).then(({ data }) => {
-        this.modules = data && data.code === 0 ? data.data : [];
-      });
+        this.modules = data && data.code === 0 ? data.data : []
+      })
       this.$http({
-        url: this.$http.adornUrl("/hotel/hotelInfo/select"),
-        method: "get",
-        params: this.$http.adornParams(),
+        url: this.$http.adornUrl('/hotel/hotelInfo/select'),
+        method: 'get',
+        params: this.$http.adornParams()
       }).then(({ data }) => {
-        this.hotels = data && data.code === 0 ? data.data : [];
-      });
+        this.hotels = data && data.code === 0 ? data.data : []
+      })
       this.$http({
-        url: this.$http.adornUrl("/sys/command/data"),
-        method: "get",
-        params: this.$http.adornParams(),
+        url: this.$http.adornUrl('/sys/command/data'),
+        method: 'get',
+        params: this.$http.adornParams()
       }).then(({ data }) => {
-        this.commands = data && data.code === 0 ? data.data : [];
-      });
+        this.commands = data && data.code === 0 ? data.data : []
+      })
     },
     // 每页数
-    sizeChangeHandle(val) {
-      this.pageSize = val;
-      this.pageIndex = 1;
-      this.getDataList();
+    sizeChangeHandle (val) {
+      this.pageSize = val
+      this.pageIndex = 1
+      this.getDataList()
     },
     // 当前页
-    currentChangeHandle(val) {
-      this.pageIndex = val;
-      this.getDataList();
+    currentChangeHandle (val) {
+      this.pageIndex = val
+      this.getDataList()
     },
     // 多选
-    selectionChangeHandle(val) {
-      this.dataListSelections = val;
+    selectionChangeHandle (val) {
+      this.dataListSelections = val
     },
     // 新增 / 修改
-    addOrUpdateHandle(id) {
-      this.addOrUpdateVisible = true;
+    addOrUpdateHandle (id) {
+      this.addOrUpdateVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init(id);
-      });
+        this.$refs.addOrUpdate.init(id)
+      })
     },
     // 删除
-    deleteHandle(id, name) {
+    deleteHandle (id, name) {
       var ids = id
         ? [id]
         : this.dataListSelections.map((item) => {
-            return item.id;
-          });
+          return item.id
+        })
       var names = name
         ? [name]
         : this.dataListSelections.map((item) => {
-            return item.name;
-          });
+          return item.name
+        })
       this.$confirm(
-        `确定对[设备:${names.join(",")}]进行[${
-          name ? "删除" : "批量删除"
+        `确定对[设备:${names.join(',')}]进行[${
+          name ? '删除' : '批量删除'
         }]操作?`,
-        "提示",
+        '提示',
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
         }
       ).then(() => {
         this.$http({
-          url: this.$http.adornUrl("/equipment/equip/delete"),
-          method: "post",
-          data: this.$http.adornData(ids, false),
+          url: this.$http.adornUrl('/equipment/equip/delete'),
+          method: 'post',
+          data: this.$http.adornData(ids, false)
         }).then(({ data }) => {
           if (data && data.code === 0) {
             this.$message({
-              message: "操作成功",
-              type: "success",
+              message: '操作成功',
+              type: 'success',
               duration: 1500,
               onClose: () => {
-                this.getDataList();
-              },
-            });
+                this.getDataList()
+              }
+            })
           } else {
-            this.$message.error(data.msg);
+            this.$message.error(data.msg)
           }
-        });
-      });
+        })
+      })
     },
-    recycleHandle(id, name) {
+    recycleHandle (id, name) {
       var ids = id
         ? [id]
         : this.dataListSelections.map((item) => {
-            return item.id;
-          });
+          return item.id
+        })
       var names = name
         ? [name]
         : this.dataListSelections.map((item) => {
-            return item.name;
-          });
+          return item.name
+        })
       this.$confirm(
-        `确定对[设备:${names.join(",")}]进行[${
-          name ? "回收" : "批量回收"
+        `确定对[设备:${names.join(',')}]进行[${
+          name ? '回收' : '批量回收'
         }]操作?`,
-        "提示",
+        '提示',
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
         }
       ).then(() => {
         this.$http({
-          url: this.$http.adornUrl("/equipment/equip/recycle"),
-          method: "post",
-          data: this.$http.adornData(ids, false),
+          url: this.$http.adornUrl('/equipment/equip/recycle'),
+          method: 'post',
+          data: this.$http.adornData(ids, false)
         }).then(({ data }) => {
           if (data && data.code === 0) {
             this.$message({
-              message: "操作成功",
-              type: "success",
+              message: '操作成功',
+              type: 'success',
               duration: 1500,
               onClose: () => {
-                this.getDataList();
-              },
-            });
+                this.getDataList()
+              }
+            })
           } else {
-            this.$message.error(data.msg);
+            this.$message.error(data.msg)
           }
-        });
-      });
+        })
+      })
     },
     generateQrcode: function (id, name) {
-      let valid = true;
-      let devices = [];
+      let valid = true
+      let devices = []
       this.dataListSelections.forEach((item, index) => {
         if (item.qrcodeInfo && item.ossId) {
-          valid = false;
-          devices.push(item.name);
+          valid = false
+          devices.push(item.name)
         }
-      });
-      const msg = `设备:  [${devices.join(",")}] 已生成二维码`;
+      })
+      const msg = `设备:  [${devices.join(',')}] 已生成二维码`
       if (!valid) {
-        this.$alert(msg, "提示", {
-          confirmButtonText: "确定",
+        this.$alert(msg, '提示', {
+          confirmButtonText: '确定',
           callback: () => {
             this.$message({
-              type: "warning",
-              message: msg,
-            });
-          },
-        });
-        return;
+              type: 'warning',
+              message: msg
+            })
+          }
+        })
+        return
       }
       var ids = id
         ? [id]
         : this.dataListSelections.map((item) => {
-            return item.id;
-          });
+          return item.id
+        })
       var names = name
         ? [name]
         : this.dataListSelections.map((item) => {
-            return item.name;
-          });
-      this.generateQrcodeVisible = true;
+          return item.name
+        })
+      this.generateQrcodeVisible = true
       this.$nextTick(() => {
-        this.$refs.generateQrcode.init(ids, names);
-      });
+        this.$refs.generateQrcode.init(ids, names)
+      })
     },
-    releaseEquip(id, name) {
-      let valid = true;
-      let qrcode = true;
-      let devices = [];
-      let qrcodeDevice = [];
+    releaseEquip (id, name) {
+      let valid = true
+      let qrcode = true
+      let devices = []
+      let qrcodeDevice = []
       this.dataListSelections.forEach((item, index) => {
         if (this.checkIfRelease(item)) {
-          valid = false;
-          devices.push(item.name);
+          valid = false
+          devices.push(item.name)
         }
         if (item.status !== 1) {
-          qrcode = false;
-          qrcodeDevice.push(item.name);
+          qrcode = false
+          qrcodeDevice.push(item.name)
         }
-      });
+      })
       if (!qrcode) {
-        this.$alert(`设备:  [${qrcodeDevice.join(",")}] 状态不能下发`, "提示", {
-          confirmButtonText: "确定",
+        this.$alert(`设备:  [${qrcodeDevice.join(',')}] 状态不能下发`, '提示', {
+          confirmButtonText: '确定',
           callback: () => {
             this.$message({
-              type: "warning",
-              message: `设备:  [${qrcodeDevice.join(",")}] 状态不能下发`,
-            });
-          },
-        });
-        return;
+              type: 'warning',
+              message: `设备:  [${qrcodeDevice.join(',')}] 状态不能下发`
+            })
+          }
+        })
+        return
       }
-      const msg = `设备:  [${devices.join(",")}] 已下发`;
+      const msg = `设备:  [${devices.join(',')}] 已下发`
       if (!valid) {
-        this.$alert(msg, "提示", {
-          confirmButtonText: "确定",
+        this.$alert(msg, '提示', {
+          confirmButtonText: '确定',
           callback: () => {
             this.$message({
-              type: "warning",
-              message: msg,
-            });
-          },
-        });
-        return;
+              type: 'warning',
+              message: msg
+            })
+          }
+        })
+        return
       }
       var ids = id
         ? [id]
         : this.dataListSelections.map((item) => {
-            return item.id;
-          });
+          return item.id
+        })
       var names = name
         ? [name]
         : this.dataListSelections.map((item) => {
-            return item.name;
-          });
-      this.releaseVisible = true;
+          return item.name
+        })
+      this.releaseVisible = true
       this.$nextTick(() => {
-        this.$refs.release.init(ids, names);
-      });
+        this.$refs.release.init(ids, names)
+      })
     },
     imgUrl: function (row) {
       if (!row.qrcodeUrl) {
-        return "";
+        return ''
       }
-      return row.qrcodeUrl;
+      return row.qrcodeUrl
     },
-    checkIfRelease(item) {
-      const userId = getUserId();
-      return !item.agentId && (item.hotelId || item.agentId !== Number(userId));
+    checkIfRelease (item) {
+      const userId = getUserId()
+      return !item.agentId && (item.hotelId || item.agentId !== Number(userId))
     },
-    old(id, name) {
-      let valid = true;
-      let devices = [];
-      let qrcode = true;
-      let qrcodeDevices = [];
+    old (id, name) {
+      let valid = true
+      let devices = []
+      let qrcode = true
+      let qrcodeDevices = []
       this.dataListSelections.forEach((item, index) => {
         if (item.status > 1) {
-          valid = false;
-          devices.push(item.name);
+          valid = false
+          devices.push(item.name)
         } else if (item.status < 1) {
-          qrcode = false;
-          qrcodeDevices.push(item.name);
+          qrcode = false
+          qrcodeDevices.push(item.name)
         }
-      });
+      })
       if (!qrcode) {
         this.$alert(
-          `设备:  [${qrcodeDevices.join(",")}] 未绑定二维码`,
-          "提示",
+          `设备:  [${qrcodeDevices.join(',')}] 未绑定二维码`,
+          '提示',
           {
-            confirmButtonText: "确定",
+            confirmButtonText: '确定',
             callback: () => {
               this.$message({
-                type: "warning",
-                message: `设备:  [${qrcodeDevices.join(",")}] 未绑定二维码`,
-              });
-            },
+                type: 'warning',
+                message: `设备:  [${qrcodeDevices.join(',')}] 未绑定二维码`
+              })
+            }
           }
-        );
-        return;
+        )
+        return
       }
-      const msg = `设备:  [${devices.join(",")}] 已老化`;
+      const msg = `设备:  [${devices.join(',')}] 已老化`
       if (!valid) {
-        this.$alert(msg, "提示", {
-          confirmButtonText: "确定",
+        this.$alert(msg, '提示', {
+          confirmButtonText: '确定',
           callback: () => {
             this.$message({
-              type: "warning",
-              message: msg,
-            });
-          },
-        });
-        return;
+              type: 'warning',
+              message: msg
+            })
+          }
+        })
+        return
       }
       var ids = id
         ? [id]
         : this.dataListSelections.map((item) => {
-            return item.id;
-          });
+          return item.id
+        })
       var names = name
         ? [name]
         : this.dataListSelections.map((item) => {
-            return item.name;
-          });
-      this.oldVisible = true;
+          return item.name
+        })
+      this.oldVisible = true
       this.$nextTick(() => {
-        this.$refs.old.init(ids, names);
-      });
+        this.$refs.old.init(ids, names)
+      })
     },
-    releaseCommand(command) {
+    releaseCommand (command) {
       if (this.dataListSelections.length === 0) {
-        this.$alert("请选择主机", "提示", {
-          confirmButtonText: "确定",
+        this.$alert('请选择主机', '提示', {
+          confirmButtonText: '确定',
           callback: () => {
             this.$message({
-              type: "warning",
-              message: "请选择设备",
-            });
-          },
-        });
-        return;
-      }
-      const names = [];
-      const macs = [];
-      this.dataListSelections.forEach((item, index) => {
-        names.push(item.name);
-        macs.push(item.mac);
-      });
-      if (command.commandType === 1) {
-        this.commandVisible = true;
-        this.$nextTick(() => {
-          this.$refs.command.init(command, names, macs);
-        });
-      } else if (command.commandType === 2) {
-        this.commandExecuteVisible = true;
-        this.$nextTick(() => {
-          this.$refs.commandExecute.init(command, names, macs);
-        });
-      } else if (command.commandType === 3) {
-        this.commandViewVisible = true;
-        this.$nextTick(() => {
-          this.$refs.commandView.init(command, names, macs);
-        });
-      }
-    },
-    downloadImage(imgURL, name) {
-      try {
-        const image = new Image();
-        image.setAttribute("crossOrigin", "anonymous");
-        image.onload = function () {
-          const canvas = document.createElement("canvas");
-          canvas.width = image.width;
-          canvas.height = image.height;
-          const context = canvas.getContext("2d");
-          context.drawImage(image, 0, 0, image.width, image.height);
-          const url = canvas.toDataURL("image/png");
-          const a = document.createElement("a");
-          const event = new MouseEvent("click");
-          a.download = name;
-          a.href = url;
-          a.dispatchEvent(event);
-        };
-        image.src = imgURL;
-      } catch (error) {
-        
-      }
-    },
-    download() {
-      let imgList=[]
-      this.dataListSelections.forEach((item, index) => {
-        item.qrcodeUrl && isURL(item.qrcodeUrl) && imgList.push(item.qrcodeUrl)
-      })
-      if(imgList.length === 0){
-        this.$message.error('请选择已绑定二维码的设备');
+              type: 'warning',
+              message: '请选择设备'
+            })
+          }
+        })
         return
       }
-      imgList.forEach((url, index) => {
-        let name = Math.random().toString(36).substr(2)
-        let type = url.substring(url.lastIndexOf('.') + 1)
-        this.downloadImage(url, name + '.' + type)
-      });
+      const names = []
+      const macs = []
+      this.dataListSelections.forEach((item, index) => {
+        names.push(item.name)
+        macs.push(item.mac)
+      })
+      if (command.commandType === 1) {
+        this.commandVisible = true
+        this.$nextTick(() => {
+          this.$refs.command.init(command, names, macs)
+        })
+      } else if (command.commandType === 2) {
+        this.commandExecuteVisible = true
+        this.$nextTick(() => {
+          this.$refs.commandExecute.init(command, names, macs)
+        })
+      } else if (command.commandType === 3) {
+        this.commandViewVisible = true
+        this.$nextTick(() => {
+          this.$refs.commandView.init(command, names, macs)
+        })
+      }
+    },
+    downloadImage (imgURL, name) {
+      try {
+        const image = new Image()
+        image.setAttribute('crossOrigin', 'anonymous')
+        image.onload = function () {
+          const canvas = document.createElement('canvas')
+          canvas.width = image.width
+          canvas.height = image.height
+          const context = canvas.getContext('2d')
+          context.drawImage(image, 0, 0, image.width, image.height)
+          const url = canvas.toDataURL('image/png')
+          const a = document.createElement('a')
+          const event = new MouseEvent('click')
+          a.download = name
+          a.href = url
+          a.dispatchEvent(event)
+        }
+        image.src = imgURL
+      } catch (error) {
+
+      }
     },
     // download () {
-    //   let params = ''
+    //   let imgList = []
     //   this.dataListSelections.forEach((item, index) => {
-    //     params = 'ids=' + item.id + '&'
+    //     item.qrcodeUrl && isURL(item.qrcodeUrl) && imgList.push(item.qrcodeUrl)
     //   })
-    //   this.$http({
-    //     url: this.$http.adornUrl('/equipment/equip/download?' + params + 't=' + new Date().getTime()),
-    //     method: 'get',
-    //     responseType: 'blob'
-    //   }).then(({data}) => {
+    //   if (imgList.length === 0) {
+    //     this.$message.error('请选择已绑定二维码的设备')
+    //     return
+    //   }
+    //   imgList.forEach((url, index) => {
+    //     let name = Math.random().toString(36).substr(2)
+    //     let type = url.substring(url.lastIndexOf('.') + 1)
+    //     this.downloadImage(url, name + '.' + type)
     //   })
     // }
-  },
-};
+    download () {
+      let params = ''
+      console.log(this.dataListSelections)
+      this.dataListSelections.forEach((item, index) => {
+        params += 'ids=' + item.id + '&'
+      })
+      this.$http({
+        url: this.$http.adornUrl('/equipment/equip/download?' + params + 't=' + new Date().getTime()),
+        method: 'get',
+        responseType: 'blob'
+      }).then(({data}) => {
+        if (!data) {
+          this.$message.error('下载内容为空')
+          return
+        }
+        let url = window.URL.createObjectURL(new Blob([data]))
+        let link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', new Date().getTime() + '.zip')
+
+        document.body.appendChild(link)
+        link.click()
+        // 释放URL对象所占资源
+        window.URL.revokeObjectURL(url)
+        // 用完即删
+        document.body.removeChild(link)
+      }).catch(err => {
+        console.log('err: ', err)
+      })
+    }
+  }
+}
 </script>

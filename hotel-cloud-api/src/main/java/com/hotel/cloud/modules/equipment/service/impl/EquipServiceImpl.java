@@ -26,12 +26,15 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -245,6 +248,33 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
         ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
         CommonUtils.zip(filePathList, zos);
+    }
+
+    @Override
+    @Transactional
+    public void importExcel(MultipartFile file) throws IOException {
+        List<EquipEntity> equips = ExcelUtils.importExcel(file, 0, 1, EquipEntity.class);
+
+        Map<String, List<EquipEntity>> maps = equips.stream().map(equip -> {
+            if(StringUtils.isBlank(equip.getModuleName())) {
+                throw new RRException("设备模块不能为空");
+            }
+            if(StringUtils.isBlank(equip.getName())) {
+                throw new RRException("设备名称不能为空");
+            }
+            if(StringUtils.isBlank(equip.getMac())) {
+                throw new RRException("mac地址不能为空");
+            }
+            return equip;
+        }).collect(Collectors.groupingBy(EquipEntity::getModuleName));
+        Set<String> moduleNames = maps.keySet();
+        List<EquipModuleEntity> modules = equipModuleService.list(new QueryWrapper<EquipModuleEntity>().in("name"));
+        if(modules.size() != moduleNames.size()) {
+            throw new RRException(ExceptionEnum.EQUIP_MODULE_NOT_EXIST);
+        }
+        for (EquipEntity equip : equips) {
+
+        }
     }
 
     /**

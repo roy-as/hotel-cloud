@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.hotel.cloud.modules.equipment.entity.EquipEntity;
 import com.hotel.cloud.modules.equipment.service.EquipService;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -144,9 +145,13 @@ public class EquipController {
 
     @GetMapping("/download")
     public void download(Long[] ids, HttpServletResponse response) throws IOException {
-
         equipService.download(ids, response);
+    }
 
+    @PostMapping("/import")
+    public R importExcel(MultipartFile file) throws IOException {
+        equipService.importExcel(file);
+        return R.ok();
     }
 
 

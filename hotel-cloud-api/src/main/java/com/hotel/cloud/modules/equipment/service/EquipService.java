@@ -7,6 +7,7 @@ import com.hotel.cloud.common.vo.equip.QrcodeVo;
 import com.hotel.cloud.common.vo.equip.EquipVo;
 import com.hotel.cloud.modules.equipment.entity.EquipEntity;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -39,5 +40,7 @@ public interface EquipService extends IService<EquipEntity> {
     void saveEquip(EquipEntity equip) throws MqttException;
 
     void download(Long[] ids, HttpServletResponse response) throws IOException;
+
+    void importExcel(MultipartFile file) throws IOException;
 }
 

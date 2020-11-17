@@ -23,7 +23,8 @@ public enum  ExceptionEnum {
     COUPON_EXPIRED(1027, "优惠券已过期"),
     STOCK_NOT_ENOUGH(1028, "库存不足"),
     PARAM_ERROR(1029, "参数错误"),
-    COMMAND_NOT_EXIST(1030, "指令不存在")
+    COMMAND_NOT_EXIST(1030, "指令不存在"),
+    EQUIP_MODULE_NOT_EXIST(1031, "设备模块不存在")
     ;
 
     private Integer code;
