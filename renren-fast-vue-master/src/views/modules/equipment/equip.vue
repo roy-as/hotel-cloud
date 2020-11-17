@@ -109,12 +109,19 @@
           >批量回收
         </el-button>
         <el-button
-          v-if="isAuth('equipment:equip:recycle')"
+          v-if="isAuth('equipment:equip:save')"
           type="primary"
           @click="download()"
           :disabled="dataListSelections.length <= 0"
           >二维码下载
         </el-button>
+        <el-button
+          v-if="isAuth('equipment:equip:save')"
+          type="primary"
+          @click="downloadTemplate()"
+        >导入模板
+        </el-button>
+        <el-button  v-if="isAuth('equipment:equip:save')" type="primary" @click="uploadHandle()">批量导入</el-button>
       </el-form-item>
       <div>
         <el-form-item label="下发指令">
@@ -397,6 +404,7 @@
       v-if="commandExecuteVisible"
       ref="commandExecute"
     ></command-execute>
+    <upload v-if="uploadVisible" ref="upload" @refreshDataList="getDataList"></upload>
   </div>
 </template>
 
@@ -410,6 +418,7 @@ import Command from './equip-command'
 import CommandView from './equip-command-view'
 import CommandExecute from './equip-command-execute'
 import { isURL } from '@/utils/validate'
+import Upload from './equip-upload'
 
 export default {
   data () {
@@ -482,7 +491,8 @@ export default {
       oldVisible: false,
       commandVisible: false,
       commandViewVisible: false,
-      commandExecuteVisible: false
+      commandExecuteVisible: false,
+      uploadVisible: false
     }
   },
   components: {
@@ -492,7 +502,8 @@ export default {
     Old,
     Command,
     CommandView,
-    CommandExecute
+    CommandExecute,
+    Upload
   },
   activated () {
     this.getDataList()
@@ -902,24 +913,45 @@ export default {
         method: 'get',
         responseType: 'blob'
       }).then(({data}) => {
-        if (!data) {
-          this.$message.error('下载内容为空')
-          return
-        }
-        let url = window.URL.createObjectURL(new Blob([data]))
-        let link = document.createElement('a')
-        link.style.display = 'none'
-        link.href = url
-        link.setAttribute('download', new Date().getTime() + '.zip')
-
-        document.body.appendChild(link)
-        link.click()
-        // 释放URL对象所占资源
-        window.URL.revokeObjectURL(url)
-        // 用完即删
-        document.body.removeChild(link)
+        this.downloadFile(data, new Date().getTime() + '.zip')
       }).catch(err => {
         console.log('err: ', err)
+      })
+    },
+    downloadTemplate () {
+      this.$http({
+        url: this.$http.adornUrl('/equipment/equip/downloadTemplate'),
+        method: 'get',
+        responseType: 'blob'
+      }).then(({data}) => {
+        this.downloadFile(data, '智能主机导入模版.xlsx')
+      }).catch(err => {
+        console.log('err: ', err)
+      })
+    },
+    downloadFile (data, fileName) {
+      if (!data) {
+        this.$message.error('下载内容为空')
+        return
+      }
+      let url = window.URL.createObjectURL(new Blob([data]))
+      let link = document.createElement('a')
+      link.style.display = 'none'
+      link.href = url
+      link.setAttribute('download', fileName)
+
+      document.body.appendChild(link)
+      link.click()
+      // 释放URL对象所占资源
+      window.URL.revokeObjectURL(url)
+      // 用完即删
+      document.body.removeChild(link)
+    },
+    // 上传文件
+    uploadHandle () {
+      this.uploadVisible = true
+      this.$nextTick(() => {
+        this.$refs.upload.init()
       })
     }
   }

@@ -51,7 +51,7 @@ public class EquipController {
      */
     @RequestMapping("/list")
     @RequiresPermissions("equipment:equip:list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = equipService.queryPage(params);
 
         return R.ok().put("page", page);
@@ -63,8 +63,8 @@ public class EquipController {
      */
     @RequestMapping("/info/{id}")
     @RequiresPermissions("equipment:equip:info")
-    public R info(@PathVariable("id") Long id){
-		EquipEntity equip = equipService.getById(id);
+    public R info(@PathVariable("id") Long id) {
+        EquipEntity equip = equipService.getById(id);
 
         return R.ok().put("equip", equip);
     }
@@ -84,8 +84,8 @@ public class EquipController {
      */
     @RequestMapping("/update")
     @RequiresPermissions("equipment:equip:update")
-    public R update(@RequestBody EquipEntity equip){
-		equipService.updateById(equip);
+    public R update(@RequestBody EquipEntity equip) {
+        equipService.updateById(equip);
 
         return R.ok();
     }
@@ -95,8 +95,8 @@ public class EquipController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("equipment:equip:delete")
-    public R delete(@RequestBody Long[] ids){
-		equipService.batchDelete(Arrays.asList(ids));
+    public R delete(@RequestBody Long[] ids) {
+        equipService.batchDelete(Arrays.asList(ids));
 
         return R.ok();
     }
@@ -113,7 +113,7 @@ public class EquipController {
     public R selectAgentAndHotel() {
         boolean isAgent = ShiroUtils.isAgent();
         List<HotelInfoEntity> hotels;
-        if(!isAgent) {
+        if (!isAgent) {
             hotels = new ArrayList<>();
         } else {
             hotels = hotelInfoService.select();
@@ -148,12 +148,16 @@ public class EquipController {
         equipService.download(ids, response);
     }
 
+    @GetMapping("/downloadTemplate")
+    public void downloadTemplate(HttpServletResponse response) throws IOException {
+        equipService.downloadTemplate(response);
+    }
+
     @PostMapping("/import")
-    public R importExcel(MultipartFile file) throws IOException {
+    public R importExcel(MultipartFile file) throws Exception {
         equipService.importExcel(file);
         return R.ok();
     }
-
 
 
 }

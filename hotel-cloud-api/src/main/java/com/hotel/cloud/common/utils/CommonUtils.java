@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -184,7 +185,7 @@ public class CommonUtils {
         List<InputStream> inputs = new ArrayList<>(srcFiles.size());
         for (String path : srcFiles) {
             File file = new File(path);
-            if(file.exists()) {
+            if (file.exists()) {
                 FileInputStream is = new FileInputStream(file);
                 ZipEntry zipEntry = new ZipEntry(file.getName());
                 zos.putNextEntry(zipEntry);
@@ -192,12 +193,12 @@ public class CommonUtils {
                 inputs.add(is);
             }
         }
-        if(null != zos) {
+        if (null != zos) {
             zos.flush();
             zos.closeEntry();
             zos.close();
         }
-        if(CollectionUtils.isNotEmpty(inputs)) {
+        if (CollectionUtils.isNotEmpty(inputs)) {
             for (InputStream is : inputs) {
                 is.close();
             }
@@ -219,6 +220,12 @@ public class CommonUtils {
         list.add("/Users/aby/Desktop/test1/3.png");
         FileOutputStream os = new FileOutputStream("/Users/aby/Desktop/test1/test.zip");
         zip(list, new ZipOutputStream(os));
+    }
+
+    public static void download(HttpServletResponse response, String fileName) {
+        response.setCharacterEncoding(Constants.DEFAULT_CHARSET);
+        response.setContentType("application/x-msdownload");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
     }
 }
 

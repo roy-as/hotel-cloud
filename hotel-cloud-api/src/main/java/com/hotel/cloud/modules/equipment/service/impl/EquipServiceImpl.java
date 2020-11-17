@@ -25,16 +25,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -64,7 +62,7 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
     public void init() {
         String temDir = sysProperty.getTempDir();
         File file = new File(temDir);
-        if(!file.exists() || file.isFile()) {
+        if (!file.exists() || file.isFile()) {
             file.mkdirs();
         }
     }
@@ -209,7 +207,7 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
         Set<Long> moduleIds = equips.stream().map(EquipEntity::getModuleId).collect(Collectors.toSet());
         List<EquipModuleEntity> modules = equipModuleService.getBaseMapper().selectBatchIds(moduleIds);
         Map<Long, EquipModuleEntity> moduleMap = modules.stream().collect(Collectors.toMap(EquipModuleEntity::getId, module -> module));
-        for(EquipEntity equip: equips) {
+        for (EquipEntity equip : equips) {
             equip.setPrice(moduleMap.get(equip.getModuleId()).getPrice());
         }
         return equips;
@@ -243,38 +241,69 @@ public class EquipServiceImpl extends ServiceImpl<EquipDao, EquipEntity> impleme
             filePathList.add(filePath);
         }
         String fileName = LocalDateTime.now().format(Constants.FORMATTER_TIME) + Constants.ZIP_SUFFIX;
-        response.setCharacterEncoding(Constants.DEFAULT_CHARSET);
-        response.setContentType("application/x-msdownload");
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        CommonUtils.download(response, fileName);
         ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
         CommonUtils.zip(filePathList, zos);
     }
 
     @Override
     @Transactional
-    public void importExcel(MultipartFile file) throws IOException {
+    public void importExcel(MultipartFile file) throws Exception {
         List<EquipEntity> equips = ExcelUtils.importExcel(file, 0, 1, EquipEntity.class);
 
         Map<String, List<EquipEntity>> maps = equips.stream().map(equip -> {
-            if(StringUtils.isBlank(equip.getModuleName())) {
+            if (StringUtils.isBlank(equip.getModuleName())) {
                 throw new RRException("设备模块不能为空");
             }
-            if(StringUtils.isBlank(equip.getName())) {
+            if (StringUtils.isBlank(equip.getName())) {
                 throw new RRException("设备名称不能为空");
             }
-            if(StringUtils.isBlank(equip.getMac())) {
+            if (StringUtils.isBlank(equip.getMac())) {
                 throw new RRException("mac地址不能为空");
             }
             return equip;
         }).collect(Collectors.groupingBy(EquipEntity::getModuleName));
         Set<String> moduleNames = maps.keySet();
-        List<EquipModuleEntity> modules = equipModuleService.list(new QueryWrapper<EquipModuleEntity>().in("name"));
-        if(modules.size() != moduleNames.size()) {
+        List<EquipModuleEntity> modules = equipModuleService.list(new QueryWrapper<EquipModuleEntity>().in("name", moduleNames));
+        if (modules.size() != moduleNames.size()) {
             throw new RRException(ExceptionEnum.EQUIP_MODULE_NOT_EXIST);
         }
+        Map<String, Long> moduleMap = modules.stream().collect(Collectors.toMap(EquipModuleEntity::getName, EquipModuleEntity::getId));
+        SysUserEntity loginUser = ShiroUtils.getLoginUser();
         for (EquipEntity equip : equips) {
-
+            equip.setModuleId(moduleMap.get(equip.getModuleName()));
+            equip.setCreateBy(loginUser.getUsername());
+            equip.setUpdateBy(loginUser.getUsername());
+            equip.setCreateTime(new Date());
+            mqttService.subscribe(equip.getMac());
         }
+        this.saveBatch(equips);
+
+        List<QrcodeVo> qrcodeVos = equips.stream().filter(equipEntity -> StringUtils.isNotBlank(equipEntity.getQrcodeInfo()))
+                .map(equip -> new QrcodeVo(equip.getId(), equip.getQrcodeInfo())).collect(Collectors.toList());
+
+        this.generateQrcode(qrcodeVos);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void generateQrcode(List<QrcodeVo> qrcodeVos) {
+        try{
+            for (QrcodeVo qrcodeVo : qrcodeVos) {
+                this.generateQrcode(qrcodeVo);
+            }
+        }catch (Exception e) {
+            log.error("绑定二维码信息失败", e);
+        }
+    }
+
+    @Override
+    public void downloadTemplate(HttpServletResponse response) throws IOException {
+        InputStream is = this.getClass().getResourceAsStream(Constants.EQUIP_IMPORT_TEMPLATE);
+        OutputStream os = response.getOutputStream();
+        CommonUtils.download(response, Constants.EQUIP_TEMPLATE_FILE_NAME);
+        IOUtils.copy(is, os);
+        os.flush();
+        is.close();
     }
 
     /**

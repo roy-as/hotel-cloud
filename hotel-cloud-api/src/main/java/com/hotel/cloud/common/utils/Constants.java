@@ -70,6 +70,10 @@ public class Constants {
     public static final String REDIS_COMMAND_KEY = "command:{0}";
 
     public static final String ZIP_SUFFIX = ".zip";
+
+    public static final String EQUIP_IMPORT_TEMPLATE = "/智能主机导入模版.xlsx";
+
+    public static final String EQUIP_TEMPLATE_FILE_NAME = "智能主机导入模版.xlsx";
 	/**
 	 * 菜单类型
 	 * 
