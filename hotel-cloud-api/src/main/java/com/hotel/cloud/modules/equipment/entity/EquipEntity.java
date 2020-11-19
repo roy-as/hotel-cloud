@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 设备表
@@ -130,6 +131,10 @@ public class EquipEntity implements Serializable {
 	 * 0:在线，1:离线
 	 */
 	private Integer online;
+
+	@TableField(exist = false)
+	@NotNull(message = "二维码不能为空")
+	private Long qrcodeId;
 
 	@TableField(exist = false)
 	private BigDecimal price;

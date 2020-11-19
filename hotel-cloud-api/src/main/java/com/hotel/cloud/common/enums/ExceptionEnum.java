@@ -24,7 +24,8 @@ public enum  ExceptionEnum {
     STOCK_NOT_ENOUGH(1028, "库存不足"),
     PARAM_ERROR(1029, "参数错误"),
     COMMAND_NOT_EXIST(1030, "指令不存在"),
-    EQUIP_MODULE_NOT_EXIST(1031, "设备模块不存在")
+    EQUIP_MODULE_NOT_EXIST(1031, "设备模块不存在"),
+    QRCODE_NOT_EXIST_OR_USED(1032, "二维码不存在或已使用")
     ;
 
     private Integer code;

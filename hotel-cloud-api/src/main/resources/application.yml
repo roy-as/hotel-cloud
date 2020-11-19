@@ -46,7 +46,7 @@ spring:
     username: YunZhuUserName_Az1
     password: yun_zhu_password_Az1
     server-uri: tcp://yunzhu.store:1883
-    client-id: hotel-cloud-api_dev
+    client-id: hotel-cloud-api_prod
     publish-topic: /yunzhuA/{0}/down
     time-out: 30
     qos: 1

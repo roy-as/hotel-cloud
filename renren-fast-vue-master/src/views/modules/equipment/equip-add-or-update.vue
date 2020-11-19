@@ -14,6 +14,13 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="二维码" prop="qrcodeId" :class="{ 'is-required': !dataForm.id }">
+        <el-select v-model="dataForm.qrcodeId" @change="$forceUpdate()" filterable clearable placeholder="请选择"
+                   style="width: 100%; position: relative" :disabled="!!dataForm.id" :required="true">
+          <el-option v-for="qrcode in qrcodes" :key="qrcode.id" :label="qrcode.info" :value="qrcode.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="版本号" prop="versionNumber">
         <el-input v-model="dataForm.versionNumber" placeholder="版本号"></el-input>
       </el-form-item>
@@ -45,6 +52,7 @@
       return {
         visible: false,
         modules: [],
+        qrcodes: [],
         dataForm: {
           id: 0,
           name: '',
@@ -52,9 +60,9 @@
           mac: '',
           remark: '',
           sn: '',
-          status: '',
           expiredTime: '',
-          versionNumber: ''
+          versionNumber: '',
+          qrcodeId: ''
         },
         dataRule: {
           name: [
@@ -66,7 +74,7 @@
           mac: [
             { required: true, message: 'mac地址不能为空', trigger: 'blur' }
           ],
-          status: [
+          qrcodeId: [
             { required: true, message: '状态不能为空', trigger: 'blur' }
           ]
         }
@@ -84,6 +92,13 @@
             params: this.$http.adornParams()
           }).then(({data}) => {
             this.modules = data && data.code === 0 ? data.data : []
+          })
+          this.$http({
+            url: this.$http.adornUrl('/sys/qrcode/select'),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({data}) => {
+            this.qrcodes = data && data.code === 0 ? data.data : []
           })
           if (this.dataForm.id) {
             this.$http({
@@ -121,6 +136,7 @@
                 'mac': this.dataForm.mac,
                 'remark': this.dataForm.remark,
                 'versionNumber': this.dataForm.versionNumber,
+                'qrcodeId': this.dataForm.qrcodeId,
                 'expiredTime': this.dataForm.expiredTime ? this.dataForm.expiredTime.getTime() : null
               })
             }).then(({data}) => {

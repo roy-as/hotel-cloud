@@ -20,8 +20,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.time.LocalDateTime;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -38,6 +38,23 @@ public class CommonUtils {
         return !isEmpty(arr);
     }
 
+    private static int BLACK = 0x000000;
+    private static int WHITE = 0xFFFFFF;
+
+
+    /**
+     * 设置 Graphics2D 属性  （抗锯齿）
+     *
+     * @param graphics2D
+     */
+    private static void setGraphics2D(Graphics2D graphics2D) {
+        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics2D.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_DEFAULT);
+        Stroke s = new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
+        graphics2D.setStroke(s);
+    }
+
+
     /**
      * 生成二维码
      *
@@ -47,7 +64,7 @@ public class CommonUtils {
      * @return 二维码的base64字符串
      * @throws RRException
      */
-    public static byte[] createQrCode(String content, int width, int height, InputStream logoStream) throws RRException {
+    public static byte[] createQrCode(String content, int width, int height, InputStream logoStream, String text) throws RRException {
         // 定义二维码的参数
         Map<EncodeHintType, Object> hints = Maps.newHashMap();
         hints.put(EncodeHintType.CHARACTER_SET, Constants.DEFAULT_CHARSET);    // 指定字符编码
@@ -62,6 +79,50 @@ public class CommonUtils {
             if (null != logoStream) {
                 image = addLogoToQrCode(image, logoStream);
             }
+            // 自定义文本描述
+            if (StringUtils.isNotBlank(text)) {
+                // 新的图片，把带logo的二维码下面加上文字
+                BufferedImage outImage = new BufferedImage(height, height + 20, BufferedImage.TYPE_4BYTE_ABGR);
+                Graphics2D outg = outImage.createGraphics();
+                outg.setColor(Color.WHITE);
+                outg.fillRect(0, 0, height, height + 20);
+                // 画二维码到新的面板
+                outg.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
+                // 画文字到新的面板
+                outg.setColor(Color.BLACK);
+                outg.setFont(new Font("微软雅黑", Font.BOLD, 15)); // 字体、字型、字号
+                // 消除字体的锯齿
+                outg.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                outg.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_DEFAULT);
+                int strWidth = outg.getFontMetrics().stringWidth(text);
+                if (strWidth > width - 1) {
+                    // //长度过长就截取前面部分
+                    // 长度过长就换行
+                    String note1 = text.substring(0, text.length() / 2);
+                    String note2 = text.substring(text.length() / 2);
+                    int strWidth1 = outg.getFontMetrics().stringWidth(note1);
+                    int strWidth2 = outg.getFontMetrics().stringWidth(note2);
+                    outg.drawString(note1, width / 2 - strWidth1 / 2, height + (outImage.getHeight() - height) / 2 - 12);
+                    BufferedImage outImage2 = new BufferedImage(height, height + 40, BufferedImage.TYPE_4BYTE_ABGR);
+                    Graphics2D outg2 = outImage2.createGraphics();
+                    outg2.setColor(Color.WHITE);
+                    outg2.fillRect(0, 0, height, height + 40);
+                    outg2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    outg2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_DEFAULT);
+                    outg2.drawImage(outImage, 0, 0, outImage.getWidth(), outImage.getHeight(), null);
+                    outg2.setColor(Color.BLACK);
+                    outg2.setFont(new Font("微软雅黑", Font.BOLD, 15)); // 字体、字型、字号
+                    outg2.drawString(note2, width / 2 - strWidth2 / 2,outImage.getHeight() + (outImage2.getHeight() - outImage.getHeight()) / 2 - 5);
+                    outg2.dispose();
+                    outImage2.flush();
+                    outImage = outImage2;
+                } else {
+                    outg.drawString(text, width / 2 - strWidth / 2, height + (outImage.getHeight() - height) / 2 - 12); // 画文字
+                }
+                outg.dispose();
+                outImage.flush();
+                image = outImage;
+            }
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             // 输出二维码图片流
             ImageIO.write(image, Constants.QRCODE_FORMAT, outputStream);
@@ -73,11 +134,15 @@ public class CommonUtils {
     }
 
     public static byte[] createQrCode(String content, InputStream logo) {
-        return createQrCode(content, Constants.DEFAULT_QRCODE_WIDTH, Constants.DEFAULT_QRCODE_HEIGHT, logo);
+        return createQrCode(content, Constants.DEFAULT_QRCODE_WIDTH, Constants.DEFAULT_QRCODE_HEIGHT, logo, null);
     }
 
     public static byte[] createQrCode(String content) {
-        return createQrCode(content, Constants.DEFAULT_QRCODE_WIDTH, Constants.DEFAULT_QRCODE_HEIGHT, null);
+        return createQrCode(content, Constants.DEFAULT_QRCODE_WIDTH, Constants.DEFAULT_QRCODE_HEIGHT, null, null);
+    }
+
+    public static byte[] createQrCode(String content, String text) {
+        return createQrCode(content, Constants.DEFAULT_QRCODE_WIDTH, Constants.DEFAULT_QRCODE_HEIGHT, null, text);
     }
 
     public static String uuid() {
@@ -213,19 +278,11 @@ public class CommonUtils {
         is.close();
     }
 
-    public static void main(String[] args) throws Exception {
-        Set<String> list = new LinkedHashSet<>();
-        list.add("/Users/aby/Desktop/test1/1.png");
-        list.add("/Users/aby/Desktop/test1/2.png");
-        list.add("/Users/aby/Desktop/test1/3.png");
-        FileOutputStream os = new FileOutputStream("/Users/aby/Desktop/test1/test.zip");
-        zip(list, new ZipOutputStream(os));
-    }
-
     public static void download(HttpServletResponse response, String fileName) {
         response.setCharacterEncoding(Constants.DEFAULT_CHARSET);
         response.setContentType("application/x-msdownload");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
     }
+
 }
 

@@ -39,8 +39,6 @@ public interface EquipService extends IService<EquipEntity> {
 
     void saveEquip(EquipEntity equip) throws MqttException;
 
-    void download(Long[] ids, HttpServletResponse response) throws IOException;
-
     void importExcel(MultipartFile file) throws Exception;
 
     void downloadTemplate(HttpServletResponse response) throws IOException;

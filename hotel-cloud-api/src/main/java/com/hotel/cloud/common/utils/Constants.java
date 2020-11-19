@@ -51,9 +51,9 @@ public class Constants {
     public static final String QRCODE_FORMAT = "PNG";
     public static final String PNG_SUFFIX = ".png";
     // 默认二维码宽
-    public static final int DEFAULT_QRCODE_WIDTH = 240;
+    public static final int DEFAULT_QRCODE_WIDTH = 400;
     // 默认二维码高度
-    public static final int DEFAULT_QRCODE_HEIGHT = 240;
+    public static final int DEFAULT_QRCODE_HEIGHT = 400;
     // 酒店角色ID
     public static final Long HOTEL_ROLE_ID = 5L;
     // 安装公司角色ID
@@ -74,6 +74,10 @@ public class Constants {
     public static final String EQUIP_IMPORT_TEMPLATE = "/智能主机导入模版.xlsx";
 
     public static final String EQUIP_TEMPLATE_FILE_NAME = "智能主机导入模版.xlsx";
+
+    public static final String QRCODE_IMPORT_TEMPLATE = "/二维码导入模版.xlsx";
+
+    public static final String QRCODE_TEMPLATE_FILE_NAME = "二维码导入模版.xlsx";
 	/**
 	 * 菜单类型
 	 * 

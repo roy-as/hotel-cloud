@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hotel.cloud.modules.sys.dao.QrcodeDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.hotel.cloud.modules.sys.entity.QrcodeEntity" id="qrcodeMap">
+        <result property="id" column="id"/>
+        <result property="info" column="info"/>
+        <result property="url" column="url"/>
+        <result property="equipId" column="equip_id"/>
+        <result property="equipName" column="equip_name"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+
+</mapper>
