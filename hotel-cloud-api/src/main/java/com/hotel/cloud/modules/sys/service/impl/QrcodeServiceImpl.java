@@ -63,19 +63,25 @@ public class QrcodeServiceImpl extends ServiceImpl<QrcodeDao, QrcodeEntity> impl
             return;
         }
         List<QrcodeEntity> list = new ArrayList<>(entities.size());
-        SysUserEntity loginUser = ShiroUtils.getLoginUser();
+        String username = ShiroUtils.getLoginUser().getUsername();
         Date now = new Date();
         for (QrcodeEntity entity : entities) {
-            byte[] data = CommonUtils.createQrCode(entity.getInfo(), entity.getInfo());
-            SysOssEntity oss = sysOssService.saveFile(data, Constants.PNG_SUFFIX);
-            QrcodeEntity qrcode = new QrcodeEntity();
-            qrcode.setInfo(entity.getInfo());
-            qrcode.setUrl(oss.getUrl());
-            qrcode.setCreateBy(loginUser.getUsername());
-            qrcode.setCreateTime(now);
-            list.add(qrcode);
+            int number = entity.getNumber();
+            for (int i = 0; i < number; i++) {
+                String info = entity.getInfo() + "-" + CommonUtils.subUUID() + "-" + System.currentTimeMillis() / 1000000;
+                byte[] data = CommonUtils.createQrCode(info, info);
+                SysOssEntity oss = sysOssService.upload(data, Constants.PNG_SUFFIX);
+                QrcodeEntity qrcode = new QrcodeEntity();
+                qrcode.setInfo(info);
+                qrcode.setUrl(oss.getUrl());
+                qrcode.setCreateBy(username);
+                qrcode.setCreateTime(now);
+                list.add(qrcode);
+            }
         }
-        this.saveBatch(list);
+        if (CollectionUtils.isNotEmpty(list)) {
+            this.baseMapper.insertBatch(list);
+        }
     }
 
     @Override

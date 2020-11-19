@@ -39,12 +39,18 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssDao, SysOssEntity> impl
 
 	@Override
 	public SysOssEntity saveFile(byte[] bytes, String suffix) throws IOException {
+		SysOssEntity ossEntity = this.upload(bytes, suffix);
+		this.save(ossEntity);
+		return ossEntity;
+	}
+
+	@Override
+	public SysOssEntity upload(byte[] bytes, String suffix) throws IOException {
 		String url = OSSFactory.build().uploadSuffix(bytes, suffix);
 		//保存文件信息
 		SysOssEntity ossEntity = new SysOssEntity();
 		ossEntity.setUrl(url);
 		ossEntity.setCreateDate(new Date());
-		this.save(ossEntity);
 		return ossEntity;
 	}
 

@@ -4,6 +4,8 @@ import com.hotel.cloud.modules.sys.entity.QrcodeEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * 
  * 
@@ -13,5 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface QrcodeDao extends BaseMapper<QrcodeEntity> {
+
+    void insertBatch(List<QrcodeEntity> qrcodes) ;
 	
 }

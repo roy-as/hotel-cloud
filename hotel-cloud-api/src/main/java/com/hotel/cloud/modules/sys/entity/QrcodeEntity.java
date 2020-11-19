@@ -1,6 +1,7 @@
 package com.hotel.cloud.modules.sys.entity;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -28,7 +29,7 @@ public class QrcodeEntity implements Serializable {
 	/**
 	 * 二维码信息
 	 */
-	@Excel(name = "二维码信息")
+	@Excel(name = "二维码信息", orderNum = "0")
 	private String info;
 	/**
 	 * 地址
@@ -50,5 +51,9 @@ public class QrcodeEntity implements Serializable {
 	 * 创建时间
 	 */
 	private Date createTime;
+
+	@TableField(exist = false)
+	@Excel(name = "数量", orderNum = "1")
+	private int number;
 
 }

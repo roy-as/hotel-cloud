@@ -19,4 +19,6 @@ public interface SysOssService extends IService<SysOssEntity> {
     SysOssEntity saveFile(MultipartFile file) throws IOException;
 
     SysOssEntity saveFile(byte[] bytes, String suffix) throws IOException;
+
+    SysOssEntity upload(byte[] bytes, String suffix) throws IOException;
 }

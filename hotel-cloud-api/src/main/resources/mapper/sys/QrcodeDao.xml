@@ -14,5 +14,12 @@
         <result property="createTime" column="create_time"/>
     </resultMap>
 
+    <insert id="insertBatch">
+        insert into t_qrcode (info, url, create_by, create_time) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.info},#{item.url},#{item.createBy},#{item.createTime})
+        </foreach>
+    </insert>
+
 
 </mapper>
