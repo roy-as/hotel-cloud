@@ -3,7 +3,7 @@
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('sys:qrcode:save')" type="primary" @click="downloadTemplate()">导入模板</el-button>
+        <el-button v-if="isAuth('sys:qrcode:save')" type="primary" @click="downloadTemplate()">模版导出</el-button>
         <el-button  v-if="isAuth('sys:qrcode:save')" type="primary" @click="uploadHandle()">批量导入</el-button>
         <el-button v-if="isAuth('sys:qrcode:list')" type="primary" @click="download()" :disabled="dataListSelections.length <= 0">二维码下载</el-button>
       </el-form-item>
