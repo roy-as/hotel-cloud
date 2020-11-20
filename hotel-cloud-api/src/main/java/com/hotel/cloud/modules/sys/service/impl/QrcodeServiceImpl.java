@@ -9,7 +9,6 @@ import com.hotel.cloud.modules.oss.entity.SysOssEntity;
 import com.hotel.cloud.modules.oss.service.SysOssService;
 import com.hotel.cloud.modules.sys.dao.QrcodeDao;
 import com.hotel.cloud.modules.sys.entity.QrcodeEntity;
-import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import com.hotel.cloud.modules.sys.service.QrcodeService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -40,6 +39,7 @@ public class QrcodeServiceImpl extends ServiceImpl<QrcodeDao, QrcodeEntity> impl
         IPage<QrcodeEntity> page = this.page(
                 new Query<QrcodeEntity>().getPage(params),
                 new QueryWrapper<QrcodeEntity>()
+                .orderByDesc("create_time")
         );
 
         return new PageUtils(page);

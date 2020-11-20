@@ -90,7 +90,7 @@ public class CommonUtils {
                 outg.drawImage(image, 0, 0, image.getWidth(), image.getHeight(), null);
                 // 画文字到新的面板
                 outg.setColor(Color.BLACK);
-                outg.setFont(new Font("微软雅黑", Font.BOLD, 15)); // 字体、字型、字号
+                outg.setFont(new Font("宋体", Font.BOLD, 15)); // 字体、字型、字号
                 // 消除字体的锯齿
                 outg.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 outg.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_DEFAULT);
@@ -111,7 +111,7 @@ public class CommonUtils {
                     outg2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_DEFAULT);
                     outg2.drawImage(outImage, 0, 0, outImage.getWidth(), outImage.getHeight(), null);
                     outg2.setColor(Color.BLACK);
-                    outg2.setFont(new Font("微软雅黑", Font.BOLD, 15)); // 字体、字型、字号
+                    outg2.setFont(new Font("宋体", Font.BOLD, 15)); // 字体、字型、字号
                     outg2.drawString(note2, width / 2 - strWidth2 / 2,outImage.getHeight() + (outImage2.getHeight() - outImage.getHeight()) / 2 - 5);
                     outg2.dispose();
                     outImage2.flush();
