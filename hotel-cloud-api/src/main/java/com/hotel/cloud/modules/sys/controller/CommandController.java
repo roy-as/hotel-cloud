@@ -79,7 +79,7 @@ public class CommandController {
     @RequestMapping("/update")
     @RequiresPermissions("sys:command:update")
     public R update(@RequestBody CommandEntity command) {
-        if(!command.getData().contains("[") && !command.getData().contains("]")) {
+        if(StringUtils.isNotBlank(command.getData()) && !command.getData().contains("[") && !command.getData().contains("]")) {
             String[] datas = command.getData().split(",");
             command.setData(Arrays.toString(datas));
         }
