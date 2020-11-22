@@ -55,9 +55,6 @@
           ],
           command: [
             { required: true, message: '指令不能为空', trigger: 'blur' }
-          ],
-          data: [
-            { required: true, message: '数据包不能为空', trigger: 'blur' }
           ]
         }
       }

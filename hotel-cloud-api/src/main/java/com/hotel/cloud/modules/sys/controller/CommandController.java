@@ -5,6 +5,7 @@ import com.hotel.cloud.common.vo.CommandVo;
 import com.hotel.cloud.modules.sys.entity.CommandEntity;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
 import com.hotel.cloud.modules.sys.service.CommandService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -59,7 +60,7 @@ public class CommandController {
             commands[i] = Objects.requireNonNull(CommonUtils.hexStr2bytes(commandStr[i]))[0];
         }
         command.setCommand(Arrays.toString(commands));
-        if(!command.getData().contains("[") && !command.getData().contains("]")) {
+        if(StringUtils.isNotBlank(command.getData()) && !command.getData().contains("[") && !command.getData().contains("]")) {
             String[] datas = command.getData().split(",");
             command.setData(Arrays.toString(datas));
         }
