@@ -228,7 +228,7 @@ public class CommonUtils {
         byte[] bytes = new byte[len];
         for (int i = 0; i < len; i++) {
             int x = i * 2;
-            bytes[i] = Byte.parseByte(String.valueOf(new char[]{chars[x], chars[x + 1]}), 16);
+            bytes[i] = (byte) Integer.parseInt(String.valueOf(new char[]{chars[x], chars[x + 1]}), 16);
         }
         return bytes;
     }
@@ -283,6 +283,5 @@ public class CommonUtils {
         response.setContentType("application/x-msdownload");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
     }
-
 }
 
