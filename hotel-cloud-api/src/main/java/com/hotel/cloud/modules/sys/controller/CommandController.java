@@ -54,12 +54,10 @@ public class CommandController {
     @RequestMapping("/save")
     @RequiresPermissions("sys:command:save")
     public R save(@RequestBody CommandEntity command) {
-        String[] commandStr = command.getCommand().split(",");
-        byte[] commands = new byte[commandStr.length];
-        for (int i = 0; i < commandStr.length; i++) {
-            commands[i] = Objects.requireNonNull(CommonUtils.hexStr2bytes(commandStr[i]))[0];
+        if(StringUtils.isNotBlank(command.getCommand()) && !command.getCommand().contains("[") && !command.getCommand().contains("]")) {
+            String[] commands = command.getCommand().split(",");
+            command.setCommand(Arrays.toString(commands));
         }
-        command.setCommand(Arrays.toString(commands));
         if(StringUtils.isNotBlank(command.getData()) && !command.getData().contains("[") && !command.getData().contains("]")) {
             String[] datas = command.getData().split(",");
             command.setData(Arrays.toString(datas));
@@ -79,6 +77,10 @@ public class CommandController {
     @RequestMapping("/update")
     @RequiresPermissions("sys:command:update")
     public R update(@RequestBody CommandEntity command) {
+        if(StringUtils.isNotBlank(command.getCommand()) && !command.getCommand().contains("[") && !command.getCommand().contains("]")) {
+            String[] commands = command.getCommand().split(",");
+            command.setCommand(Arrays.toString(commands));
+        }
         if(StringUtils.isNotBlank(command.getData()) && !command.getData().contains("[") && !command.getData().contains("]")) {
             String[] datas = command.getData().split(",");
             command.setData(Arrays.toString(datas));

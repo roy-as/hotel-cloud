@@ -172,25 +172,4 @@ public class Mqtt implements ApplicationRunner {
             }
         }
     }
-
-    public static void main(String[] args) throws Exception {
-        MqttProperty property = new MqttProperty();
-        property.setServerUri("tcp://yunzhu.store:1883");
-        property.setClientId("hebo_test");
-        property.setUsername("YunZhuUserName_Az1");
-        property.setPassword("yun_zhu_password_Az1");
-        property.setSubscribeTopic("/yunzhuA/84cca884a084/up");
-        property.setPublishTopic("/yunzhuA/{0}/down");
-        property.setQos(1);
-        Mqtt mqtt = new Mqtt();
-        mqtt.setMqttProperty(property);
-        mqtt.connect();
-
-        //mqtt.subscribe("123456789");
-       // mqtt.subscribe("40f52022b40a");
-        byte[] message = {0x25, 0x06, 89, 117, 110, 122, 104, 117, 12, 64, 89, 117, 110, 122, 104, 117, 65, 100, 109, 105, 110};
-        mqtt.publish("123456789", message, 1);
-
-        //System.out.println("/yunzhuA/84cca884a084/up".split("/")[2]);
-    }
 }

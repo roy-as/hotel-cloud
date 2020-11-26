@@ -52,7 +52,7 @@ public class CommandServiceImpl extends ServiceImpl<CommandDao, CommandEntity> i
             throw new RRException(ExceptionEnum.COMMAND_NOT_EXIST);
         }
         String command = commandEntity.getCommand();
-        Integer commandType =  commandEntity.getCommandType();
+        Integer commandType = commandEntity.getCommandType();
         JSONArray array = JSON.parseArray(command);
         byte[] commands = new byte[array.size()];
         for (int i = 0; i < array.size(); i++) {
@@ -62,7 +62,7 @@ public class CommandServiceImpl extends ServiceImpl<CommandDao, CommandEntity> i
         Map<String, CommandStatus> resultMap = new HashMap<>(macs.length, 0.75f);
         CountDownLatch countDownLatch = new CountDownLatch(macs.length);
         for (String mac : macs) {
-            ThreadPoolUtils.execute(() ->{
+            ThreadPoolUtils.execute(() -> {
                 try {
                     resultMap.put(mac, this.mqttService.publish(mac, commands, commandType, vo.getDatas()));
                 } catch (Exception e) {

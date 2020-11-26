@@ -3,6 +3,7 @@ package com.hotel.cloud.common.vo;
 import lombok.Data;
 
 import java.util.Arrays;
+import java.util.Map;
 
 @Data
 public class CommandStatus {
@@ -17,7 +18,9 @@ public class CommandStatus {
 
     private boolean success;
 
-    public String getUpBody() {
-        return Arrays.toString(this.upBody);
+    private Map<String, Object> data;
+
+    public void setUpBody(byte[] upBody) {
+        this.upBody = upBody;
     }
 }

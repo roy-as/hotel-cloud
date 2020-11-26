@@ -112,7 +112,7 @@ public class CommonUtils {
                     outg2.drawImage(outImage, 0, 0, outImage.getWidth(), outImage.getHeight(), null);
                     outg2.setColor(Color.BLACK);
                     outg2.setFont(new Font("宋体", Font.BOLD, 15)); // 字体、字型、字号
-                    outg2.drawString(note2, width / 2 - strWidth2 / 2,outImage.getHeight() + (outImage2.getHeight() - outImage.getHeight()) / 2 - 5);
+                    outg2.drawString(note2, width / 2 - strWidth2 / 2, outImage.getHeight() + (outImage2.getHeight() - outImage.getHeight()) / 2 - 5);
                     outg2.dispose();
                     outImage2.flush();
                     outImage = outImage2;
@@ -246,6 +246,16 @@ public class CommonUtils {
         return data;
     }
 
+    public static String bytes2HexString(byte[] bytes) {
+        String strHex;
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            strHex = Integer.toHexString(b & 0xFF);
+            sb.append((strHex.length() == 1) ? "0" + strHex : strHex); // 每个字节由两个字符表示，位数不够，高位补0
+        }
+        return sb.toString();
+    }
+
     public static void zip(Set<String> srcFiles, ZipOutputStream zos) throws IOException {
         List<InputStream> inputs = new ArrayList<>(srcFiles.size());
         for (String path : srcFiles) {
@@ -282,6 +292,26 @@ public class CommonUtils {
         response.setCharacterEncoding(Constants.DEFAULT_CHARSET);
         response.setContentType("application/x-msdownload");
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+    }
+
+    public static String byte2BinaryString(byte[] bytes) {
+
+        StringBuilder binaryString = new StringBuilder();
+
+        for (byte b : bytes) {
+            String hexString = Integer.toHexString(b);
+            String hex = hexString.length() > 2 ? hexString.substring(hexString.length() - 2) : hexString;
+            int num = Integer.parseInt(hex, 16);
+            String binary = Integer.toBinaryString(num);
+            StringBuilder zero = new StringBuilder();
+            int length = 8 - binary.length();
+            for (int i = 0; i < length; i++) {
+                zero.append("0");
+            }
+            binaryString.append(zero).append(binary);
+        }
+        return binaryString.toString();
+
     }
 }
 
