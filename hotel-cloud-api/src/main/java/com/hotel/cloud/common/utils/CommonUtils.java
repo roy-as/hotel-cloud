@@ -313,5 +313,55 @@ public class CommonUtils {
         return binaryString.toString();
 
     }
+
+    public static byte[] int2Byte(List<Integer> nums) {
+        StringBuilder buffer = new StringBuilder();
+        byte[] bytes = new byte[5];
+        int index = 0;
+        for (int i = 1; i <= 40; i++) {
+            if (buffer.length() == 8) {
+                String binary = buffer.reverse().toString();
+                bytes[index] = complement(binary);
+                index++;
+                buffer = new StringBuilder();
+            }
+            if (nums.contains(i)) {
+                buffer.append("1");
+            } else {
+                buffer.append("0");
+            }
+
+        }
+
+        return bytes;
+    }
+
+    public static byte[] int2Byte(Integer[] nums) {
+        List<Integer> list = new ArrayList<>(Arrays.asList(nums));
+        return int2Byte(list);
+    }
+
+
+    /**
+     * 补码
+     * String st="11111010"
+     * 结果 11111011
+     */
+    public static byte complement(String binary) {
+        if (binary.startsWith("0")) {
+            return Byte.parseByte(binary, 2);
+        }
+        char[] chars = binary.toCharArray();
+        StringBuilder sb = new StringBuilder();
+        for (char ch : chars) {
+            if (ch == '1') {
+                sb.append("0");
+            } else {
+                sb.append("1");
+            }
+        }
+        return (byte) ((-1) * (Byte.parseByte(sb.toString(), 2) + 1));
+
+    }
 }
 

@@ -93,6 +93,28 @@ public class MqttServiceImpl implements MqttService {
     }
 
     @Override
+    public CommandStatus publish(String target, byte[] command, byte[] data) throws Exception {
+        byte[] body = ArrayUtils.addAll(command, data);
+        this.mqtt.publish(target, body, 1);
+        long start = System.currentTimeMillis();
+        CommandStatus commandStatus = null;
+        String redisKey = MessageFormat.format(Constants.REDIS_COMMAND_KEY, target);
+        while (System.currentTimeMillis() - start <= 5000) {
+            commandStatus = redisUtils.get(redisKey, CommandStatus.class);
+            if (null != commandStatus && null != commandStatus.getCommand()) {
+                commandStatus.setSuccess(ArrayUtils.isEquals(body, commandStatus.getDownBody()) && ArrayUtils.isEquals(command, ArrayUtils.subarray(commandStatus.getCommand(), 0, command.length)));
+                return commandStatus;
+            }
+        }
+        if (null == commandStatus) {
+            commandStatus = new CommandStatus();
+            commandStatus.setMac(target);
+        }
+        commandStatus.setSuccess(false);
+        return commandStatus;
+    }
+
+    @Override
     public void subscribe(String target) throws MqttException {
         mqtt.subscribe(MessageFormat.format(mqttProperty.getSubscribeTopic(), target));
         mqtt.subscribe(MessageFormat.format(mqttProperty.getPublishTopic(), target));

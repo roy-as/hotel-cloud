@@ -78,6 +78,9 @@ public class Constants {
     public static final String QRCODE_IMPORT_TEMPLATE = "/二维码导入模版.xlsx";
 
     public static final String QRCODE_TEMPLATE_FILE_NAME = "二维码导入模版.xlsx";
+
+    public static final byte[] KEY_BIND_KEY = {0x13, 0x01};
+    public static final byte[] KEY_BIND_SWITCH = {0X36, 0x02};
 	/**
 	 * 菜单类型
 	 * 

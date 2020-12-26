@@ -7,10 +7,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hotel.cloud.common.enums.ExceptionEnum;
 import com.hotel.cloud.common.exception.RRException;
-import com.hotel.cloud.common.utils.CommonUtils;
-import com.hotel.cloud.common.utils.PageUtils;
-import com.hotel.cloud.common.utils.Query;
-import com.hotel.cloud.common.utils.ThreadPoolUtils;
+import com.hotel.cloud.common.utils.*;
+import com.hotel.cloud.common.vo.BindVo;
 import com.hotel.cloud.common.vo.CommandStatus;
 import com.hotel.cloud.common.vo.CommandVo;
 import com.hotel.cloud.modules.sys.dao.CommandDao;
@@ -18,10 +16,12 @@ import com.hotel.cloud.modules.sys.entity.CommandEntity;
 import com.hotel.cloud.modules.sys.service.CommandService;
 import com.hotel.cloud.modules.sys.service.MqttService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
@@ -78,4 +78,34 @@ public class CommandServiceImpl extends ServiceImpl<CommandDao, CommandEntity> i
         countDownLatch.await(10, TimeUnit.SECONDS);
         return resultMap;
     }
+
+    @Override
+    public CommandStatus bind(BindVo vo) throws Exception {
+        byte[] data = this.getBindData(vo);
+        byte[] command = vo.getType() == 1 ? Constants.KEY_BIND_KEY : Constants.KEY_BIND_SWITCH;
+        return mqttService.publish(vo.getMac(), command, data);
+    }
+
+    private byte[] getBindData(BindVo vo) {
+        if (vo.getType() == 1) {
+            List<Integer> openKeyOpenList = vo.getOpenKeyOpen();
+            byte[] openKeyOpenBytes = CommonUtils.int2Byte(openKeyOpenList);
+            List<Integer> openKeyCLoseList = vo.getOpenKeyClose();
+            byte[] openKeyCloseBytes = CommonUtils.int2Byte(openKeyCLoseList);
+            List<Integer> closeKeyOpenList = vo.getCloseKeyOpen();
+            byte[] closeKeyOpenBytes = CommonUtils.int2Byte(closeKeyOpenList);
+            List<Integer> closeKeyCloseList = vo.getCloseKeyClose();
+            byte[] closeKeyCloseBytes = CommonUtils.int2Byte(closeKeyCloseList);
+            byte[] openBytes = ArrayUtils.addAll(openKeyOpenBytes, openKeyCloseBytes);
+            byte[] closeBytes = ArrayUtils.addAll(closeKeyOpenBytes, closeKeyCloseBytes);
+            byte[] bytes = ArrayUtils.addAll(openBytes, closeBytes);
+            byte[] key = {vo.getKey()};
+            return ArrayUtils.addAll(key, bytes);
+        } else {
+            byte[] keyBytes = CommonUtils.int2Byte(vo.getKeys());
+            byte[] switchBytes = CommonUtils.int2Byte(vo.getSwitches());
+            return ArrayUtils.addAll(keyBytes, switchBytes);
+        }
+    }
+
 }

@@ -46,7 +46,7 @@ spring:
     username: YunZhuUserName_Az1
     password: yun_zhu_password_Az1
     server-uri: tcp://yunzhu.store:1883
-    client-id: hotel-cloud-api_prod
+    client-id: hotel-cloud-api_test
     publish-topic: /yunzhuA/{0}/down
     time-out: 30
     qos: 1
@@ -75,7 +75,7 @@ mybatis-plus:
     cache-enabled: false
     call-setters-on-nulls: true
     jdbc-type-for-null: 'null'
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
   # APP模块，是通过jwt认证的，如果要使用APP模块，则需要修改【加密秘钥】
   jwt:

@@ -1,6 +1,7 @@
 package com.hotel.cloud.modules.sys.controller;
 
 import com.hotel.cloud.common.utils.*;
+import com.hotel.cloud.common.vo.BindVo;
 import com.hotel.cloud.common.vo.CommandVo;
 import com.hotel.cloud.modules.sys.entity.CommandEntity;
 import com.hotel.cloud.modules.sys.entity.SysUserEntity;
@@ -111,5 +112,11 @@ public class CommandController {
     @PostMapping("/release")
     public R release(@Validated @RequestBody CommandVo vo) throws Exception {
         return R.ok().put("data", this.commandService.release(vo));
+    }
+
+    @PostMapping("/bind")
+    public R bind(@Validated @RequestBody BindVo vo) throws Exception {
+        commandService.bind(vo);
+        return R.ok();
     }
 }

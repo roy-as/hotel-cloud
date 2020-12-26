@@ -1,23 +1,23 @@
 package com.hotel.cloud.common.mqtt;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.hotel.cloud.common.enums.FlagEnum;
-import com.hotel.cloud.common.utils.CommonUtils;
-import com.hotel.cloud.config.property.MqttProperty;
-import com.hotel.cloud.modules.equipment.entity.EquipEntity;
-import com.hotel.cloud.modules.equipment.service.EquipService;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.paho.client.mqttv3.*;
-import org.eclipse.paho.client.mqttv3.internal.wire.MqttWireMessage;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.stereotype.Component;
+        import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+        import com.hotel.cloud.common.enums.FlagEnum;
+        import com.hotel.cloud.common.utils.CommonUtils;
+        import com.hotel.cloud.config.property.MqttProperty;
+        import com.hotel.cloud.modules.equipment.entity.EquipEntity;
+        import com.hotel.cloud.modules.equipment.service.EquipService;
+        import lombok.extern.slf4j.Slf4j;
+        import org.eclipse.paho.client.mqttv3.*;
+        import org.eclipse.paho.client.mqttv3.internal.wire.MqttWireMessage;
+        import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+        import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.boot.ApplicationArguments;
+        import org.springframework.boot.ApplicationRunner;
+        import org.springframework.stereotype.Component;
 
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
+        import java.text.MessageFormat;
+        import java.util.Arrays;
+        import java.util.List;
 
 
 @Slf4j
